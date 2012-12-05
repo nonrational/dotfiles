@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Log output:
+#
+# Based on Gary Bernhardt's .githelpers
+#
+# The time massaging regexes start with ^[^<]* because that ensures that they
+# only operate before the first "<". That "<" will be the beginning of the
+# author name, ensuring that we don't destroy anything in the commit message
+# that looks like time.
+#
+# The log format uses } characters between each field, and `column` is later
+# used to split on them. A } in the commit subject or any other field will
+# break this.
+
+HASH="%C(yellow)%h%Creset"
+RELATIVE_TIME="%Cgreen(%ar)%Creset"
+AUTHOR="%C(bold blue)<%an>%Creset"
+REFS="%C(red)%d%Creset"
+SUBJECT="%s"
+columns=$(tput cols)
+SHOWCOL=$((columns+30))
+FORMAT="$HASH}$RELATIVE_TIME}$AUTHOR}$REFS $SUBJECT"
+
+pretty_git_log() {
+    git log --graph --abbrev-commit --date=relative --pretty="tformat:${FORMAT}" $* |
+        # Repalce (2 years ago) with (2 years)
+        sed -Ee 's/(^[^<]*) ago)/\1)/' |
+        # Replace (2 years, 5 months) with (2 years)
+        sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?)/\1)/' |
+        # Line columns up based on } delimiter
+        column -s '}' -t |
+        # delete everything after COLUMNS to prevent horizontal paging. stupid less...
+        cut -c -$SHOWCOL |
+        # Page only if we need to
+        less -FXRS -h80
+}
+
+dcommit_from_master(){
+    branch=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/');
+    if [ "$branch" == "(master)" ]; then
+        echo "(master) git svn dcommit";
+        git svn dcommit
+    else
+        echo "Will not dcommit from $branch";
+    fi
+}
+
+add_wildcard(){
+    modified_files | grep -i $1 | xargs git add
+    untracked_files | grep -i $1 | xargs git add
+    new_files | grep -i $1 | xargs git add
+}
+
+modified_files() {
+    git st | awk '/modified/ {print "./"$3}';
+}
+
+untracked_files() {
+    git st | awk '/#\t/ {print "./"$2}';
+}
+
+new_files() {
+    git st | awk '/new\ file/ {print "./"$4}';
+}
+

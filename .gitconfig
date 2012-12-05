@@ -1,0 +1,39 @@
+[user]
+    name = Alan Norton
+    email = alan@betterment.com
+[github]
+    user = nonrational
+[core]
+    excludesfile = /Users/norton/.gitignore_global
+    quotepath = false
+    whitespace = cr-at-eol
+[alias]
+    ci = commit -v
+    co = checkout
+    df = "diff ..@{u}"
+    di = diff
+    dc = diff --cached
+    r = !git l -20
+    ra = !git r --all
+    l = "!source ~/.githelpers && pretty_git_log"
+    amend = commit --amend
+    mad = add *
+    aa = add --all
+    aww = "!source ~/.githelpers && add_wildcard"
+    st = status
+    sync = !sh -c \"git pull && git push\"
+    drb = !git svn rebase
+    dci = "!source ~/.githelpers && dcommit_from_master"
+    drevise = "!git rebase -i git-svn"
+    modified = "!source ~/.githelpers && modified_files"
+    untracked = "!source ~/.githelpers && untracked_files"
+    new = "!source ~/.githelpers && new_files"
+    assumed = !sh -c \"git ls-files -v | grep '^[a-z]'\"
+    disregard = update-index --assume-unchanged
+    dismiss = update-index --assume-unchanged
+    attend = update-index --no-assume-unchanged
+[color]
+    ui = true
+[gist]
+    browse = true
+    private = true
