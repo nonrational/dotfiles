@@ -14,7 +14,7 @@ if [ "$host" == "asterix" ]; then
     alias jj='autojump'
 
     alias sleep='gsleep'
-    alias find='gfind'
+    alias find='/opt/local/bin/gfind'
     alias jj='autojump'
 
     # use 1.8.1 ant
