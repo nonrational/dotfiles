@@ -1,0 +1,50 @@
+[
+    {
+        "id": "tools",
+        "children":
+        [
+
+            {
+                "id": "Js Minifier",
+                "caption": "Minify Javascript",
+                "command": "minify"
+            }
+
+        ]
+    },
+    {
+        "id": "preferences",
+        "children":
+        [
+            {
+                "caption": "Package Settings",
+                "id": "package-settings",
+                "children":
+                [
+                    {
+                        "caption": "Js Minifier",
+                        "children":
+                        [
+                            {
+                                "caption": "Js Minifier Settings – Default",
+                                "command": "open_file",
+                                "args":
+                                {
+                                    "file": "${packages}/JsMinifier/Minifier.sublime-settings"
+                                }
+                            },
+                            {
+                                "caption": "Js Minifier Settings – User",
+                                "command": "open_file",
+                                "args":
+                                {
+                                    "file": "${packages}/User/Minifier.sublime-settings"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
