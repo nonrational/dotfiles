@@ -1,7 +1,15 @@
 #!/bin/bash
 
 # assume this in run in the .dotfiles checkout
-DOTS="$PWD"
+DOTS="$HOME/.dotfiles"
+if [ "$1" != "" ]; then
+    DOTS="$1"
+fi
+
+if [ ! -d $DOTS ]; then
+    echo "$DOTS does not exist! Aborting..."
+    exit 1
+fi
 
 force_delete=0
 
@@ -10,6 +18,7 @@ host="`uname -n | sed -e 's/\.local//g'`";
 
 # make some options require arguments
 # set -- $(getopt abf: "$@")
+
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -25,7 +34,7 @@ linky(){
     file=$1
     src="$DOTS/$file"
 
-    if [ ! -e $src ]; then
+    if [ ! -e "$src" ]; then
         echo "[error] $src does not exist!"
         return
     fi
@@ -37,9 +46,9 @@ linky(){
         trg=$2
     fi
 
-    if [ -e $trg ]; then
+    if [ -e "$trg" ]; then
         if [ $force_delete == 1 ]; then
-            rm -rvi $trg
+            rm -rf $trg
             ln -sv $src $trg
         else
             echo "[error] unable to push $src; $trg exists."
@@ -50,24 +59,19 @@ linky(){
     fi
 }
 
-linky .bash_profile
-linky .bashrc
-linky .profile
-linky .gitconfig
-linky .githelpers
-linky .gitignore_global
-linky .inputrc
-linky .nethackrc
-linky .screenrc
-linky .ssh.config ~/.ssh/config
-linky .vim
-linky .viminfo
-linky .vimrc
-linky "bin.$host" ~/bin
+# Anything that starts with a dot should be linked as is.
+STANDARD_DOT_FILES=$DOTS/.*
+for sdf in $STANDARD_DOT_FILES; do
+    linky `basename $sdf`
+done
 
-if [ "$osenv" == "Darwin" ]; then
-    echo "Linking OS X Addons"
-    linky Sublime\ Text\ 2 /Users/norton/Library/Application\ Support/
-elif [ "$osenv" == "Linux" ]; then
-    echo "Linking Linux Addons"
+# special cases - these don't start with a dot
+linky .ssh.config ~/.ssh/config
+linky "bin.$uname" ~/bin
+
+if [ "$uname" == "Darwin" ]; then
+    echo "Linking OS X Specific Addons ... ";
+    ln -sfv $DOTS/Sublime\ Text\ 2 ${HOME}/Library/Application\ Support
+elif [ "$uname" == "Linux" ]; then
+    echo "Linking Linux Specific Addons ... "
 fi
