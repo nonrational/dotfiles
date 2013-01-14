@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# vars
+src=/etc/apache2/extra/httpd-vhosts.conf
+trg=/etc/apache2/extra/httpd-vhosts-static.conf
+sudo touch /dev/null
+# echo "'s/127.0.0.1/192.168.124.251/g' > httpd-vhosts-static.conf"
+sudo cp $src $trg
+sudo gsed -i 's/127.0.0.1/192.168.124.251/g' $trg
+#sudo gsed -i 's/127.0.0.1/192.168.124.98/g' $trg
+# grep NameVirtualHost $src $trg | sed 's/^.*:N/N/g'
+sudo apachectl restart
+while [ ! -e /var/run/httpd.pid ]; do
+    sleep 1;
+    echo -n '.'
+done
+echo
+echo "/usr/sbin/httpd:`cat /var/run/httpd.pid`"

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#read -s -p "Password: " PASS
+#echo
+#ISSUE=$1
+
+#echo -n $ISSUE
+#curl --silent -u anorton http://jira.betterment.com/jira/rest/api/latest/issue/$ISSUE # | \
+#     awk -F"[,:]" '{for(i=1;i<=NF;i++){if($i~/summary\042/){print $(i+1); exit;} } }' | tr -d '"'

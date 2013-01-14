@@ -5,6 +5,9 @@ DOTS="$PWD"
 
 force_delete=0
 
+uname="`uname`"
+host="`uname -n | sed -e 's/\.local//g'`";
+
 # make some options require arguments
 # set -- $(getopt abf: "$@")
 while [ $# -gt 0 ]
@@ -22,7 +25,7 @@ linky(){
     file=$1
     src="$DOTS/$file"
 
-    if [ ! -f $src ]; then
+    if [ ! -e $src ]; then
         echo "[error] $src does not exist!"
         return
     fi
@@ -34,7 +37,7 @@ linky(){
         trg=$2
     fi
 
-    if [ -f $trg ]; then
+    if [ -e $trg ]; then
         if [ $force_delete == 1 ]; then
             rm -rvi $trg
             ln -sv $src $trg
@@ -60,10 +63,11 @@ linky .ssh.config ~/.ssh/config
 linky .vim
 linky .viminfo
 linky .vimrc
+linky "bin.$host" ~/bin
 
 if [ "$osenv" == "Darwin" ]; then
     echo "Linking OS X Addons"
-    # linky Sublime\ Text\ 2 /Users/norton/Library/Application\ Support/
+    linky Sublime\ Text\ 2 /Users/norton/Library/Application\ Support/
 elif [ "$osenv" == "Linux" ]; then
     echo "Linking Linux Addons"
 fi

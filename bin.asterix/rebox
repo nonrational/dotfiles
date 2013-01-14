@@ -1,0 +1,7 @@
+#!/bin/sh
+
+killall Dropbox 
+sleep 1;
+open -a Dropbox &
+sleep 5;
+open -a DropboxAlt &

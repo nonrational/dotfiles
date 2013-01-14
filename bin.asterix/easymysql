@@ -1,0 +1,6 @@
+#!/bin/sh
+mysql -uroot -e"show processlist;"
+sleep 3
+sudo /Library/StartupItems/MySQLCOM/MySQLCOM stop
+sudo /Library/StartupItems/MySQLCOM/MySQLCOM start
+
