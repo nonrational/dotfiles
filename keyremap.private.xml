@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<root>
+  <item>
+    <name>Private Remapping Settings</name>
+
+    <item>
+      <name>Home/End for Eclipse</name>
+      <appendix>Home/End are CMD+Left/CMD+Right</appendix>
+      <identifier>private.app_eclipse_line_home_end</identifier>
+      <only>ECLIPSE</only>
+      <autogen>--KeyToKey-- FROMKEYCODE_HOME, KeyCode::CURSOR_LEFT, ModifierFlag::COMMAND_L</autogen>
+      <autogen>--KeyToKey-- FROMKEYCODE_END, KeyCode::CURSOR_RIGHT, ModifierFlag::COMMAND_L</autogen>
+    </item>
+<!--
+    <item>
+      <name>RealForce Application Key</name>
+      <appendix></appendix>
+      <identifier>private.realforce_application_key</identifier>
+      <autogen>--KeyToKey-- FROMKEYCODE_APPLICATION, KeyCode::CURSOR_LEFT, ModifierFlag::COMMAND_L</autogen>
+    </item>
+ -->
+    <item>
+      <name>Use PC Style Home/End (except Emacs, Terminal, VM, RDC, X11, and Eclipse)</name>
+      <appendix>(Change Home/End to Command+Left/Command+Right)</appendix>
+      <appendix>(Change End to Command+Right)</appendix>
+      <appendix>(+ Change Home/End to Control+A/Control+E in Emacs,X11)</appendix>
+      <identifier>private.remap.pclikehomeend</identifier>
+      <block>
+        <not>EMACS, TERMINAL, VIRTUALMACHINE, REMOTEDESKTOPCONNECTION, X11, ECLIPSE</not>
+        <autogen>--KeyToKey-- FROMKEYCODE_HOME, VK_COMMAND, KeyCode::CURSOR_UP,    ModifierFlag::COMMAND_L</autogen>
+        <autogen>--KeyToKey-- FROMKEYCODE_HOME, VK_CONTROL, KeyCode::CURSOR_UP,    ModifierFlag::COMMAND_L</autogen>
+        <autogen>--KeyToKey-- FROMKEYCODE_END,  VK_COMMAND, KeyCode::CURSOR_DOWN,  ModifierFlag::COMMAND_L</autogen>
+        <autogen>--KeyToKey-- FROMKEYCODE_END,  VK_CONTROL, KeyCode::CURSOR_DOWN,  ModifierFlag::COMMAND_L</autogen>
+        <autogen>--KeyToKey-- FROMKEYCODE_HOME,             KeyCode::CURSOR_LEFT,  ModifierFlag::COMMAND_L</autogen>
+        <autogen>--KeyToKey-- FROMKEYCODE_END,              KeyCode::CURSOR_RIGHT, ModifierFlag::COMMAND_L</autogen>
+      </block>
+      <block>
+        <only>EMACS, X11</only>
+        <autogen>--KeyToKey-- FROMKEYCODE_HOME, KeyCode::A, ModifierFlag::CONTROL_L</autogen>
+        <autogen>--KeyToKey-- FROMKEYCODE_END,  KeyCode::E, ModifierFlag::CONTROL_L</autogen>
+      </block>
+    </item>
+
+  </item>
+</root>
