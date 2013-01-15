@@ -22,7 +22,7 @@ if [ "$host" == "asterix" ]; then
     alias best='ant test 1> /dev/null/'
 fi
 
-if [[ "$uname" == "Darwin" ]]; then
+if [ "$uname" == "Darwin" ]; then
     if [ -f /opt/local/etc/profile.d/autojump.sh ]; then
         . /opt/local/etc/profile.d/autojump.sh
     fi
@@ -39,7 +39,7 @@ if [[ "$uname" == "Darwin" ]]; then
     pman() {
         man -t "${1}" | open -f -a /Applications/Preview.app/
     }
-elif [[ "$uname" == "Linux" ]]; then
+elif [ "$uname" == "Linux" ]; then
     alias ls='ls --color'
 fi
 
