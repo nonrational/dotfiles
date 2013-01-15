@@ -47,20 +47,44 @@ dcommit_from_master(){
 }
 
 add_wildcard(){
-    modified_files | grep -i $1 | xargs git add
-    untracked_files | grep -i $1 | xargs git add
-    new_files | grep -i $1 | xargs git add
+    modified_files | grep -i $1 | xargs -I{} git add {}
+    untracked_files | grep -i $1 | xargs -I{} git add {}
+    deleted_files | grep -i $1 | xargs -I{} git add {}
+}
+
+what_the_hell_just_happened(){
+    ref=${1:-"HEAD"}
+
+    old=$ref@{1}
+    new=$ref
+
+    log() {
+        git log --graph --pretty=short -1 $1
+    }
+
+    echo "Old revision:"
+    log $old
+    echo
+    echo "New revision:"
+    log $new
+    echo
+    echo "Changes:"
+    git diff --stat --summary $old $new
 }
 
 modified_files() {
-    git st | awk '/modified/ {print "./"$3}';
+    git st | awk '/modified/ {print "./" substr($0, index($0,$3))}';
+}
+
+deleted_files() {
+    git st | awk '/deleted/ {print "./" substr($0, index($0,$3))}';
 }
 
 untracked_files() {
-    git st | awk '/#\t/ {print "./"$2}';
+    git st | grep -v "modified" | awk '/#\t/ {print "./" substr($0, index($0,$2))}';
 }
 
 new_files() {
-    git st | awk '/new\ file/ {print "./"$4}';
+    git st | awk '/new\ file/ {print "./" substr($0, index($0,$4))}';
 }
 

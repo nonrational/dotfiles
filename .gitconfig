@@ -28,10 +28,12 @@
     modified = "!source ~/.githelpers && modified_files"
     untracked = "!source ~/.githelpers && untracked_files"
     new = "!source ~/.githelpers && new_files"
+    deleted = "!source ~/.githelpers && deleted_files"
     assumed = !sh -c \"git ls-files -v | grep '^[a-z]'\"
     disregard = update-index --assume-unchanged
     dismiss = update-index --assume-unchanged
     attend = update-index --no-assume-unchanged
+    wtf = "!source ~/.githelpers && what_the_hell_just_happened"
 [color]
     ui = true
 [gist]
