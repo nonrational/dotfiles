@@ -1,16 +1,3 @@
-# This is an example nethackrc file. You should edit this to suit the needs
-# of your personal nethack build and add some reasonable default options
-# for your users.
-
-# If you compiled dgamelaunch with the `vi' editor enabled instead of ee,
-# perhaps a helpful blurb such as this might help:
-
-# This editor is vi-like. Type ESC a couple times, then ':q!' (without quotes)
-# to exit if you get stuck. To save, hit ESC and then ZZ or type ':wq'
-# (without quotes.) To insert text, hit 'i' to enter insert mode.
-
-# Here are some examples of reasonable defaults:
-
 
 OPTIONS=pettype:cat,hilite_pet,showrace
 OPTIONS=fruit:morsel of existential dread
@@ -205,31 +192,8 @@ MENUCOLOR="Take something out of .*"=none
 MENUCOLOR="cancellation"=magenta&underline
 MENUCOLOR="bag"=magenta&underline
 
-
-
 MENUCOLOR="wand$"=magenta&underline
 MENUCOLOR="wand named"=magenta&underline
 MENUCOLOR="wand called"=lightmagenta&underline
 
-
-
-
 OPTIONS=name:Laird
-
-
-
-
-
-# This is an example nethackrc file. You should edit this to suit your needs
-
-# This editor is vi-like. Type ESC a couple times, then ':q!' (without quotes)
-# to exit if you get stuck. To save, hit ESC and then ZZ or type ':wq'
-# (without quotes.) To insert text, hit 'i' to enter insert mode.
-# You could also go to http://alt.org/nethack/ and choose either WebConf or RC Edit
-
-# For more information on what you can set in your nethackrc file, refer to:
-#   http://www.nethack.org/v343/Guidebook.html#_TOCentry_42
-# Happy hacking
-# For more information on what you can set in your nethackrc file, refer to:
-#   http://www.nethack.org/v343/Guidebook.html#_TOCentry_42
-# Happy hacking!
