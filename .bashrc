@@ -2,7 +2,7 @@
 #echo sourcing .bashrc
 
 host=`uname -n | sed -e 's/\.local//g'`;
-osenv=`uname`;
+uname=`uname`;
 
 if [ "$host" == "asterix" ]; then
     export FLEX_HOME='/Applications/Adobe Flash Builder 4/sdks/3.5.0.12683B'
@@ -22,7 +22,7 @@ if [ "$host" == "asterix" ]; then
     alias best='ant test 1> /dev/null/'
 fi
 
-if [ "$osenv" == "Darwin" ]; then
+if [[ "$uname" == "Darwin" ]]; then
     if [ -f /opt/local/etc/profile.d/autojump.sh ]; then
         . /opt/local/etc/profile.d/autojump.sh
     fi
@@ -39,6 +39,8 @@ if [ "$osenv" == "Darwin" ]; then
     pman() {
         man -t "${1}" | open -f -a /Applications/Preview.app/
     }
+elif [[ "$uname" == "Linux" ]]; then
+    alias ls='ls --color'
 fi
 
 export CLICOLOR=1
