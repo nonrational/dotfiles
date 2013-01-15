@@ -5,3 +5,5 @@ Backup
 .DS_Store
 .AppleDouble
 Sublime Text 2/Settings/Auto Save Session.sublime_session
+.viminfo
+*.swp

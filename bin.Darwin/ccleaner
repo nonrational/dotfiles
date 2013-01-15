@@ -1,0 +1,9 @@
+#!/bin/bash
+
+sudo touch /dev/null
+osascript -e 'tell application "Spotify" to quit'
+osascript -e 'tell application "iTunes" to quit'
+osascript -e 'tell application "Last.fm" to quit'
+rm -rf ~/Library/Caches/com.spotify.client/*
+rm -rf ~/Library/Caches/com.apple.iTunes/*
+sudo periodic daily weekly monthly
