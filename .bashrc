@@ -39,8 +39,11 @@ if [ "$uname" == "Darwin" ]; then
     pman() {
         man -t "${1}" | open -f -a /Applications/Preview.app/
     }
+    # use BSD ls with no --color
+    alias ls='ls -F'
 elif [ "$uname" == "Linux" ]; then
-    alias ls='ls --color'
+    # use GNU ls with --color
+    alias ls='ls --color -F'
 fi
 
 export CLICOLOR=1
@@ -55,7 +58,6 @@ shopt -s nocaseglob
 shopt -s checkwinsize
 
 # handy aliases
-alias ls='ls -F'
 alias ll='ls -l'
 alias la='ls -hlA'
 alias l='ls'
