@@ -1,0 +1,14 @@
+#!/bin/bash
+# QuickDump
+# Copy this to a directory in your PATH and change the variables to suit your needs.
+# Then enjoy blissful, compressed database dumps
+
+SCRIPT_DIR=~/dev/wrkspc/betterment/etc/development/scripts/
+SSH_USER=anorton
+HOST=db1.betterment.com
+DB_USER=betterment-biz
+OUTPUT_FILE=~/dev/db/bettermentdb-`date +%Y-%m-%d.%H%M`.sql.gz
+
+echo "mysqlrexdump.sh bettermentdb >> $OUTPUT_FILE"
+
+$SCRIPT_DIR/mysqlrexdump.sh $HOST $SSH_USER $DB_USER | tee >(gzip --stdout > $OUTPUT_FILE) | grep ^--
