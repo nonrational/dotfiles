@@ -77,11 +77,11 @@ alias cdate="date '+%Y%m%d%H%M%S'"
 #osx - open an application and force a new instance even if there's one already running
 alias opena="open -n -a"
 
-function parse_git_branch {
+parse_git_branch() {
     git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
-function proml {
+uber_prompt() {
     local        BLUE="\[\033[0;34m\]"
     local      YELLOW="\[\033[0;33m\]"
     local         RED="\[\033[0;31m\]"
@@ -90,14 +90,17 @@ function proml {
     local LIGHT_GREEN="\[\033[1;32m\]"
     local       WHITE="\[\033[1;37m\]"
     local  LIGHT_GRAY="\[\033[0;37m\]"
-    case $TERM in
-        xterm*) TITLEBAR='\[\033]0;\u@\h:\w\007\]';;
-        *) TITLEBAR="";;
-    esac
 
     PS1="$LIGHT_GRAY\u@\h:\W$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
     PS2='> '
     PS4='+ '
 }
 
-proml
+uber_prompt
+
+# if there are settings for a particular machine, put them in .local.bashrc
+# i.e. PS1="[\u@\h \W]\$ "
+if [ -f $HOME/.local.bashrc ]; then
+    echo "Sourcing $HOME/.local.bashrc"
+    . $HOME/.local.bashrc
+fi
