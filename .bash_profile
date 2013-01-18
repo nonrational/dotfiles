@@ -8,15 +8,16 @@ if [ -f $HOME/.bashrc ]; then
 fi
 
 MYPATHS=$(find $HOME/bin -type d -exec echo -n ':{}' \;)
-export PATH=$PATH$MYPATHS
 
 if [ "$host" == "asterix" ]; then
-    export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$HOME/bin:$PATH
+    export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$PATH
     export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
     if [ -e $HOME/pear/bin ]; then
         export PATH=$PATH:$HOME/pear/bin
     fi
 fi
+
+export PATH=$HOME/bin:$PATH$MYPATHS
 
 if [ "$osenv" == "Darwin" ]; then
     # if running on Lion, unhides the ~/Library folder in Finder
