@@ -44,6 +44,15 @@ if [ "$uname" == "Darwin" ]; then
 elif [ "$uname" == "Linux" ]; then
     # use GNU ls with --color
     alias ls='ls --color -F'
+    alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+    if [ -f ~/.bash_aliases ]; then
+        . ~/.bash_aliases
+    fi
+
+    if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+        . /etc/bash_completion
+    fi
 fi
 
 export CLICOLOR=1
@@ -66,11 +75,13 @@ alias du='du -h'
 alias top='top -o cpu'
 alias grep="grep --color"
 
+alias hosts='sudo vim /etc/hosts'
+alias pjs='sudo jps -lv | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
+
 # fun aliases
 alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
 alias scg='curl -s http://www.madsci.org/cgi-bin/cgiwrap/~lynn/jardin/SCG | grep "<h2>" -A4 | tr "\n" " " | sed -e "s/<h2>[ \t]*//" -e "s/\<.*$//g"'
 alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | fold -w 18 | head -n1"
-alias hosts='sudo vim /etc/hosts'
 
 #aliases for my local stuff
 alias cdate="date '+%Y%m%d%H%M%S'"
