@@ -8,9 +8,9 @@
 	"ignored_packages":
 	[
 		"Vintage",
+		"CoffeeScript",
 		"JSHint",
 		"sublime-jslint",
-		"CoffeeScript",
 		"SyncedSideBar"
 	],
 	"indent_guide_options":
