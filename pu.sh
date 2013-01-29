@@ -74,7 +74,6 @@ for sdf in $STANDARD_DOT_FILES; do
 done
 
 # special cases - these don't start with a dot
-linky ssh.config ~/.ssh/config
 linky "bin.$uname" ~/bin
 
 # root configurations
@@ -86,6 +85,7 @@ if [ "$uname" == "Darwin" ]; then
     echo "Linking OS X Specific Addons ... ";
     ln -sfv $DOTS/Sublime\ Text\ 2 $HOME/Library/Application\ Support
     ln -sfv $DOTS/keyremap.private.xml $HOME/Library/Application\ Support/KeyRemap4MacBook/private.xml
+    linky ssh.config ~/.ssh/config
 elif [ "$uname" == "Linux" ]; then
     echo "Linking Linux Specific Addons ... "
 fi
