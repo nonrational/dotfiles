@@ -20,6 +20,8 @@ if [ "$host" == "asterix" ]; then
     # use 1.8.1 ant
     alias ant='/usr/local/bin/ant'
     alias best='ant test 1> /dev/null/'
+    alias dbc='cd "$(find $HOME/dev/dbc/ -name `date '+%Y%m%d'`)"'
+
 fi
 
 if [ "$uname" == "Darwin" ]; then
@@ -31,7 +33,10 @@ if [ "$uname" == "Darwin" ]; then
         . /opt/local/etc/bash_completion
     fi
 
+
+    export EDITNOW='subl'
     export EDITOR='subl -w'
+
     export LESS="$LESS -i -F -R -X"
     # set java home
     export JAVA_HOME=/Library/Java/Home
@@ -45,6 +50,9 @@ elif [ "$uname" == "Linux" ]; then
     # use GNU ls with --color
     alias ls='ls --color -F'
     alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+    export EDITNOW='vim'
+    export EDITOR='vim'
 
     if [ -f ~/.bash_aliases ]; then
         . ~/.bash_aliases
@@ -75,8 +83,9 @@ alias du='du -h'
 alias top='top -o cpu'
 alias grep="grep --color"
 
-alias hosts='sudo vim /etc/hosts'
-alias pjs='sudo jps -lv | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
+
+alias hosts='sudo $EDITNOW /etc/hosts'
+alias pjs='sudo jps -mlvV | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
 
 # fun aliases
 alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
@@ -84,6 +93,8 @@ alias scg='curl -s http://www.madsci.org/cgi-bin/cgiwrap/~lynn/jardin/SCG | grep
 alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | fold -w 18 | head -n1"
 
 #aliases for my local stuff
+alias ddate="date '+%Y%m%d%'"
+alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 #osx - open an application and force a new instance even if there's one already running
 alias opena="open -n -a"
