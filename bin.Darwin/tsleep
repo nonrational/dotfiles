@@ -1,0 +1,48 @@
+#!/bin/bash
+
+_hms()
+{
+    local S=${1}
+    ((h=S/3600))
+    ((m=S%3600/60))
+    ((s=S%60))
+    printf "%dh:%dm:%ds\n" $h $m $s
+}
+
+countdown ()
+{
+    if [[ $1 = *[![:digit:]]* ]]; then
+        echo "Usage: countdown (seconds) [label]";
+        return;
+    fi;
+
+    message=$2
+    if [ "x$message" == "x" ]; then
+        message="Remaining Time"
+    fi
+
+    local t=$1 remaining=$1;
+    SECONDS=0;
+    while sleep .2; do
+        printf '\r'"$message"': '"`_hms $remaining`"' ';
+        if (( (remaining=t-SECONDS) <=0 )); then
+            break;
+        fi;
+    done
+}
+
+max_seconds=0
+
+while [[ "$1" == *[MmHhSs] ]]; do
+    _scale=${1//[0-9]/}
+    _time=${1//[^0-9]/}
+    case $_scale in
+        [Hh] ) (( max_seconds=max_seconds+(60*60*$_time) )); ;;
+        [Mm] ) (( max_seconds=max_seconds+(60*$_time) )); ;;
+        [Ss] ) (( max_seconds=max_seconds+($_time) )); ;;
+    esac
+    shift
+done
+
+countdown $max_seconds "System Sleep in "
+osascript -e 'tell application "System Events" to sleep'
