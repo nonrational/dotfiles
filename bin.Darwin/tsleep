@@ -29,6 +29,7 @@ countdown ()
             break;
         fi;
     done
+    printf '\rCountdown complete.                        \n';
 }
 
 max_seconds=0
@@ -44,5 +45,5 @@ while [[ "$1" == *[MmHhSs] ]]; do
     shift
 done
 
-countdown $max_seconds "System Sleep in "
+countdown $max_seconds "System will sleep in "
 osascript -e 'tell application "System Events" to sleep'
