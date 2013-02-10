@@ -45,13 +45,15 @@ countdown ()
 
 max_seconds=0
 
-while [[ "$1" == *[MmHhSs] ]]; do
+while [[ $# -gt 0 ]]; do
     _scale=${1//[0-9]/}
     _time=${1//[^0-9]/}
     case $_scale in
         [Hh] ) (( max_seconds=max_seconds+(60*60*$_time) )); ;;
         [Mm] ) (( max_seconds=max_seconds+(60*$_time) )); ;;
         [Ss] ) (( max_seconds=max_seconds+($_time) )); ;;
+        "" ) (( max_seconds=max_seconds+($_time) )); ;;
+        ? ) echo "Nerds! Invalid time scale specified. ($1)" && exit 1;;
     esac
     shift
 done
