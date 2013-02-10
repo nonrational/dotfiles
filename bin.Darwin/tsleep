@@ -1,5 +1,16 @@
-#!/bin/bash
+#!/bin/sh
+#####################
+## tsleep - Time Sleep for OS X Systems
+##
+## Wait a specified amount of hours, minutes, and seconds. Then, sleep the system.
+##
+## Example Usage:
+## user@osxhost$ tsleep 3m 4H 400s 70m
+## System will sleep in : 5h:19m:39s
+##
+#####################
 
+#
 _hms()
 {
     local S=${1}
