@@ -5,6 +5,7 @@
 		"ApacheConf.tmLanguage",
 		"Autocomplete Javascript with Method Signature",
 		"CoffeeScript",
+		"Emmet",
 		"FileDiffs",
 		"Git",
 		"HTML5",
@@ -31,8 +32,7 @@
 		"SyncedSideBar",
 		"Tag",
 		"Theme - Soda",
-		"WordHighlight",
-		"ZenCoding"
+		"WordHighlight"
 	],
 	"repositories":
 	[
