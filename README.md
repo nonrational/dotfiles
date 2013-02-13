@@ -11,8 +11,8 @@ Getting Started:
     
 Alternatively (requires wget but not git):
 
-    mkdir ~/.dotfiles && cd ~/.dotfiles
     wget https://github.com/nonrational/dotfiles/archive/master.zip && unzip master && rm master
+    mv dotfiles-master .dotfiles && cd .dotfiles
     ./pu.sh
     
 Arguments to pu.sh:
