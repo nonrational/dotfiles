@@ -6,12 +6,12 @@ Making it Work
 --------
 Getting Started:
 
-    git clone https://github.com/nonrational/dotfiles ~/.dotfiles && cd !$
+    git clone https://github.com/nonrational/dotfiles ~/.dotfiles && cd ~/.dotfiles
     ./pu.sh
     
 Alternatively (requires wget but not git):
 
-    mkdir ~/.dotfiles && cd !$
+    mkdir ~/.dotfiles && cd ~/.dotfiles
     wget https://github.com/nonrational/dotfiles/archive/master.zip && unzip master.zip
     ./pu.sh
     
