@@ -1,1 +1,0 @@
-# This plugin is outdated, please use [Emmet](https://github.com/sergeche/emmet-sublime) instead
