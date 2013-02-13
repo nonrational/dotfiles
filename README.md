@@ -12,7 +12,7 @@ Getting Started:
 Alternatively (requires wget but not git):
 
     mkdir ~/.dotfiles && cd ~/.dotfiles
-    wget https://github.com/nonrational/dotfiles/archive/master.zip && unzip master.zip
+    wget https://github.com/nonrational/dotfiles/archive/master.zip && unzip master && rm master
     ./pu.sh
     
 Arguments to pu.sh:
