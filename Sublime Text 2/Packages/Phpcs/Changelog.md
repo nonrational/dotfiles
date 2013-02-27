@@ -1,6 +1,18 @@
 Sublime PHP CodeSniffer, Linter and Mess Detector Plugin Changelog
 ==================================================================
 
+6.1
+---
+* Bug fix for users of ST2 and PHP_CodeSniffer1.5.0 (Currently RC1). Essentially we now need to pass cwd so that PHP_CodeSniffer knows where to put the tmp files for its caching mechanism. Fixes [GH-68](https://github.com/benmatselby/sublime-phpcs/issues/68)
+
+6.0.1
+-----
+* Missed a s/SCheck/scheck/ conversion
+
+6.0
+---
+* Add support for [scheck](https://github.com/facebook/pfff/wiki/Main). Thanks to [Darby Payne](https://github.com/dpayne) for this patch
+
 5.1.1
 -----
 * Minor patch to scrub the last report so the points and line numbers are correct each time. Fixes GH-67

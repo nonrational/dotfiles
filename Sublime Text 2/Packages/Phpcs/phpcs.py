@@ -10,6 +10,7 @@ try:
     from HTMLParser import HTMLParser
 except:
     from html.parser import HTMLParser
+from os.path import expanduser
 
 class Pref:
     @staticmethod
@@ -46,6 +47,10 @@ class Pref:
         Pref.phpmd_executable_path = settings.get('phpmd_executable_path', '')
         Pref.phpmd_additional_args = settings.get('phpmd_additional_args')
 
+        Pref.scheck_run = bool(settings.get('scheck_run'))
+        Pref.scheck_command_on_save = bool(settings.get('scheck_command_on_save'))
+        Pref.scheck_executable_path = settings.get('scheck_executable_path', '')
+        Pref.scheck_additional_args = settings.get('scheck_additional_args')
 
 st_version = 2
 if sublime.version() == '' or int(sublime.version()) > 3000:
@@ -109,7 +114,15 @@ class ShellCommand():
             info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             info.wShowWindow = subprocess.SW_HIDE
 
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, startupinfo=info)
+        """
+        Fixes the fact that PHP_CodeSniffer now caches the reports to cwd()
+         - http://pear.php.net/package/PHP_CodeSniffer/download/1.5.0
+         - https://github.com/benmatselby/sublime-phpcs/issues/68
+        """
+        home = expanduser("~")
+        debug_message("cwd: " + home)
+
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, startupinfo=info, cwd=home)
 
         if proc.stdout:
             data = proc.communicate()[0]
@@ -249,6 +262,46 @@ class MessDetector(ShellCommand):
             self.error_list.append(error)
 
 
+class Scheck(ShellCommand):
+    """Concrete class for Scheck"""
+    def execute(self, path):
+        if Pref.scheck_run != True:
+            return
+
+        args = []
+
+        if Pref.phpcs_php_prefix_path != "" and self.__class__.__name__ in Pref.phpcs_commands_to_php_prefix:
+            args = [Pref.phpcs_php_prefix_path]
+
+        if Pref.scheck_executable_path != "":
+            application_path = Pref.scheck_executable_path
+        else:
+            application_path = 'scheck'
+
+        if (len(args) > 0):
+            args.append(application_path)
+        else:
+            args = [application_path]
+
+        for key, value in Pref.scheck_additional_args.items():
+            args.append(key)
+            if value != "":
+                args.append(value)
+
+        args.append(os.path.normpath(path))
+
+        self.parse_report(args)
+
+    def parse_report(self, args):
+        report = self.shell_out(args)
+        debug_message(report)
+        lines = re.finditer('.*:(?P<line>\d+):(?P<column>\d+): CHECK: (?P<message>.*)', report)
+
+        for line in lines:
+            error = CheckstyleError(line.group('line'), line.group('message'))
+            self.error_list.append(error)
+
+
 class Linter(ShellCommand):
     """Content class for php -l"""
     def execute(self, path):
@@ -312,6 +365,8 @@ class PhpcsCommand():
                 self.checkstyle_reports.append(['Sniffer', Sniffer().get_errors(path), 'dot'])
             if Pref.phpmd_run:
                 self.checkstyle_reports.append(['MessDetector', MessDetector().get_errors(path), 'dot'])
+            if Pref.scheck_run:
+                self.checkstyle_reports.append(['Scheck', Scheck().get_errors(path), 'dot'])
         else:
             if Pref.phpcs_linter_command_on_save and Pref.phpcs_linter_run:
                 self.checkstyle_reports.append(['Linter', Linter().get_errors(path), 'dot'])
@@ -319,6 +374,8 @@ class PhpcsCommand():
                 self.checkstyle_reports.append(['Sniffer', Sniffer().get_errors(path), 'dot'])
             if Pref.phpmd_command_on_save and Pref.phpmd_run:
                 self.checkstyle_reports.append(['MessDetector', MessDetector().get_errors(path), 'dot'])
+            if Pref.scheck_command_on_save and Pref.scheck_run:
+                self.checkstyle_reports.append(['Scheck', Scheck().get_errors(path), 'dot'])
 
         sublime.set_timeout(self.generate, 0)
 
