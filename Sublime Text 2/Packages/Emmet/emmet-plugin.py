@@ -11,12 +11,20 @@ BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 PACKAGES_PATH = sublime.packages_path() or os.path.dirname(BASE_PATH)
 # EMMET_GRAMMAR = os.path.join(BASE_PATH, 'Emmet.tmLanguage')
 EMMET_GRAMMAR = 'Packages/%s/Emmet.tmLanguage' % os.path.basename(BASE_PATH)
-sys.path += [BASE_PATH] + [os.path.join(BASE_PATH, f) for f in ['completions', 'emmet']]
+sys.path += [BASE_PATH] + [os.path.join(BASE_PATH, f) for f in ['emmet_completions', 'emmet']]
 
-import completions as cmpl
+
+# Make sure all dependencies are reloaded on upgrade
+if 'emmet.reloader' in sys.modules:
+	reload(sys.modules['emmet.reloader'])
+import emmet.reloader
+
+# import completions as cmpl
 import emmet.pyv8loader as pyv8loader
-from completions.meta import HTML_ELEMENTS_ATTRIBUTES, HTML_ATTRIBUTES_VALUES
+import emmet_completions as cmpl
+from emmet_completions.meta import HTML_ELEMENTS_ATTRIBUTES, HTML_ATTRIBUTES_VALUES
 from emmet.context import Context
+from emmet.context import js_file_reader as _js_file_reader
 from emmet.pyv8loader import LoaderDelegate
 
 __version__      = '1.1'
@@ -36,6 +44,19 @@ user_settings = None
 
 def is_st3():
 	return sublime.version()[0] == '3'
+
+def js_file_reader(file_path, use_unicode=True):
+	if hasattr(sublime, 'load_resource'):
+		rel_path = file_path
+		for prefix in [sublime.packages_path(), sublime.installed_packages_path()]:
+			if rel_path.startswith(prefix):
+				rel_path = os.path.join('Packages', rel_path[len(prefix) + 1:])
+				break
+
+		rel_path = rel_path.replace('.sublime-package', '')
+		return sublime.load_resource(rel_path)
+
+	return _js_file_reader(file_path, use_unicode)
 
 def init():
 	"Init Emmet plugin"
@@ -70,7 +91,8 @@ def init():
 		files=['../editor.js'], 
 		ext_path=settings.get('extensions_path', None), 
 		contrib=contrib, 
-		logger=delegate.log
+		logger=delegate.log,
+		reader=js_file_reader
 	)
 
 	update_settings()
