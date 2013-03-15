@@ -1,17 +1,26 @@
 import sublime, sublime_plugin, re, sys, os
 
+directory = os.path.dirname(os.path.realpath(__file__))
+libs_path = os.path.join(directory, "libs")
+
 # crazyness to get jsbeautifier.unpackers to actually import
 # with sublime's weird hackery of the path and module loading
-directory = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(directory, "jsbeaufifier"))
-sys.path.append(os.path.join(directory, "jsbeautifier", "unpackers"))
+if libs_path not in sys.path:
+	sys.path.append(libs_path)
 
 # if you don't explicitly import jsbeautifier.unpackers here things will bomb out,
 # even though we don't use it directly.....
 import jsbeautifier, jsbeautifier.unpackers
+import merge_utils
 
+s = None
 
-s = sublime.load_settings("JsFormat.sublime-settings")
+def plugin_loaded():
+	global s
+	s = sublime.load_settings("JsFormat.sublime-settings")
+
+if sys.version_info < (3, 0):
+	plugin_loaded()
 
 class PreSaveFormatListner(sublime_plugin.EventListener):
 	"""Event listener to run JsFormat during the presave event"""
@@ -27,7 +36,7 @@ class PreSaveFormatListner(sublime_plugin.EventListener):
 		if(syntaxPath != None):
 			syntax = os.path.splitext(syntaxPath)[0].split('/')[-1].lower()
 
-		formatFile = "js" in ext or "json" in ext or "javascript" in syntax or "json" in syntax
+		formatFile = ext in ['js', 'json'] or "javascript" in syntax or "json" in syntax
 
 		if(s.get("format_on_save") == True and formatFile):
 			view.run_command("js_format")
@@ -68,11 +77,12 @@ class JsFormatCommand(sublime_plugin.TextCommand):
 		else:
 			replaceRegion = sublime.Region(0, self.view.size())
 
-		res = jsbeautifier.beautify(self.view.substr(replaceRegion), opts)
-		if(not formatSelection and settings.get('ensure_newline_at_eof_on_save')):
-			res = res + "\n"
+		orig = self.view.substr(replaceRegion)
+		res = jsbeautifier.beautify(orig, opts)
 
-		self.view.replace(edit, replaceRegion, res)
+		_, err = merge_utils.merge_code(self.view, edit, orig, res)
+		if err:
+			sublime.error_message("JsFormat: Merge failure: '%s'" % err)
 
 		# re-place cursor
 		offset = self.get_nws_offset(nwsOffset, self.view.substr(sublime.Region(0, self.view.size())))

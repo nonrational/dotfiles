@@ -7,7 +7,8 @@ or the entire file if there is no selection.
 ## Features
 * javascript/json formatting (obviously)
 * all settings are customizable (whitespace, formatting style, etc..)
-* puts the cursor back in the same location it was before formatting (accounts for whitespace/newline changes)
+* puts the cursor back in the same location it was before formatting (accounts for whitespace/newline changes)* 
+* Sublime Text 3 support (as much as we can support alpha/beta software)
 
 ## Settings
 JsFormat uses whatever tab character settings are configured with the standard "translate_tabs_to_spaces" and "tab_size" sublime settings.
@@ -24,11 +25,12 @@ In addition, the following settings are available in JsFormat/JsFormat.sublime-s
 * "eval_code": false,
 * "unescape_strings": false,
 * "break_chained_methods": false*
-* "ensure_newline_at_eof_on_save": false
 * "format_on_save": false
 
 I had an brain fart a while back and merged a pull request that modified jsbeautifier. As a result, the functionality that
-was added from that pull request has been lost. ```"ensure_newline_at_eof_on_save"``` is no longer supported.
+was added from that pull request has been lost. ```"ensure_space_before_linestarters"``` is no longer supported.
+
+Suport for ensure_newline_at_eof_on_save has been removed as well. This functionality exists in sublime core, no need for JsFormat to duplicate it.
 
 ## Install
 #### [Package Control](https://github.com/wbond/sublime_package_control) (*Recommended*)

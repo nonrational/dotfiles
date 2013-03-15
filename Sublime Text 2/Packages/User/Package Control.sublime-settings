@@ -4,7 +4,10 @@
 	[
 		"ApacheConf.tmLanguage",
 		"Autocomplete Javascript with Method Signature",
+		"Browser Refresh",
 		"CoffeeScript",
+		"CSSFormat",
+		"CSSTidy",
 		"Emmet",
 		"FileDiffs",
 		"Git",
@@ -32,6 +35,7 @@
 		"SyncedSideBar",
 		"Tag",
 		"Theme - Soda",
+		"TidyHTML5",
 		"WordHighlight"
 	],
 	"repositories":
