@@ -113,7 +113,12 @@ uber_prompt() {
     local       WHITE="\[\033[1;37m\]"
     local  LIGHT_GRAY="\[\033[0;37m\]"
 
-    PS1="$LIGHT_GRAY\u@\h:\W$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
+    if [ "`whoami`" != 'norton' -o "`whoami`" != 'anorton' ]; then
+        PS1="$LIGHT_GRAY\h:\W$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
+    else
+        PS1="$LIGHT_GRAY\u@\h:\W$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
+    fi
+
     PS2='> '
     PS4='+ '
 }
