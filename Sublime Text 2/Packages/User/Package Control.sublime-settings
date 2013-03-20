@@ -1,11 +1,10 @@
 {
-	"auto_upgrade_last_run": null,
 	"auto_upgrade": false,
+	"auto_upgrade_last_run": null,
 	"installed_packages":
 	[
 		"ApacheConf.tmLanguage",
 		"Autocomplete Javascript with Method Signature",
-		"Browser Refresh",
 		"CoffeeScript",
 		"CSSFormat",
 		"CSSTidy",
