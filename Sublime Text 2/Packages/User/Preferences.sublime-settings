@@ -8,7 +8,6 @@
 	"ignored_packages":
 	[
 		"Vintage",
-		"sublime-jslint",
 		"SyncedSideBar"
 	],
 	"indent_guide_options":

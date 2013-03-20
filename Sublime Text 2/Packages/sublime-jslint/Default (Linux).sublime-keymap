@@ -1,7 +1,0 @@
-[
-    {
-        "keys": ["ctrl+j"],
-        "__doc__": "Run JSLint",
-        "command": "jslint"
-    }
-]
