@@ -9,7 +9,7 @@ fi
 
 MYPATHS=$(find $HOME/bin -type d -exec echo -n ':{}' \;)
 
-if [ "$host" == "asterix" ]; then
+if [ "$host" == "asterix" -o "$host" == "hypnos" ]; then
     export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:$PATH
     export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
     if [ -e $HOME/pear/bin ]; then
@@ -20,6 +20,7 @@ fi
 export PATH=$HOME/bin:$PATH$MYPATHS
 
 if [ "$osenv" == "Darwin" ]; then
+    
     # if running on Lion, unhides the ~/Library folder in Finder
     if which sw_vers >/dev/null 2>&1 && [[ $(sw_vers |awk '/ProductVersion/ {print $2}' |sed 's/\([0-9]*\.[0-9]*\)\.[0-9]*/\1/') == '10.7' ]] && which chflags >/dev/null 2>&1; then
         chflags nohidden ~/Library
