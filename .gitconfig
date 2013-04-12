@@ -8,12 +8,14 @@
     quotepath = false
     whitespace = cr-at-eol
 [alias]
+    pull = pull --ff-only
     ci = commit -v
     co = checkout
     df = "diff ..@{u}"
     di = diff
     dc = diff --cached
     r = !git l -20
+    la = !git l --all
     ra = !git r --all
     l = "!source ~/.githelpers && pretty_git_log"
     amend = commit --amend

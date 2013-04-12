@@ -1,5 +1,5 @@
 # sourced on new screens, non-login shells.
-#echo sourcing .bashrc
+# echo sourcing .bashrc
 
 host=`uname -n | sed -e 's/\.local//g'`;
 uname=`uname`;
@@ -8,6 +8,7 @@ if [ "$host" == "asterix" ]; then
     export FLEX_HOME='/Applications/Adobe Flash Builder 4/sdks/3.5.0.12683B'
     export RSL_VERSION=3.5.0.21474
     export CATALINA_HOME='/Users/norton/dev/tomcat6'
+    export PATH="$PATH:$CATALINA_HOME/bin"
 
     [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
@@ -21,7 +22,6 @@ if [ "$host" == "asterix" ]; then
     alias ant='/usr/local/bin/ant'
     alias best='ant test 1> /dev/null/'
     alias dbc='cd "$(find $HOME/dev/dbc/ -name `date '+%Y%m%d'`)"'
-
 fi
 
 if [ "$uname" == "Darwin" ]; then
@@ -46,6 +46,12 @@ if [ "$uname" == "Darwin" ]; then
     }
     # use BSD ls with no --color
     alias ls='ls -F'
+    alias top='top -o cpu'
+    alias opena="open -n -a"
+
+    ### Added by the Heroku Toolbelt
+    export PATH="/usr/local/heroku/bin:$PATH"
+
 elif [ "$uname" == "Linux" ]; then
     # use GNU ls with --color
     alias ls='ls --color -F'
@@ -80,9 +86,8 @@ alias la='ls -hlA'
 alias l='ls'
 alias df='df -h'
 alias du='du -h'
-alias top='top -o cpu'
 alias grep="grep --color"
-
+alias become="sudo su -"
 
 alias hosts='sudo $EDITNOW /etc/hosts'
 alias pjs='sudo jps -mlvV | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
@@ -96,8 +101,7 @@ alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | fold -w 18 | 
 alias ddate="date '+%Y%m%d%'"
 alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
-#osx - open an application and force a new instance even if there's one already running
-alias opena="open -n -a"
+
 
 parse_git_branch() {
     git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
@@ -112,18 +116,25 @@ uber_prompt() {
     local LIGHT_GREEN="\[\033[1;32m\]"
     local       WHITE="\[\033[1;37m\]"
     local  LIGHT_GRAY="\[\033[0;37m\]"
-
-    if [ "`whoami`" != 'norton' -o "`whoami`" != 'anorton' ]; then
-        PS1="$LIGHT_GRAY\h:\W$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
-    else
-        PS1="$LIGHT_GRAY\u@\h:\W$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
-    fi
-
+    PS1="$LIGHT_GRAY$1$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
     PS2='> '
     PS4='+ '
 }
 
-uber_prompt
+myself="`whoami`"
+linux_prompt="[\u@\h \W]"
+darwin_prompt="\u@\h:\W"
+me_prompt="\h:\W"
+
+if [ "$uname" == "Darwin" ]; then
+    if [ "$myself" == 'norton' -o "$myself" == 'anorton' ]; then
+        uber_prompt $me_prompt;
+    else
+        uber_prompt $darwin_prompt;
+    fi
+else
+    uber_prompt $linux_prompt
+fi
 
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
@@ -131,3 +142,5 @@ if [ -f $HOME/.local.bashrc ]; then
     # echo "Sourcing $HOME/.local.bashrc"
     . $HOME/.local.bashrc
 fi
+
+
