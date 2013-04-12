@@ -116,7 +116,7 @@ uber_prompt() {
     local LIGHT_GREEN="\[\033[1;32m\]"
     local       WHITE="\[\033[1;37m\]"
     local  LIGHT_GRAY="\[\033[0;37m\]"
-    PS1="$LIGHT_GRAY$1$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
+    PS1="$LIGHT_GRAY$*$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
     PS2='> '
     PS4='+ '
 }
