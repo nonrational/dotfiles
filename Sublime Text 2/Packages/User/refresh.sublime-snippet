@@ -1,9 +1,0 @@
-<snippet>
-    <content><![CDATA[
-<meta http-equiv="refresh" content="0;URL='${0:http://example.com/}'">
-]]></content>
-    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-    <tabTrigger>refresh</tabTrigger>
-    <!-- Optional: Set a scope to limit where the snippet will trigger -->
-    <scope>text.html.basic</scope>
-</snippet>
