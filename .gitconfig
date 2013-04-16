@@ -4,7 +4,7 @@
 [github]
     user = nonrational
 [core]
-    excludesfile = ~/.gitignore_global
+    excludesfile = /opt/boxen/config/git/gitignore
     quotepath = false
     whitespace = cr-at-eol
 [alias]
@@ -41,3 +41,8 @@
 [gist]
     browse = true
     private = true
+[hub]
+    protocol = https
+    user = nonrational
+[credential]
+    helper = /opt/boxen/bin/boxen-git-credential
