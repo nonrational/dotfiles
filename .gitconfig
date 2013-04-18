@@ -46,3 +46,5 @@
     user = nonrational
 [credential]
     helper = /opt/boxen/bin/boxen-git-credential
+[push]
+	default = upstream
