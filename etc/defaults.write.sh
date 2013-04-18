@@ -8,6 +8,10 @@ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool false
 # BLAZING FAST key repeat
 defaults write NSGlobalDomain KeyRepeat -int 0
+
+# Always show scrollbars
+defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
+
 # don't hide my library
 chflags nohidden ~/Library
 # Don’t show Dashboard as a Space
@@ -90,6 +94,13 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 
 # Disable the warning before emptying the Trash
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+# Use plain text mode for new TextEdit documents
+defaults write com.apple.TextEdit RichText -int 0
+
+# Open and save files as UTF-8 in TextEdit
+defaults write com.apple.TextEdit PlainTextEncoding -int 4
+defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 
 killall Dock
 killall Finder
