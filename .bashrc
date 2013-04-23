@@ -30,7 +30,6 @@ if [ "$uname" == "Darwin" ]; then
 
     export EDITNOW='subl'
     export EDITOR='subl -w'
-
     export LESS="$LESS -i -F -R -X"
     # set java home
     export JAVA_HOME=/Library/Java/Home
@@ -42,9 +41,7 @@ if [ "$uname" == "Darwin" ]; then
     alias ls='ls -F'
     alias top='top -o cpu'
     alias opena="open -n -a"
-
-    ### Added by the Heroku Toolbelt
-    export PATH="/usr/local/heroku/bin:$PATH"
+    [[ "`which gfind`" ]] && alias find="gfind"
 
 elif [ "$uname" == "Linux" ]; then
     # use GNU ls with --color
