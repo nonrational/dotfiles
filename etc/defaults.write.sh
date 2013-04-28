@@ -12,6 +12,9 @@ defaults write NSGlobalDomain KeyRepeat -int 0
 # Always show scrollbars
 defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 
+# Disable window animations
+defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
+
 # don't hide my library
 chflags nohidden ~/Library
 # Don’t show Dashboard as a Space
