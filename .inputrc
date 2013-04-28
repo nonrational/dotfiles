@@ -3,7 +3,7 @@ set show-all-if-ambiguous on
 # Ignore case when completing, very nice!
 set completion-ignore-case on
 
-# this makes the "delete" key work rather than 
+# this makes the "delete" key work rather than
 # just entering a ~
 "\e[3~": delete-char
 
@@ -12,8 +12,8 @@ set completion-ignore-case on
 "\e[5C": forward-word
 "\e[5D": backward-word
 
-# these allow you to start typing a command and 
-# use the up/down arrow to auto complete from 
+# these allow you to start typing a command and
+# use the up/down arrow to auto complete from
 # commands in your history
 # "\e[B": history-search-forward
 # "\e[A": history-search-backward
@@ -24,3 +24,5 @@ set completion-ignore-case on
 "\e[5~": beginning-of-history
 "\e[6~": end-of-history
 "\e[2~": quoted-insert
+
+TAB: menu-complete

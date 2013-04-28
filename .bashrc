@@ -7,11 +7,6 @@ uname=`uname`;
 if [ "$host" == "asterix" ]; then
     export FLEX_HOME='/Applications/Adobe Flash Builder 4/sdks/3.5.0.12683B'
     export RSL_VERSION=3.5.0.21474
-    export CATALINA_HOME='/Users/norton/dev/tomcat6'
-    export PATH="$PATH:$CATALINA_HOME/bin"
-
-    alias sleep='gsleep'
-    alias find='/opt/local/bin/gfind'
 
     # use 1.8.1 ant
     alias ant='/usr/local/bin/ant'
@@ -42,8 +37,10 @@ if [ "$uname" == "Darwin" ]; then
     alias top='top -o cpu'
     alias opena="open -n -a"
     [[ "`which gfind`" ]] && alias find="gfind"
+    [[ "`which gsleep`" ]] && alias sleep="gsleep"
 
 elif [ "$uname" == "Linux" ]; then
+
     # use GNU ls with --color
     alias ls='ls --color -F'
     alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -51,13 +48,11 @@ elif [ "$uname" == "Linux" ]; then
     export EDITNOW='vim'
     export EDITOR='vim'
 
-    if [ -f ~/.bash_aliases ]; then
-        . ~/.bash_aliases
+    [[ -s ~/.bash_aliases ]] && source ~/.bash_aliases;
+    if [[ -s /etc/bash_completion ]] && ! shopt -oq posix; then
+        source /etc/bash_completion;
     fi
 
-    if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
-        . /etc/bash_completion
-    fi
 fi
 
 export CLICOLOR=1
