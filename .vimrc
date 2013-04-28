@@ -16,7 +16,7 @@ set ignorecase
 set smartcase
 set gdefault
 
-" use indents of 2 spaces, and have them copied down lines: "
+set tabstop=4
 set shiftwidth=4
 set shiftround
 set expandtab
