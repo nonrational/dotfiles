@@ -14,6 +14,3 @@ if [ "$host" == "asterix" -o "$host" == "hypnos" ]; then
         export PATH=$PATH:$HOME/pear/bin
     fi
 fi
-
-# Turn ~/.ssh/known_hosts into a treasure trove of auto-completion goodness
-complete -W "$(echo `cat ~/.ssh/known_hosts | cut -f 1 -d ' ' | sed -e s/,.*//g | uniq | grep -v "\["`;)" ssh
