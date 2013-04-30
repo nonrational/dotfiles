@@ -15,13 +15,11 @@ fi
 
 if [ "$uname" == "Darwin" ]; then
     [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
-
     brewery=`brew --prefix`
-    [[ -s $brewery/etc/autojump.sh ]] && . $brewery/etc/autojump.sh
     alias jj='autojump'
-
-    [[ -s /opt/local/etc/bash_completion ]] && source /opt/local/etc/bash_completion
-    [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+    [[ -s $brewery/etc/autojump.sh ]] && . $brewery/etc/autojump.sh
+    [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
+    [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
 
     export EDITNOW='subl'
     export EDITOR='subl -w'
