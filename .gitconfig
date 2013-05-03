@@ -36,6 +36,7 @@
     dismiss = update-index --assume-unchanged
     attend = update-index --no-assume-unchanged
     wtf = "!source ~/.githelpers && what_the_hell_just_happened"
+    nuke = "!git reset --hard HEAD && git clean -fd"
 [color]
     ui = true
 [gist]
