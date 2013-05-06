@@ -108,3 +108,4 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 
 killall Dock
 killall Finder
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
