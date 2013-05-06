@@ -1,8 +1,0 @@
-#!/bin/bash
-
-for sd in `find ~/dev/wrkspc -name \.svn -type d | sed 's/\/\.svn//g'`; do
-    echo "svn up $sd"
-    cd $sd;
-    svn up 1> /dev/null
-    cd ..;
-done
