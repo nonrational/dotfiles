@@ -1,20 +1,12 @@
 # sourced on new screens, non-login shells.
 # echo sourcing .bashrc
-
 host=`uname -n | sed -e 's/\.local//g'`;
 uname=`uname`;
 
-if [ "$host" == "asterix" ]; then
-    export FLEX_HOME='/Applications/Adobe Flash Builder 4/sdks/3.5.0.12683B'
-    export RSL_VERSION=3.5.0.21474
-
-    # use 1.8.1 ant
-    alias ant='/usr/local/bin/ant'
-    alias dbc='cd "$(find $HOME/dev/dbc/ -name `date '+%Y%m%d'`)"'
-fi
-
 if [ "$uname" == "Darwin" ]; then
     [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
+
+    # homebrew version
     brewery=`brew --prefix`
     alias jj='autojump'
     [[ -s $brewery/etc/autojump.sh ]] && . $brewery/etc/autojump.sh
@@ -47,7 +39,7 @@ elif [ "$uname" == "Linux" ]; then
     export EDITOR='vim'
 
     [[ -s . /usr/share/autojump/autojump.sh ]] && . /usr/share/autojump/autojump.sh
-    [[ -s ~/.bash_aliases ]] && source ~/.bash_aliases;
+    [[ -s ~/.bash_aliases ]] && . ~/.bash_aliases;
     if [[ -s /etc/bash_completion ]] && ! shopt -oq posix; then
         . /etc/bash_completion;
     fi
