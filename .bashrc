@@ -38,7 +38,7 @@ elif [ "$uname" == "Linux" ]; then
     export EDITNOW='vim'
     export EDITOR='vim'
 
-    [[ -s . /usr/share/autojump/autojump.sh ]] && . /usr/share/autojump/autojump.sh
+    [[ -s /usr/share/autojump/autojump.sh ]] && . /usr/share/autojump/autojump.sh
     [[ -s ~/.bash_aliases ]] && . ~/.bash_aliases;
     if [[ -s /etc/bash_completion ]] && ! shopt -oq posix; then
         . /etc/bash_completion;
