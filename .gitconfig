@@ -5,6 +5,7 @@
     user = nonrational
 [core]
     excludesfile = /opt/boxen/config/git/gitignore
+	# excludesfile = /Users/norton/.gitignore_global
     quotepath = false
     whitespace = cr-at-eol
 [alias]
@@ -49,3 +50,5 @@
     helper = /opt/boxen/bin/boxen-git-credential
 [push]
 	default = upstream
+[git-up "bundler"]
+	check = true

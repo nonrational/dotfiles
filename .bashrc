@@ -3,14 +3,21 @@
 host=`uname -n | sed -e 's/\.local//g'`;
 uname=`uname`;
 
+if [ "$host" == "endymion" ]; then
+    # local buildy stuff
+    export FLEX_HOME='/Applications/Adobe Flash Builder 4/sdks/3.5.0.12683B'
+    export RSL_VERSION=3.5.0.21474
+    alias go="ant local && ~/my/toolbox/tomcat-6.0.18/bin/catalina.sh jpda run"
+fi
+
 if [ "$uname" == "Darwin" ]; then
     [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
 
-    # homebrew version
     brewery=`brew --prefix`
-    alias jj='autojump'
-    [[ -s $brewery/etc/autojump.sh ]] && . $brewery/etc/autojump.sh
+    [[ -s $brewery/etc/autojump.sh ]]     && . $brewery/etc/autojump.sh
     [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
+
+    # if we're not using boxen, we might be using rvm...
     [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
 
     export EDITNOW='subl'
@@ -22,6 +29,8 @@ if [ "$uname" == "Darwin" ]; then
     pman() {
         man -t "${1}" | open -f -a /Applications/Preview.app/
     }
+
+    alias jj='autojump'
     # use BSD ls with no --color
     alias ls='ls -F'
     alias top='top -o cpu'
