@@ -3,13 +3,6 @@
 host=`uname -n | sed -e 's/\.local//g'`;
 uname=`uname`;
 
-if [ "$host" == "endymion" ]; then
-    # local buildy stuff
-    export FLEX_HOME='/Applications/Adobe Flash Builder 4/sdks/3.5.0.12683B'
-    export RSL_VERSION=3.5.0.21474
-    alias go="ant local && ~/my/toolbox/tomcat-6.0.18/bin/catalina.sh jpda run"
-fi
-
 if [ "$uname" == "Darwin" ]; then
     [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
 
