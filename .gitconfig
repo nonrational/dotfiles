@@ -35,6 +35,7 @@
     assumed = !sh -c \"git ls-files -v | grep '^[a-z]'\"
     disregard = update-index --assume-unchanged
     dismiss = update-index --assume-unchanged
+    dissed = !git ls-files -v | grep ^[a-z] || echo "None"
     attend = update-index --no-assume-unchanged
     wtf = "!. ~/.githelpers && what_the_hell_just_happened"
     nuke = "!git reset --hard HEAD && git clean -fd"
