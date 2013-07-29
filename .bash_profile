@@ -5,3 +5,4 @@
 [[ -d $HOME/bin ]] && export PATH=$HOME/bin:$PATH
 [[ -d $JAVA_HOME/bin ]] && export PATH=$JAVA_HOME/bin:$PATH
 [[ -d "/usr/local/heroku/bin" ]] && export PATH="$PATH:/usr/local/heroku/bin"
+[[ -d "/usr/local/share/npm/bin/" ]] && export PATH="$PATH:/usr/local/share/npm/bin/"
