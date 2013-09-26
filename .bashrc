@@ -17,7 +17,10 @@ if [ "$uname" == "Darwin" ]; then
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
     # set java home
+
+    # JAVA 6
     export JAVA_HOME=/Library/Java/Home
+
     # preview man
     pman() {
         man -t "${1}" | open -f -a /Applications/Preview.app/

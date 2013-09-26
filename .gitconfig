@@ -24,6 +24,7 @@
     aa = add --all
     aww = "!. ~/.githelpers && add_wildcard"
     st = status
+    stp = status --porcelain
     sync = !sh -c \"git pull && git push\"
     drb = !git svn rebase
     dci = "!. ~/.githelpers && dcommit_from_master"
@@ -39,6 +40,8 @@
     attend = update-index --no-assume-unchanged
     wtf = "!. ~/.githelpers && what_the_hell_just_happened"
     nuke = "!git reset --hard HEAD && git clean -fd"
+    firm = "!git reset --soft $1 && git reset"
+    mall = "!git up && git co stage && git merge master && git push origin stage && git co develop && git merge stage && git push origin develop"
 [color]
     ui = true
 [gist]
@@ -53,3 +56,13 @@
 	default = upstream
 [git-up "bundler"]
 	check = true
+[merge]
+    # Include summaries of merged commits in newly created merge commit messages
+    log = true
+    keepBackup = false;
+    tool = p4merge
+[mergetool "p4merge"]
+    cmd = p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+    keepTemporaries = false
+    trustExitCode = false
+    keepBackup = false
