@@ -1,0 +1,3 @@
+if . "~/.bash_completion.d/shaws.bash" > /dev/null 2>&1; then
+    complete -F _GetOptPEM shaws
+fi

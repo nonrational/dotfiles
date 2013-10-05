@@ -1,0 +1,10 @@
+#!/bin/sh
+
+PEMDIR=~/.ssh/aws
+
+if [[ $# < 2 ]]; then
+    echo "Usage: $0 <pem-name> <ip>";
+    exit 1
+fi
+
+ssh -i $PEMDIR/$1 ec2-user@$2
