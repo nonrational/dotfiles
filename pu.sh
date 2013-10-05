@@ -3,7 +3,7 @@
 force_delete=0
 apply_root=0
 
-DOTS="$HOME/.dotfiles"
+DOTS="$PWD"
 uname="`uname`"
 host="`uname -n | sed -e 's/\.local//g'`";
 
