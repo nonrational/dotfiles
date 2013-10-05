@@ -7,4 +7,16 @@ if [[ $# < 2 ]]; then
     exit 1
 fi
 
-ssh -i $PEMDIR/$1 ec2-user@$2
+# is it already an ip?
+if [[ "$2" =~ [0-9\.]+ ]]; then
+    server_ip=$2
+else
+    server_ip=`nslookup $2 | awk '/Address/ {print $2}' | tail -n1`
+fi
+
+if [[ "$server_ip" =~ ^10 ]] && ! ifconfig | grep 192.168.237 > /dev/null 2>&1; then
+    echo "You must be on the VPN, kemosabe."
+    exit 2
+fi
+
+ssh -i $PEMDIR/$1 ec2-user@$server_ip
