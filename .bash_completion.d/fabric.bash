@@ -130,4 +130,3 @@ function __fab_completion() {
     # Set possible completions
     COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
 }
-complete -o default -o nospace -F __fab_completion fab
