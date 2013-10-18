@@ -120,7 +120,5 @@ fi
 
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
-if [ -f $HOME/.local.bashrc ]; then
-    # echo "Sourcing $HOME/.local.bashrc"
-    . $HOME/.local.bashrc
-fi
+[[ -s $HOME/.local.bashrc ]]  && . $HOME/.local.bashrc
+[[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
