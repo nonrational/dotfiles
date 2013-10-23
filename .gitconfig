@@ -21,7 +21,7 @@
     l = "!. ~/.githelpers && pretty_git_log"
     amend = commit --amend
     mad = add *
-    aa = add --all
+    aa = add --all .
     aww = "!. ~/.githelpers && add_wildcard"
     st = status
     stp = status --porcelain
