@@ -2,7 +2,13 @@
 # so, screen will *not* source this on new screen creation (ctrl+a,c)
 
 [[ -s $HOME/.bashrc ]] && . $HOME/.bashrc
-[[ -d $HOME/bin ]] && export PATH=$HOME/bin:$PATH
+
+if [[ -d $HOME/bin ]]; then
+    for bindir in `find $HOME/bin/ -maxdepth 1 -type d | sort -r`; do
+        export PATH=$bindir:$PATH
+    done
+fi
+
 [[ -d $JAVA_HOME/bin ]] && export PATH=$JAVA_HOME/bin:$PATH
 [[ -d "/usr/local/heroku/bin" ]] && export PATH="$PATH:/usr/local/heroku/bin"
 [[ -d "/usr/local/share/npm/bin/" ]] && export PATH="$PATH:/usr/local/share/npm/bin/"
