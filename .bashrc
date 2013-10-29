@@ -16,9 +16,7 @@ if [ "$uname" == "Darwin" ]; then
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
-    # set java home
 
-    # JAVA 6
     export JAVA_HOME=/Library/Java/Home
 
     # preview man
@@ -33,6 +31,9 @@ if [ "$uname" == "Darwin" ]; then
     alias opena="open -n -a"
     [[ "`which gfind`" ]] && alias find="gfind"
     [[ "`which gsleep`" ]] && alias sleep="gsleep"
+
+    [[ "`which aws`" ]] && complete -C aws_completer aws
+
 
 elif [ "$uname" == "Linux" ]; then
 
@@ -78,6 +79,7 @@ alias pjs='sudo jps -mlvV | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
 alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
 alias scg='curl -s http://www.madsci.org/cgi-bin/cgiwrap/~lynn/jardin/SCG | grep "<h2>" -A4 | tr "\n" " " | sed -e "s/<h2>[ \t]*//" -e "s/\<.*$//g"'
 alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | fold -w 18 | head -n1"
+alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
 
 #aliases for my local stuff
 alias ddate="date '+%Y%m%d%'"
