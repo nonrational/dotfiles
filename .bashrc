@@ -16,6 +16,7 @@ if [ "$uname" == "Darwin" ]; then
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
+    export HISTCONTROL=ignoredups
 
     export JAVA_HOME=/Library/Java/Home
 
