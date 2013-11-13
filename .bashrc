@@ -10,8 +10,8 @@ if [ "$uname" == "Darwin" ]; then
     [[ -s $brewery/etc/autojump.sh ]]     && . $brewery/etc/autojump.sh
     [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
 
-    export RBENV_ROOT="$brewery/var/rbenv"
-    if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+    # export RBENV_ROOT="$brewery/var/rbenv"
+    # if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
     export EDITNOW='subl'
     export EDITOR='subl -w'

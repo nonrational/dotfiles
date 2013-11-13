@@ -5,7 +5,7 @@
 
 if [[ -d $HOME/bin ]]; then
     for bindir in `find $HOME/bin/ -maxdepth 1 -type d | sort -r`; do
-        export PATH=$bindir:$PATH
+        export PATH=${bindir%/}:$PATH
     done
 fi
 
