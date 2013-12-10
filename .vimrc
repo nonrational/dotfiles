@@ -135,3 +135,8 @@ iabbrev hse he/she
 
 syntax on
 
+if $VIM_CRONTAB == "true"
+set nobackup
+set nowritebackup
+endif
+
