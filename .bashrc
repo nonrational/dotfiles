@@ -30,6 +30,7 @@ if [ "$uname" == "Darwin" ]; then
     alias ls='ls -F'
     alias top='top -o cpu'
     alias opena="open -n -a"
+    alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     [[ "`which gfind`" ]] && alias find="gfind"
     [[ "`which gsleep`" ]] && alias sleep="gsleep"
 
