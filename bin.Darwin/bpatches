@@ -1,0 +1,12 @@
+#!/bin/bash
+release=$1
+
+if [[ -z "$release" ]]; then
+    echo "Usage: `basename $0` [tag]"
+    exit 1
+fi
+
+files=`(find . -name "*$release*pre*sql" ; find . -name "*$release*post*sql")`
+
+echo $files | tr ' ' '\n'
+echo $files | xargs cat | pbcopy && echo "Contents copied to clipboard!" 1>&2
