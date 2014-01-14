@@ -47,9 +47,9 @@ dcommit_from_master(){
 }
 
 add_wildcard(){
-    modified_files | grep -i $1 | xargs -I{} git add {}
-    untracked_files | grep -i $1 | xargs -I{} git add {}
-    deleted_files | grep -i $1 | xargs -I{} git add {}
+    git ls-files --modified | grep -i $1 | xargs -I{} git add {}
+    git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git add {}
+    git ls-files --deleted | grep -i $1 | xargs -I{} git rm {}
 }
 
 what_the_hell_just_happened(){
@@ -71,8 +71,3 @@ what_the_hell_just_happened(){
     echo "Changes:"
     git diff --stat --summary $old $new
 }
-
-new_files() {
-    git st | awk '/new\ file/ {print "./" substr($0, index($0,$4))}';
-}
-

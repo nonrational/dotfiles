@@ -22,17 +22,18 @@
     amend = commit --amend
     mad = add *
     aa = add --all .
-    aww = "!. ~/.githelpers && add_wildcard"
     st = status
     stp = status --porcelain
     sync = !sh -c \"git pull && git push\"
+
     drb = !git svn rebase
     dci = "!. ~/.githelpers && dcommit_from_master"
     drevise = "!git rebase -i git-svn"
+
     modified = "!git ls-files --modified"
     deleted = "!git ls-files --deleted"
     untracked = "!git ls-files --others --exclude-standard"
-    new = "!. ~/.githelpers && new_files"
+
     assumed = !sh -c \"git ls-files -v | grep '^[a-z]'\"
     disregard = update-index --assume-unchanged
     dismiss = update-index --assume-unchanged
@@ -41,6 +42,8 @@
     wtf = "!. ~/.githelpers && what_the_hell_just_happened"
     nuke = "!git reset --hard HEAD && git clean -fd"
     firm = "!git reset --soft $1 && git reset"
+
+    aww = "!. ~/.githelpers && add_wildcard"
     mall = "!git up && git co stage && git merge master && git push origin stage && git co develop && git merge stage && git push origin develop"
 [color]
     ui = true
