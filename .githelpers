@@ -72,18 +72,6 @@ what_the_hell_just_happened(){
     git diff --stat --summary $old $new
 }
 
-modified_files() {
-    git st | awk '/modified/ {print "./" substr($0, index($0,$3))}';
-}
-
-deleted_files() {
-    git st | awk '/deleted/ {print "./" substr($0, index($0,$3))}';
-}
-
-untracked_files() {
-    git st | grep -v "modified" | awk '/#\t/ {print "./" substr($0, index($0,$2))}';
-}
-
 new_files() {
     git st | awk '/new\ file/ {print "./" substr($0, index($0,$4))}';
 }
