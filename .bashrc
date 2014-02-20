@@ -122,6 +122,20 @@ else
     uber_prompt $linux_prompt
 fi
 
+function vpn {
+/usr/bin/env osascript <<-EOF
+tell application "System Events"
+        tell current location of network preferences
+                set VPN to service "BetterVPN"
+                if exists VPN then connect VPN
+                repeat while (current configuration of VPN is not connected)
+                    delay 1
+                end repeat
+        end tell
+end tell
+EOF
+}
+
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s $HOME/.local.bashrc ]]  && . $HOME/.local.bashrc
