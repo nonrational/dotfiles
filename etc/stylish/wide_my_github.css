@@ -1,0 +1,36 @@
+.container {
+    width: 97% !important;
+}
+.pagehead {
+    margin-left: 40px !important;
+}
+.container > .repository-content, .container > .repo-container > .repository-content {
+    width: 96% !important;
+}
+.container > .with-full-navigation > .repository-content {
+    width: 88% !important;
+}
+.column-main, .repo-settings-content {
+    width: 84% !important;
+}
+.new-discussion-timeline .discussion-timeline {
+    width: 90% !important;
+}
+.news {
+    width: 78% !important;
+}
+
+/* for the Gist summary */
+.column {
+    width: 85% !important;
+}
+
+/* to keep admin pages in check */
+.columns.browser .sidebar{
+    width: 220px !important;
+}
+
+/* for inline comments. they expand to the width of the code now. hooray */
+.comment-holder {
+    max-width: 2000px !important;
+}
