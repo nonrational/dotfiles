@@ -45,6 +45,8 @@
 
     aww = "!. ~/.githelpers && add_wildcard"
     mall = "!git up && git co stage && git merge master && git push origin stage && git co develop && git merge stage && git push origin develop"
+    sup = "!. ~/.githelpers && current_pulls_into_here"
+
 [color]
     ui = true
 [gist]

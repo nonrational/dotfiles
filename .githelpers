@@ -71,3 +71,19 @@ what_the_hell_just_happened(){
     echo "Changes:"
     git diff --stat --summary $old $new
 }
+
+echoerr() { echo "$@" 1>&2; }
+# need underscore? npm install -g underscore-cli
+_underscore() { underscore "$@" 2> /dev/null; }
+
+current_pulls_into_here(){
+
+    current_repo="$(git config --get remote.origin.url | sed 's/github.com\//api.github.com\/repos\//')"
+    current_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+    curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $current_repo/pulls \
+    | _underscore filter "value.state === 'open' && value.base.ref === \"$current_branch\"" \
+    | _underscore map "value.html_url + ', ' + value.state + ', ' + value.head.ref + ', ' + value.created_at"
+
+}
+
