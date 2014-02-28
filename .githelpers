@@ -72,11 +72,10 @@ what_the_hell_just_happened(){
     git diff --stat --summary $old $new
 }
 
-echoerr() { echo "$@" 1>&2; }
-# need underscore? npm install -g underscore-cli
-_underscore() { underscore "$@" 2> /dev/null; }
-
 current_pulls_into_here(){
+
+    # need underscore? npm install -g underscore-cli
+    _underscore() { underscore "$@" 2> /dev/null; }
 
     current_repo="$(git config --get remote.origin.url | sed 's/github.com\//api.github.com\/repos\//')"
     current_branch="$(git rev-parse --abbrev-ref HEAD)"
