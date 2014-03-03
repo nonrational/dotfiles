@@ -19,15 +19,18 @@
 .news {
     width: 78% !important;
 }
-
 /* for the Gist summary */
 .column {
-    width: 85% !important;
+  width: 85% !important;
 }
-
-/* to keep admin pages in check */
+.column.one-fourth {
+  width: 25% !important;
+}
+.column.three-fourths {
+  width: 75% !important;
+}
 .columns.browser .sidebar{
-    width: 220px !important;
+  width: 220px !important;
 }
 
 /* for inline comments. they expand to the width of the code now. hooray */
