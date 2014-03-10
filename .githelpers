@@ -36,16 +36,6 @@ pretty_git_log() {
         less -FXRS -h80
 }
 
-dcommit_from_master(){
-    branch=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/');
-    if [ "$branch" == "(master)" ]; then
-        echo "(master) git svn dcommit";
-        git svn dcommit
-    else
-        echo "Will not dcommit from $branch";
-    fi
-}
-
 add_wildcard(){
     git ls-files --modified | grep -i $1 | xargs -I{} git add {}
     git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git add {}
@@ -72,6 +62,22 @@ what_the_hell_just_happened(){
     git diff --stat --summary $old $new
 }
 
+
+TIMESINCE="function timeSince(date) {\
+    var seconds = Math.floor((new Date() - date) / 1000);\
+    var interval = Math.floor(seconds / 31536000);\
+    if (interval > 1) return interval + \" years\";\
+    interval = Math.floor(seconds / 2592000);\
+    if (interval > 1) return interval + \" months\";\
+    interval = Math.floor(seconds / 86400);\
+    if (interval > 1) return interval + \" days\";\
+    interval = Math.floor(seconds / 3600);\
+    if (interval > 1) return interval + \" hours\";\
+    interval = Math.floor(seconds / 60);\
+    if (interval > 1) return interval + \" minutes\";\
+    return Math.floor(seconds) + \" seconds\";\
+}";
+
 current_pulls_into_here(){
 
     # need underscore? npm install -g underscore-cli
@@ -82,7 +88,7 @@ current_pulls_into_here(){
 
     curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $current_repo/pulls \
     | _underscore filter "value.state === 'open' && value.base.ref === \"$current_branch\"" \
-    | _underscore map "value.html_url + ', ' + value.state + ', ' + value.head.ref + ', ' + value.created_at"
+    | _underscore map "$TIMESINCE;; value.html_url + ' (' + timeSince(new Date(value.created_at)) +') ' + value.head.ref " --outfmt 'text'
 
 }
 
