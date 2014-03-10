@@ -88,7 +88,7 @@ current_pulls_into_here(){
 
     curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $current_repo/pulls \
     | _underscore filter "value.state === 'open' && value.base.ref === \"$current_branch\"" \
-    | _underscore map "$TIMESINCE;; value.html_url + ' (' + timeSince(new Date(value.created_at)) +') ' + value.head.ref " --outfmt 'text'
+    | _underscore map "$TIMESINCE;; value.html_url + ' (' + timeSince(new Date(value.created_at)) +') ' + value.base.ref + ' <~ ' + value.head.ref " --outfmt 'text'
 
 }
 
