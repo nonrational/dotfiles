@@ -46,6 +46,7 @@
     aww = "!. ~/.githelpers && add_wildcard"
     mall = "!git up && git co stage && git merge master && git push origin stage && git co develop && git merge stage && git push origin develop"
     sup = "!. ~/.githelpers && current_pulls_into_here"
+    super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
 
     lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
 

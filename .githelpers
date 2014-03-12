@@ -92,3 +92,36 @@ current_pulls_into_here(){
 
 }
 
+current_pulls_into_here_with_colorful_status(){
+
+    local      YELLOW="\033[0;33m"
+    local         RED="\033[0;31m"
+    local       GREEN="\033[0;32m"
+    local  LIGHT_GRAY="\033[0;37m"
+
+    # need underscore? npm install -g underscore-cli
+    _underscore() { underscore "$@" 2> /dev/null; }
+
+    current_repo="$(git config --get remote.origin.url | sed 's/github.com\//api.github.com\/repos\//')"
+    current_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+    for pr in $(curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $current_repo/pulls \
+        | _underscore filter "value.state === 'open' && value.base.ref === \"$current_branch\"" \
+        | _underscore map "$TIMESINCE;; value.statuses_url + ' ' + value.html_url + ' (' + timeSince(new Date(value.created_at)) +') ' + value.base.ref + ' <~ ' + value.head.ref " --outfmt 'text' | tr ' ' "#"); do
+
+        current_state=$(curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $(echo $pr | tr '#' ' ' | awk '{print $1}') | _underscore reduceRight "value.state" | tr -d '"')
+        pr=$(echo $pr | sed 's/^[^#]*#//g')
+        case "$current_state" in
+            ("success") printf "$GREEN" ;;
+            ("failure") printf "$RED" ;;
+            ("pending") printf "$YELLOW" ;;
+            (*) printf "$LIGHT_GRAY" ;;
+        esac
+
+        printf $pr | tr '#' ' '
+        echo "$LIGHT_GRAY"
+
+    done
+}
+
+
