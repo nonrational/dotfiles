@@ -49,6 +49,7 @@
     super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
 
     lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
+    stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
 
 [color]
     ui = true
