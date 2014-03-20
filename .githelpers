@@ -102,8 +102,11 @@ current_pulls_into_here_with_colorful_status(){
     # need underscore? npm install -g underscore-cli
     _underscore() { underscore "$@" 2> /dev/null; }
 
-    current_repo="$(git config --get remote.origin.url | sed 's/github.com\//api.github.com\/repos\//')"
-    current_branch="$(git rev-parse --abbrev-ref HEAD)"
+    repo_here="$(git config --get remote.origin.url | sed 's/github.com\//api.github.com\/repos\//')"
+    branch_here="$(git rev-parse --abbrev-ref HEAD)"
+
+    current_branch=${1:-$branch_here}
+    current_repo=${2:-$repo_here}
 
     for pr in $(curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $current_repo/pulls \
         | _underscore filter "value.state === 'open' && value.base.ref === \"$current_branch\"" \
