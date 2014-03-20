@@ -18,7 +18,22 @@ if [ "$uname" == "Darwin" ]; then
     export LESS="$LESS -i -F -R -X"
     export HISTCONTROL=ignoredups
 
+    alias gradle="gradle -PassumeOffline"
+
+    # give the VM a semi-ridiculous amount of memory.
+    LOTS_O_MEM='-Xmx1024m -Xms256m -XX:MaxPermSize=128m'
+    # make JVM GC sweep permgen as well.
+    GC_PERMGEN='-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC'
+
+    DO_DUMPS='-XX:+HeapDumpOnOutOfMemoryError'
+    # don't show the java dock icon
+    # this breaks osx.gradle being able to auto-connect VPN.
+    # argh.
+    NO_DOCK_ICON="-Djava.awt.headless=true"
+
     export JAVA_HOME=/Library/Java/Home
+    export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
+    export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
 
     # preview man
     pman() {
@@ -122,21 +137,7 @@ else
     uber_prompt $linux_prompt
 fi
 
-function vpn {
-/usr/bin/env osascript <<-EOF
-tell application "System Events"
-        tell current location of network preferences
-                set VPN to service "BetterVPN"
-                if exists VPN then connect VPN
-                repeat while (current configuration of VPN is not connected)
-                    delay 1
-                end repeat
-        end tell
-end tell
-EOF
-}
 
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
-[[ -s $HOME/.local.bashrc ]]  && . $HOME/.local.bashrc
 [[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
