@@ -2,6 +2,6 @@
 
 killall Dropbox
 sleep 1;
-open -n -a Dropbox &
+open -a ~/Applications/DropboxAlt.app &
 sleep 5;
-open -n -a ~/Applications/DropboxAlt.app &
+open -n -a Dropbox &
