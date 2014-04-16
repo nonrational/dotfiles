@@ -1,0 +1,11 @@
+body.fixed-content #content{
+		width:890px !important;
+}
+
+div.window {
+		width:890px !important;
+}
+
+div.window-main-col {
+		width:672px !important;
+}
