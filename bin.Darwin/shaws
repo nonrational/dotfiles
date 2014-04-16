@@ -15,7 +15,7 @@ else
     server_ip=`nslookup $2 | awk '/Address/ {print $2}' | tail -n1`
 fi
 
-if ! ifconfig | grep 192.168.237 > /dev/null 2>&1; then
+if ! ifconfig | grep 192 > /dev/null 2>&1; then
     echo "You must be on the VPN, kemosabe."
     exit 1
 fi
@@ -23,4 +23,5 @@ fi
 pemfile=$1
 shift;shift;
 
+echo ssh -i $PEMDIR/$pemfile ec2-user@$server_ip $@
 ssh -i $PEMDIR/$pemfile ec2-user@$server_ip $@
