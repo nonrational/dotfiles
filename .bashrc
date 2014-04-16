@@ -141,3 +141,4 @@ fi
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
+alias bleed="~/gocode/bin/Heartbleed"
