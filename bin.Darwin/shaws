@@ -23,5 +23,10 @@ fi
 pemfile=$1
 shift;shift;
 
-echo ssh -i $PEMDIR/$pemfile ec2-user@$server_ip $@
-ssh -i $PEMDIR/$pemfile ec2-user@$server_ip $@
+if [[ $server_ip =~ @ ]]; then
+    echo "ssh -oStrictHostKeyChecking=no -i $PEMDIR/$pemfile $server_ip $@"
+    ssh -oStrictHostKeyChecking=no -i $PEMDIR/$pemfile $server_ip $@
+else
+    echo "ssh -oStrictHostKeyChecking=no -i $PEMDIR/$pemfile ec2-user@$server_ip $@"
+    ssh -oStrictHostKeyChecking=no -i $PEMDIR/$pemfile ec2-user@$server_ip $@
+fi
