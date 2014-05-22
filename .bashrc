@@ -31,7 +31,8 @@ if [ "$uname" == "Darwin" ]; then
     # argh.
     NO_DOCK_ICON="-Djava.awt.headless=true"
 
-    export JAVA_HOME=/Library/Java/Home
+    export JAVA_HOME=`/usr/libexec/java_home`
+    export GRADLE_HOME=`find $brewery/Cellar/gradle/ -name libexec`
     export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
     export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
 
