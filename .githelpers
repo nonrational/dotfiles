@@ -28,6 +28,8 @@ pretty_git_log() {
         sed -Ee 's/(^[^<]*) ago\)/\1)/' |
         # Replace (2 years, 5 months) with (2 years)
         sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?\)/\1)/' |
+        # fix for columns max 2048 char limit
+        cut -c-2047 |
         # Line columns up based on } delimiter
         column -s '}' -t |
         # delete everything after COLUMNS to prevent horizontal paging. stupid less...
