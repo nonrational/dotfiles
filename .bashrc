@@ -34,6 +34,7 @@ if [ "$uname" == "Darwin" ]; then
     export JAVA_HOME=`/usr/libexec/java_home`
     export GRADLE_HOME=`find $brewery/Cellar/gradle/ -name libexec`
     export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
+    export JAVA_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
     export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
 
     # preview man
@@ -96,7 +97,7 @@ alias pjs='sudo jps -mlvV | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
 # fun aliases
 alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
 alias scg='curl -s http://www.madsci.org/cgi-bin/cgiwrap/~lynn/jardin/SCG | grep "<h2>" -A4 | tr "\n" " " | sed -e "s/<h2>[ \t]*//" -e "s/\<.*$//g"'
-alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | fold -w 18 | head -n1"
+alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
 alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
 
 #aliases for my local stuff
@@ -123,6 +124,10 @@ uber_prompt() {
     PS4='+ '
 }
 
+figcom () {
+    figlet "$@" | sed 's/^/# /g'
+}
+
 myself="`whoami`"
 linux_prompt="[\u@\h \W]"
 darwin_prompt="\u@\h:\W"
@@ -138,8 +143,9 @@ else
     uber_prompt $linux_prompt
 fi
 
-
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
 alias bleed="~/gocode/bin/Heartbleed"
+
+alias slaves='aws ec2 describe-instances --filters "Name=tag:Name,Values=*jenkins-slave*" | underscore flatten | underscore pluck "Instances" | underscore flatten | underscore map "value.PrivateIpAddress" --outfmt 'text' 2> /dev/null'
