@@ -9,6 +9,7 @@
     quotepath = false
     whitespace = cr-at-eol
 [alias]
+    push = "!git push || $(git push 2>&1 | tail -n2 | head -n1)"
     pull = pull --ff-only
     ci = commit -v
     co = checkout
@@ -51,6 +52,10 @@
     lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
     stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
 
+    obliterate = "!git branch -D $1 && git push origin :$1 && echo OBLITERATED"
+
+    prune-merged-branches = "!git co master; git branch --merged | grep -v 'master$' | xargs git branch -d"
+
 [color]
     ui = true
 [gist]
@@ -62,7 +67,7 @@
 [credential]
 	helper = /opt/boxen/bin/boxen-git-credential
 [push]
-	default = upstream
+	default = simple
 [git-up "bundler"]
 	check = true
 [merge]
