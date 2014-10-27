@@ -54,7 +54,7 @@
 
     obliterate = "!git branch -D $1 && git push origin :$1 && echo OBLITERATED"
 
-    prune-merged-branches = "!OLD_BRANCH=$(git rev-parse --abbrev-ref HEAD); git co master; git branch --merged | grep -v 'master$' | xargs git branch -d; git checkout $OLD_BRANCH"
+    prune-merged-branches = "!git branch --merged | xargs git branch -d"
 
 [color]
     ui = true
