@@ -1,0 +1,24 @@
+for srcdir in ~/src ~/my; do
+    cd $srcdir
+    for repo in $(gfind -wholename \*.git/config); do
+        repo_dir="$(dirname $repo)/..";
+
+        pushd $repo_dir > /dev/null
+        repo_name=$(echo $repo_dir | sed 's/\/.git\/..//g')
+
+        printf "$repo_name :"
+
+        if grep Betterment .git/config > /dev/null; then
+            git config user.email alan@betterment.com
+            echo "alan@betterment.com"
+        elif grep nonrational .git/config > /dev/null; then
+            git config user.email me@alannorton.com
+            echo "me@alannorton.com"
+        else
+            git config user.email me@alannorton.com
+            echo "me@alannorton.com"
+        fi
+
+        popd > /dev/null
+    done
+done
