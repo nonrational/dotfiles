@@ -50,7 +50,6 @@ if [ "$uname" == "Darwin" ]; then
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     [[ "`which gfind`" ]] && alias find="gfind"
     [[ "`which gsleep`" ]] && alias sleep="gsleep"
-
     [[ "`which aws`" ]] && complete -C aws_completer aws
 
 
@@ -99,6 +98,7 @@ alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
 alias scg='curl -s http://www.madsci.org/cgi-bin/cgiwrap/~lynn/jardin/SCG | grep "<h2>" -A4 | tr "\n" " " | sed -e "s/<h2>[ \t]*//" -e "s/\<.*$//g"'
 alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
 alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
+alias nukelock="find -maxdepth 2 -name Gemfile.lock | xargs git checkout"
 
 #aliases for my local stuff
 alias ddate="date '+%Y%m%d%'"
@@ -108,6 +108,15 @@ alias cdate="date '+%Y%m%d%H%M%S'"
 
 parse_git_branch() {
     git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+uninstall-all-rbenv-gems-for-current-ruby-version() {
+  list=`gem list --no-versions`
+  for gem in $list; do
+    gem uninstall $gem -aIx
+  done
+  gem list
+  gem install bundler
 }
 
 uber_prompt() {
