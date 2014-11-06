@@ -44,6 +44,12 @@ add_wildcard(){
     git ls-files --deleted | grep -i $1 | xargs -I{} git rm {}
 }
 
+reset_wildcard(){
+    git ls-files --modified | grep -i $1 | xargs -I{} git checkout {}
+    git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git checkout {}
+    git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
+}
+
 what_the_hell_just_happened(){
     ref=${1:-"HEAD"}
 
