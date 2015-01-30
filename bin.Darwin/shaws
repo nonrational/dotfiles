@@ -15,7 +15,7 @@ else
     server_ip=`nslookup $2 | awk '/Address/ {print $2}' | tail -n1`
 fi
 
-if ! ifconfig | grep 192 > /dev/null 2>&1; then
+if ! ifconfig | grep 192 > /dev/null 2>&1 && [[ "$server_ip" =~ "10.0.*" ]]; then
     echo "You must be on the VPN, kemosabe."
     exit 1
 fi
