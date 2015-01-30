@@ -16,7 +16,6 @@ if [ "$uname" == "Darwin" ]; then
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
-    export HISTCONTROL=ignoredups
 
     alias gradle="gradle -PassumeOffline"
 
@@ -44,7 +43,7 @@ if [ "$uname" == "Darwin" ]; then
 
     alias jj='autojump'
     # use BSD ls with no --color
-    alias ls='ls -F'
+    alias ls="/bin/ls -F"
     alias top='top -o cpu'
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
@@ -72,8 +71,14 @@ fi
 
 export CLICOLOR=1
 export TERM=xterm-color
-export HISTCONTROL="ignoredups"
 export HISTIGNORE="[   ]*:&:bg:fg:exit"
+export HISTCONTROL=ignoredups:erasedups  # no duplicate entries
+export HISTSIZE=100000                   # big big history
+export HISTFILESIZE=100000               # big big history
+shopt -s histappend                      # append to history, don't overwrite it
+
+# Save and reload the history after each command finishes
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # do close spelling matches with cd
 shopt -s cdspell
