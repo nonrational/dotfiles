@@ -90,20 +90,22 @@ shopt -s checkwinsize
 alias ll='ls -l'
 alias la='ls -hlA'
 alias l='ls'
+alias rm='rm -v'
 alias df='df -h'
 alias du='du -h'
 alias grep="grep --color"
-alias become="sudo su -"
 
 alias hosts='sudo $EDITNOW /etc/hosts'
-alias pjs='sudo jps -mlvV | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
 
 # fun aliases
 alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
-alias scg='curl -s http://www.madsci.org/cgi-bin/cgiwrap/~lynn/jardin/SCG | grep "<h2>" -A4 | tr "\n" " " | sed -e "s/<h2>[ \t]*//" -e "s/\<.*$//g"'
-alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
+
 alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
+alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
+alias rpg="ruby <(echo 'require \"securerandom\"; print \"#{SecureRandom.urlsafe_base64(12)}\n\";')"
+
 alias nukelock="find -maxdepth 2 -name Gemfile.lock | xargs git checkout"
+
 
 #aliases for my local stuff
 alias ddate="date '+%Y%m%d%'"
