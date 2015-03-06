@@ -55,8 +55,7 @@
     stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 
     pall = "!for r in $(git remote); do git push $r $(git rev-parse --abbrev-ref HEAD); done"
-
-    obliterate = "!git branch -D $1 && git push origin :$1 && echo OBLITERATED"
+    pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
 
     prune-merged-branches = "!git branch --merged | xargs git branch -d"
 
