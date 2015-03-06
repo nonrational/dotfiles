@@ -47,6 +47,8 @@ if [ "$uname" == "Darwin" ]; then
     alias top='top -o cpu'
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
+    alias gradle="[ -f ./gradlew ] && ./gradlew || gradle"
+
     [[ "`which gfind`" ]] && alias find="gfind"
     [[ "`which gsleep`" ]] && alias sleep="gsleep"
     [[ "`which aws`" ]] && complete -C aws_completer aws
@@ -66,7 +68,6 @@ elif [ "$uname" == "Linux" ]; then
     if [[ -s /etc/bash_completion ]] && ! shopt -oq posix; then
         . /etc/bash_completion;
     fi
-
 fi
 
 export CLICOLOR=1
@@ -78,11 +79,10 @@ export HISTFILESIZE=100000               # big big history
 shopt -s histappend                      # append to history, don't overwrite it
 
 # Save and reload the history after each command finishes
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+# export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # do close spelling matches with cd
 shopt -s cdspell
-shopt -s histappend
 shopt -s nocaseglob
 shopt -s checkwinsize
 
@@ -112,6 +112,9 @@ alias ddate="date '+%Y%m%d%'"
 alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
+git-rm-banch(){
+    git branch -D $1 && git push origin :$1
+}
 
 parse_git_branch() {
     git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
