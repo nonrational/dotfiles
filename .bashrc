@@ -10,9 +10,6 @@ if [ "$uname" == "Darwin" ]; then
     [[ -s $brewery/etc/autojump.sh ]]     && . $brewery/etc/autojump.sh
     [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
 
-    # export RBENV_ROOT="$brewery/var/rbenv"
-    # if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
@@ -30,8 +27,12 @@ if [ "$uname" == "Darwin" ]; then
     # argh.
     NO_DOCK_ICON="-Djava.awt.headless=true"
 
-    export JAVA_HOME=`/usr/libexec/java_home`
-    export GRADLE_HOME=$(find $(dirname $(brew --prefix)$(readlink $(which gradle) | cut -c3-))/.. -name libexec)
+    [[ "`which gfind`" ]] && alias find="gfind"
+    [[ "`which gsleep`" ]] && alias sleep="gsleep"
+    [[ "`which aws`" ]] && complete -C aws_completer aws
+    [[ "`which jenv`" ]] || export JAVA_HOME=$(/usr/libexec/java_home -v 1.7)
+
+    # export GRADLE_HOME=$(find $(dirname $(brew --prefix)$(readlink $(which gradle) | cut -c3-))/.. -name libexec)
     export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
     export JAVA_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
     export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
@@ -48,11 +49,6 @@ if [ "$uname" == "Darwin" ]; then
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     alias gradle="[ -f ./gradlew ] && ./gradlew || gradle"
-
-    [[ "`which gfind`" ]] && alias find="gfind"
-    [[ "`which gsleep`" ]] && alias sleep="gsleep"
-    [[ "`which aws`" ]] && complete -C aws_completer aws
-
 
 elif [ "$uname" == "Linux" ]; then
 
@@ -165,6 +161,3 @@ fi
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
-alias bleed="~/gocode/bin/Heartbleed"
-
-alias slaves='aws ec2 describe-instances --filters "Name=tag:Name,Values=*jenkins-slave*" | underscore flatten | underscore pluck "Instances" | underscore flatten | underscore map "value.PrivateIpAddress" --outfmt 'text' 2> /dev/null'
