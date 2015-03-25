@@ -57,8 +57,6 @@
     pall = "!for r in $(git remote); do git push $r $(git rev-parse --abbrev-ref HEAD); done"
     pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
 
-    prune-merged-branches = "!git branch --merged | xargs git branch -d"
-
 [color]
     ui = true
 [gist]
