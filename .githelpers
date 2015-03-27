@@ -26,7 +26,7 @@ FORMAT="$HASH}$RELATIVE_TIME}$AUTHOR}$REFS $SUBJECT"
 pretty_git_log() {
     git log --graph --abbrev-commit --date=relative --pretty="tformat:${FORMAT}" $* |
         # remove tags
-        sed -Ee 's/tag: ([a-z]{,1}-?){1,}(-[0-9])*,? ?//g' | tr -d '()' |
+        sed -Ee 's/tag: ([a-z]{,1}-?){1,}(-[0-9]{1,})*,? ?//g' | tr -d '()' |
         # Replace (2 years ago) with (2 years)
         sed -Ee 's/(^[^<]*) ago\)/\1)/' |
         # Replace (2 years, 5 months) with (2 years)
