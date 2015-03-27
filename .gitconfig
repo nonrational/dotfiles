@@ -81,3 +81,5 @@
     keepTemporaries = false
     trustExitCode = false
     keepBackup = false
+[gc]
+	auto = 0
