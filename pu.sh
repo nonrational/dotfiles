@@ -15,7 +15,6 @@ do
     case "$1" in
     (-f) force_delete=1; shift;;
     (-r) apply_root=1; shift;;
-    # (-d) shift; break;;
     (-*) echo "$0: error - unrecognized option $1" 1>&2; exit 1;;
     (*)  break;;
     esac
@@ -81,10 +80,8 @@ if [[ $apply_root == 1 ]]; then
     sudo ln -sfv $DOTS/root.profile /var/root/.profile
 fi
 
-if [ "$uname" == "Darwin" ]; then
-    echo "Linking OS X Specific Addons ... ";
-    # ln -sfv $DOTS/Sublime\ Text\ 2 $HOME/Library/Application\ Support
-    ln -sfv $DOTS/keyremap.private.xml $HOME/Library/Application\ Support/KeyRemap4MacBook/private.xml
-elif [ "$uname" == "Linux" ]; then
-    echo "Linking Linux Specific Addons ... "
-fi
+# if [ "$uname" == "Darwin" ]; then
+#     echo "Linking OS X Specific Addons ... ";
+# elif [ "$uname" == "Linux" ]; then
+#     echo "Linking Linux Specific Addons ... "
+# fi
