@@ -98,15 +98,17 @@ alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
 
 alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
 alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
-alias rpg="ruby <(echo 'require \"securerandom\"; print \"#{SecureRandom.urlsafe_base64(12)}\n\";')"
 
 alias nukelock="find -maxdepth 2 -name Gemfile.lock | xargs git checkout"
-
 
 #aliases for my local stuff
 alias ddate="date '+%Y%m%d%'"
 alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
+
+rpg(){
+    size=${1:-12}; ruby <(echo "require \"securerandom\"; print \"#{SecureRandom.urlsafe_base64($size)}\n\";")
+}
 
 git-rm-banch(){
     git branch -D $1 && git push origin :$1
