@@ -106,6 +106,10 @@ alias ddate="date '+%Y%m%d%'"
 alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
+note(){
+    subl /Users/norton/Dropbox\ \(Betterment\)/Notes/$(cdate).md
+}
+
 rpg(){
     size=${1:-12}; ruby <(echo "require \"securerandom\"; print \"#{SecureRandom.urlsafe_base64($size)}\n\";")
 }
