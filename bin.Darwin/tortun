@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+DEVICE=en0
+INTERFACE=$(networksetup -listnetworkserviceorder 2 | grep $DEVICE -B1 | awk '/^\([0-9]/ {print $2}')
+
+networksetup -setsocksfirewallproxy $INTERFACE 127.0.0.1 9050 off
+networksetup -setsocksfirewallproxystate $INTERFACE on
+tor
+networksetup -setsocksfirewallproxystate $INTERFACE off
