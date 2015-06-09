@@ -9,12 +9,12 @@ if [ "$uname" == "Darwin" ]; then
     brewery=`brew --prefix`
     [[ -s $brewery/etc/autojump.sh ]]     && . $brewery/etc/autojump.sh
     [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
+    # https://www.nativescript.org/ - tns completion
+    [[ -f $HOME/.tnsrc ]] && . $HOME/.tnsrc
 
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
-
-    alias gradle="gradle -PassumeOffline"
 
     # give the VM a semi-ridiculous amount of memory.
     LOTS_O_MEM='-Xmx1024m -Xms256m -XX:MaxPermSize=128m'
@@ -37,6 +37,8 @@ if [ "$uname" == "Darwin" ]; then
     export JAVA_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
     export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
 
+    export GOPATH=$HOME/go
+
     # preview man
     pman() {
         man -t "${1}" | open -f -a /Applications/Preview.app/
@@ -48,7 +50,21 @@ if [ "$uname" == "Darwin" ]; then
     alias top='top -o cpu'
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
-    alias gradle="[ -f ./gradlew ] && ./gradlew || gradle"
+
+    function gradle(){
+        if [[ -f ./gradlew ]]; then
+            (echo ./gradlew $@ 2>&1; ./gradlew $@)
+        else
+            (echo $(which gradle) $@ 2>&1; $(which gradle) $@)
+        fi
+    }
+
+    function kali(){
+        if ! VBoxManage list runningvms | grep kali; then
+            nohup VBoxHeadless --startvm kali --vrde off >/dev/null 2>&1 &
+        fi
+        ssh -Y -p31339 root@127.0.0.1
+    }
 
 elif [ "$uname" == "Linux" ]; then
 
