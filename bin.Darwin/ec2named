@@ -1,11 +1,1 @@
-#!/bin/bash
-
-name_partial=$1
-
-aws ec2 describe-instances --filters "Name=tag:Name,Values=*$name_partial*" \
-| underscore flatten \
-| underscore pluck "Instances" \
-| underscore flatten \
-| underscore map "value.PrivateIpAddress" --outfmt text \
-2> /dev/null \
-| grep -e '^$' -v
+ec2named.rb
