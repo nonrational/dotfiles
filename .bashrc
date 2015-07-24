@@ -127,7 +127,7 @@ note(){
 }
 
 rpg(){
-    size=${1:-12}; ruby <(echo "require \"securerandom\"; print \"#{SecureRandom.urlsafe_base64($size)}\n\";")
+    size=${1:-12}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
 }
 
 git-rm-banch(){
