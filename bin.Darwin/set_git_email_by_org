@@ -1,6 +1,6 @@
-for srcdir in ~/src ~/my; do
-    cd $srcdir
-    for repo in $(gfind -wholename \*.git/config); do
+for srcdir in $HOME/src $HOME/my; do
+    pushd $srcdir > /dev/null
+    for repo in $(gfind -maxdepth 4 -wholename \*.git/config); do
         repo_dir="$(dirname $repo)/..";
 
         pushd $repo_dir > /dev/null
@@ -21,4 +21,6 @@ for srcdir in ~/src ~/my; do
 
         popd > /dev/null
     done
+
+    popd > /dev/null
 done
