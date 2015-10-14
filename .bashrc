@@ -123,7 +123,7 @@ alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
 note(){
-    subl /Users/norton/Dropbox\ \(Betterment\)/Notes/$(cdate).md
+    atom /Users/norton/Dropbox\ \(Betterment\)/Notes/$(cdate).md
 }
 
 rpg(){
@@ -183,3 +183,6 @@ fi
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
+
+# added by travis gem
+[ -f /Users/norton/.travis/travis.sh ] && source /Users/norton/.travis/travis.sh
