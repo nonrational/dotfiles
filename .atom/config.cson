@@ -3,9 +3,14 @@
     userId: "e3fcfd98-c608-8d34-1ad3-5f83e3abafc0"
   welcome:
     showOnStartup: false
-  editor: {}
+  editor:
+    invisibles: {}
+    fontSize: 15
   core:
     themes: [
       "atom-light-ui"
       "atom-espresso-soda-theme"
     ]
+    audioBeep: false
+  "markdown-preview":
+    useGitHubStyle: true
