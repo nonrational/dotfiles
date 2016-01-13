@@ -106,6 +106,9 @@ alias rm='rm -v'
 alias df='df -h'
 alias du='du -h'
 alias grep="grep --color"
+alias hist="history|tail"
+alias history="history|tail -n100"
+alias psa="ps auxwww"
 
 alias hosts='sudo $EDITNOW /etc/hosts'
 
@@ -136,6 +139,10 @@ git-rm-banch(){
 
 parse_git_branch() {
     git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+basher(){
+    env -i PATH=$PATH "$(command -v bash)" --noprofile --norc
 }
 
 uninstall-all-rbenv-gems-for-current-ruby-version() {
