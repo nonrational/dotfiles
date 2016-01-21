@@ -1,16 +1,15 @@
 "*":
-  "exception-reporting":
-    userId: "e3fcfd98-c608-8d34-1ad3-5f83e3abafc0"
-  welcome:
-    showOnStartup: false
-  editor:
-    invisibles: {}
-    fontSize: 15
   core:
+    audioBeep: false
     themes: [
       "atom-light-ui"
       "atom-espresso-soda-theme"
     ]
-    audioBeep: false
+  editor:
+    invisibles: {}
+  "exception-reporting":
+    userId: "e3fcfd98-c608-8d34-1ad3-5f83e3abafc0"
   "markdown-preview":
     useGitHubStyle: true
+  welcome:
+    showOnStartup: false
