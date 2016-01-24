@@ -13,7 +13,7 @@
     pull = pull --ff-only
     ci = commit -v
     co = checkout
-    df = "diff ..@{u}"
+    df = "diff --name-only"
     di = diff
     dc = diff --cached
     r = !git l -20
