@@ -1,16 +1,22 @@
 # sourced on new screens, non-login shells.
 # echo sourcing .bashrc
 host=`uname -n | sed -e 's/\.local//g'`;
-uname=`uname`;
+my_uname=`uname`;
 
-if [ "$uname" == "Darwin" ]; then
+# rm -f /tmp/bashstart.*.log
+# PS4='+ $(date "+%s.%N")\011 '
+# exec 3>&2 2>/tmp/bashstart.$$.log
+# set -x
+
+if [ "$my_uname" == "Darwin" ]; then
     [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
 
     brewery=`brew --prefix`
-    [[ -s $brewery/etc/autojump.sh ]]     && . $brewery/etc/autojump.sh
+    [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
     [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
-    # https://www.nativescript.org/ - tns completion
-    [[ -f $HOME/.tnsrc ]] && . $HOME/.tnsrc
+
+    # https://www.nativescript.org/
+    # [[ -f $HOME/.tnsrc ]] && . $HOME/.tnsrc
 
     export EDITNOW='subl'
     export EDITOR='subl -w'
@@ -22,9 +28,6 @@ if [ "$uname" == "Darwin" ]; then
     GC_PERMGEN='-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC'
 
     DO_DUMPS='-XX:+HeapDumpOnOutOfMemoryError'
-    # don't show the java dock icon
-    # this breaks osx.gradle being able to auto-connect VPN.
-    # argh.
     NO_DOCK_ICON="-Djava.awt.headless=true"
 
     [[ "`which gfind`" ]] && alias find="gfind"
@@ -66,7 +69,7 @@ if [ "$uname" == "Darwin" ]; then
         ssh -Y -p31339 root@127.0.0.1
     }
 
-elif [ "$uname" == "Linux" ]; then
+elif [ "$my_uname" == "Linux" ]; then
 
     # use GNU ls with --color
     alias ls='ls --color -F'
@@ -142,7 +145,7 @@ parse_git_branch() {
 }
 
 basher(){
-    env -i PATH=$PATH "$(command -v bash)" --noprofile --norc
+    env -i PATH=$PATH TERM=xterm-color "$(command -v bash)" --noprofile --norc
 }
 
 uninstall-all-rbenv-gems-for-current-ruby-version() {
@@ -177,7 +180,7 @@ linux_prompt="[\u@\h \W]"
 darwin_prompt="\u@\h:\W"
 me_prompt="\h:\W"
 
-if [ "$uname" == "Darwin" ]; then
+if [ "$my_uname" == "Darwin" ]; then
     if [ "$myself" == 'norton' -o "$myself" == 'anorton' ]; then
         uber_prompt $me_prompt;
     else
@@ -193,3 +196,6 @@ fi
 
 # added by travis gem
 [ -f /Users/norton/.travis/travis.sh ] && source /Users/norton/.travis/travis.sh
+
+# set +x
+# exec 2>&3 3>&-
