@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+MAX_DEPTH=${1:-3}
+
+for d in $(find . -maxdepth $MAX_DEPTH -type d -name .git); do
+    cd $(dirname "$d")
+    git up || git pull
+    cd -
+done
