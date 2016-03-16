@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 limit = 10
-handles = `git branch -a`.split("\n").map { |b| b.split('/')[2] }
-frequency = handles.each_with_object(Hash.new(0)) { |handle, hash| hash[handle] += 1 }
-frequency.each { |k,v| puts "#{k}:#{v}" if v > limit }
+handles = `git branch -a`.split("\n")
+  .map { |b| b.split('/')[2] }
+  .each_with_object(Hash.new(0)) { |handle, hash| hash[handle] += 1 }
+  .each { |author, branch_count| puts "#{author}:#{branch_count}" if branch_count > limit }
