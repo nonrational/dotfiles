@@ -1,3 +1,5 @@
+/*URLs on the domain: github.com*/
+
 .container {
     width: 97% !important;
 }
@@ -16,6 +18,10 @@
 .new-discussion-timeline .discussion-timeline {
     width: 84% !important;
 }
+.timeline-new-comment {
+  max-width: 1600px;
+}
+
 .news {
     width: 66% !important;
 }
