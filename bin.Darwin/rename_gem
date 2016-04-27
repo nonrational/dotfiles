@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+
+current_dir_name=$1
+current_class_name=$(echo "$current_dir_name" | perl -pe 's/(_|\b)([a-z])/\u\2/g')
+
+new_dir_name=$2
+new_class_name=$(echo "$new_dir_name" | perl -pe 's/(_|\b)([a-z])/\u\2/g')
+
+echo "$current_dir_name ~> $new_dir_name"
+echo "$current_class_name ~> $new_class_name"
+
+
+
+function rename_gem_references() {
+    if grep "$current_dir_name\|$current_class_name" "$1"; then
+        sed -i'' -e "s/$current_dir_name/$new_dir_name/g" -e "s/$current_class_name/$new_class_name/g" "$1"
+    else
+        echo "skipping $1"
+    fi
+    if [[ "$1" =~ "$current_dir_name" ]]; then
+        rename "s/$current_dir_name/$new_dir_name/" "$1"
+    fi
+}
+
+mv -v $current_dir_name $new_dir_name
+find $new_dir_name -type d -name $current_dir_name | xargs rename "s/$current_dir_name/$new_dir_name/"
+find $new_dir_name -type f -not -path "*.git/*" | while read file; do rename_gem_references "$file"; done
