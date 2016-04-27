@@ -14,7 +14,6 @@
     ci = commit -v
     co = checkout
     df = "diff --name-only"
-    di = diff
     dc = diff --cached
     r = !git l -20
     la = !git l --all
