@@ -145,7 +145,7 @@ parse_git_branch() {
 }
 
 basher(){
-    env -i PATH=$PATH TERM=xterm-color "$(command -v bash)" --noprofile --norc
+    env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
 }
 
 uninstall-all-rbenv-gems-for-current-ruby-version() {
