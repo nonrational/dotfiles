@@ -74,6 +74,7 @@ done
 
 # special cases - these don't start with a dot
 linky "bin.$uname" ~/bin
+linky "Scripts" ~/Library/Scripts
 
 # root configurations
 if [[ $apply_root == 1 ]]; then
