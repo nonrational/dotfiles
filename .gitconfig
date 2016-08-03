@@ -16,6 +16,7 @@
     df = "diff --name-only"
     dc = diff --cached
     r = !git l -20
+    rl = !git l -200
     la = !git l --all
     ra = !git r --all
     l = "!. ~/.githelpers && pretty_git_log"

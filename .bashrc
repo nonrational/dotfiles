@@ -14,9 +14,7 @@ if [ "$my_uname" == "Darwin" ]; then
     brewery=`brew --prefix`
     [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
     [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
-
-    # https://www.nativescript.org/
-    # [[ -f $HOME/.tnsrc ]] && . $HOME/.tnsrc
+    [ -f /Users/norton/.travis/travis.sh ] && source /Users/norton/.travis/travis.sh
 
     export EDITNOW='subl'
     export EDITOR='subl -w'
@@ -26,17 +24,15 @@ if [ "$my_uname" == "Darwin" ]; then
     LOTS_O_MEM='-Xmx1024m -Xms256m -XX:MaxPermSize=128m'
     # make JVM GC sweep permgen as well.
     GC_PERMGEN='-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC'
-
     DO_DUMPS='-XX:+HeapDumpOnOutOfMemoryError'
     NO_DOCK_ICON="-Djava.awt.headless=true"
 
     [[ "`which gfind`" ]] && alias find="gfind"
     [[ "`which gsleep`" ]] && alias sleep="gsleep"
     [[ "`which aws`" ]] && complete -C aws_completer aws
-    [[ "`which jenv`" ]] || export JAVA_HOME=$(/usr/libexec/java_home -v 1.7)
+    [[ "`which jenv`" ]] || export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
-    # export GRADLE_HOME=$(find $(dirname $(brew --prefix)$(readlink $(which gradle) | cut -c3-))/.. -name libexec)
-    export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
+    export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMP"
     export JAVA_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
     export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
 
