@@ -30,7 +30,7 @@ if [ "$my_uname" == "Darwin" ]; then
     [[ "`which gfind`" ]] && alias find="gfind"
     [[ "`which gsleep`" ]] && alias sleep="gsleep"
     [[ "`which aws`" ]] && complete -C aws_completer aws
-    [[ "`which jenv`" ]] || export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+    # [[ "`which jenv`" ]] || export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
     export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMP"
     export JAVA_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
