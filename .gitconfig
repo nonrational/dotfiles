@@ -5,7 +5,6 @@
     user = nonrational
 [core]
     excludesfile = /opt/boxen/config/git/gitignore
-	# excludesfile = /Users/norton/.gitignore_global
     quotepath = false
     whitespace = cr-at-eol
 [alias]
