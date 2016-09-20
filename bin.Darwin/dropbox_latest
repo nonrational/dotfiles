@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+download_path="$HOME/Desktop/dropbox_latest.dmg"
+
+curl -o "$download_path" -L \
+-A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.112 Safari/534.30" \
+'https://www.dropbox.com/download?plat=mac'
+
+hdiutil detach '/Volumes/Dropbox\ Installer'
+hdiutil attach "$download_path"
+
+open -a '/Volumes/Dropbox Installer/Dropbox.app'
