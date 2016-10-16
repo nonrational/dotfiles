@@ -7,7 +7,8 @@ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 # Window restore is dumb
 defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool false
 # BLAZING FAST key repeat
-defaults write NSGlobalDomain KeyRepeat -int 0
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 # Always show scrollbars
 defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
@@ -105,6 +106,9 @@ defaults write com.apple.TextEdit RichText -int 0
 # Open and save files as UTF-8 in TextEdit
 defaults write com.apple.TextEdit PlainTextEncoding -int 4
 defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
+
+# Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
 killall Dock
 killall Finder

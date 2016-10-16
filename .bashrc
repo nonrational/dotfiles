@@ -90,7 +90,7 @@ export HISTFILESIZE=100000               # big big history
 shopt -s histappend                      # append to history, don't overwrite it
 
 # Save and reload the history after each command finishes
-# export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+export PROMPT_COMMAND="$PROMPT_COMMAND; \history -a;"
 
 # do close spelling matches with cd
 shopt -s cdspell
@@ -106,7 +106,6 @@ alias df='df -h'
 alias du='du -h'
 alias grep="grep --color"
 alias hist="history|tail"
-alias history="history|tail -n100"
 alias psa="ps auxwww"
 
 alias hosts='sudo $EDITNOW /etc/hosts'
