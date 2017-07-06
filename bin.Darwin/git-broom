@@ -1,3 +1,0 @@
-#!/bin/bash
-
-git branch --merged | grep -v " develop\| stage\| master" | grep -v '*' | xargs git branch -d

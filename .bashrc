@@ -12,8 +12,8 @@ if [ "$my_uname" == "Darwin" ]; then
     [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
 
     brewery=`brew --prefix`
-    [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
-    [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
+    # [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
+    # [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
     [ -f /Users/norton/.travis/travis.sh ] && source /Users/norton/.travis/travis.sh
 
     export EDITNOW='subl'
@@ -38,17 +38,12 @@ if [ "$my_uname" == "Darwin" ]; then
 
     export GOPATH=$HOME/go
 
-    # preview man
-    pman() {
-        man -t "${1}" | open -f -a /Applications/Preview.app/
-    }
-
     alias jj='autojump'
-    # use BSD ls with no --color
     alias ls="/bin/ls -F"
     alias top='top -o cpu'
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
+    alias respec="rspec --only-failures"
 
     function gradle(){
         if [[ -f ./gradlew ]]; then
@@ -90,7 +85,7 @@ export HISTFILESIZE=100000               # big big history
 shopt -s histappend                      # append to history, don't overwrite it
 
 # Save and reload the history after each command finishes
-export PROMPT_COMMAND="$PROMPT_COMMAND; \history -a;"
+# export PROMPT_COMMAND="$PROMPT_COMMAND; \history -a;"
 
 # do close spelling matches with cd
 shopt -s cdspell
@@ -117,6 +112,7 @@ alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
 alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
 
 alias nukelock="find -maxdepth 2 -name Gemfile.lock | xargs git checkout"
+alias pry-watch='while clear && sleep 1; do pry-remote -w; done'
 
 #aliases for my local stuff
 alias ddate="date '+%Y%m%d%'"

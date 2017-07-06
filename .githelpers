@@ -53,6 +53,14 @@ reset_wildcard(){
     git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
 }
 
+delete_remoteless_branches_interactive(){
+    for branch in $(git up | awk '/error:/ {print $1}'); do
+        printf "Delete $branch? ";
+        read ans;
+        [[ "$ans" == "y" ]] && git branch -D $branch;
+    done
+}
+
 what_the_hell_just_happened(){
     ref=${1:-"HEAD"}
 

@@ -1,6 +1,6 @@
 [user]
     name = Alan Norton
-    email = me@alannorton.com
+    email = alan@mealpal.com
 [github]
     user = nonrational
 [core]
@@ -28,6 +28,7 @@
     co = checkout
     df = "diff --name-only"
     dc = diff --cached
+
     r = !git l -20
     rl = !git l -200
     la = !git l --all
@@ -53,6 +54,10 @@
     dismiss = update-index --assume-unchanged
     dissed = !git ls-files -v | grep ^[a-z] || echo "None"
     attend = update-index --no-assume-unchanged
+
+    broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
+    brr = branch --sort=-committerdate
+
     wtf = "!. ~/.githelpers && what_the_hell_just_happened"
     nuke = "!git reset --hard HEAD && git clean -fd"
     firm = "!git reset --soft $1 && git reset"
@@ -60,7 +65,7 @@
     aww = "!. ~/.githelpers && add_wildcard"
     uww = "!. ~/.githelpers && reset_wildcard"
 
-    mall = "!git up && git co stage && git merge master && git push origin stage && git co develop && git merge stage && git push origin develop"
+    mall = "!git up && git co qa && git merge master && git push origin qa && git co develop && git merge qa && git push origin develop"
     sup = "!. ~/.githelpers && current_pulls_into_here"
     super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
 
@@ -100,3 +105,7 @@
 	clean = git-lfs clean %f
 	smudge = git-lfs smudge %f
 	required = true
+[diff]
+	renameLimit = 999999
+[rebase]
+	instructionFormat = (%an <%ae>) %s
