@@ -56,6 +56,7 @@
     attend = update-index --no-assume-unchanged
 
     broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
+    spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
     brr = branch --sort=-committerdate
 
     wtf = "!. ~/.githelpers && what_the_hell_just_happened"
