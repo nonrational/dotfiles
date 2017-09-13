@@ -61,6 +61,14 @@ delete_remoteless_branches_interactive(){
     done
 }
 
+delete_all_my_branches_interactive(){
+    for branch in $(git branch | egrep '^\W*aln/'); do
+        printf "Delete $branch, both local and origin? ";
+        read ans;
+        [[ "$ans" == "y" ]] && git branch -D $branch && git push origin :$branch
+    done
+}
+
 what_the_hell_just_happened(){
     ref=${1:-"HEAD"}
 
