@@ -60,7 +60,13 @@ show_git_head() {
 }
 
 pretty_git_log() {
-    git log --graph --color=always --pretty="tformat:${LOG_FORMAT}" $* | pretty_git_format
+    git log --graph --color=never --pretty="tformat:${LOG_FORMAT}" $* |
+    pretty_git_format |
+    # Hack colors back into pretty-git-log
+    sed -Ee "s/( <[A-Za-z ]+> )/$(printf $ANSI_BLUE_BOLD)\1$(printf $ANSI_RESET)/"  |  # author
+    sed -Ee "s/( \([0-9]+ [a-z]+\) )/$(printf $ANSI_GREEN)\1$(printf $ANSI_RESET)/" |  # relative date
+    sed -Ee "s/( [a-f0-9]{7} )/$(printf $ANSI_YELLOW)\1$(printf $ANSI_RESET)/"      |  # abbrev hash
+    sed -Ee "s/(  \([^\)]+\) )/$(printf $ANSI_RED_BOLD)\1$(printf $ANSI_RESET)/"       # refs
 }
 
 pretty_git_branch() {
@@ -79,10 +85,12 @@ pretty_git_format() {
     # Line columns up based on } delimiter
     column -s '}' -t |
     # Color merge commits specially
-    sed -Ee "s/(Merge (branch|remote-tracking branch|pull request) .*$)/$(printf $ANSI_RED)\1$(printf $ANSI_RESET)/" |
+    sed -Ee "s/(Merge (branch|remote-tracking branch|pull request) .*$)/$(printf $ANSI_WHITE_BOLD)\1$(printf $ANSI_RESET)/" |
+    # Account for hard cut below
+    sed -Ee "s/^/$(printf $ANSI_RESET)/" |
     # Page only if we're asked to.
     if [ -n "$GIT_NO_PAGER" ]; then
-        cut -c-${COLUMNS:-180}
+        cut -c-${COLUMNS:-160}
     else
         less --quit-if-one-screen --no-init --RAW-CONTROL-CHARS --chop-long-lines
     fi
