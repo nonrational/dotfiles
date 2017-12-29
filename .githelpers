@@ -1,8 +1,15 @@
 #!/bin/bash
 
+# Based on Gary Bernhardt's .githelpers
+# https://github.com/garybernhardt/dotfiles/blob/master/.githelpers
+
 # Log output:
 #
-# Based on Gary Bernhardt's .githelpers
+# * 51c333e    (12 days)    <Gary Bernhardt>   add vim-eunuch
+#
+# Branch output:
+#
+# * release/v1.1    (13 days)    <Leyan Lo>   add pretty_git_branch
 #
 # The time massaging regexes start with ^[^<]* because that ensures that they
 # only operate before the first "<". That "<" will be the beginning of the
@@ -13,32 +20,72 @@
 # used to split on them. A } in the commit subject or any other field will
 # break this.
 
-HASH="%C(yellow)%h%Creset"
-RELATIVE_TIME="%Cgreen(%ar)%Creset"
-AUTHOR="%C(bold blue)<%an>%Creset"
-REFS="%C(red)%d%Creset"
+LOG_HASH="%C(yellow)%h%Creset"
+LOG_RELATIVE_TIME="%Cgreen(%ar)%Creset"
+LOG_AUTHOR="%C(bold blue)<%an>%Creset"
+LOG_REFS="%C(bold red)%d%Creset"
+LOG_SUBJECT="%s"
 
-SUBJECT="%s"
-columns=$(tput cols)
-SHOWCOL=$((columns+30))
-FORMAT="$HASH}$RELATIVE_TIME}$AUTHOR}$REFS $SUBJECT"
+LOG_FORMAT="$LOG_HASH}$LOG_RELATIVE_TIME}$LOG_AUTHOR}$LOG_REFS $LOG_SUBJECT"
+
+BRANCH_PREFIX="%(HEAD)"
+BRANCH_REF="%(color:red)%(color:bold)%(refname:short)%(color:reset)"
+BRANCH_HASH="%(color:yellow)%(objectname:short)%(color:reset)"
+BRANCH_DATE="%(color:green)(%(committerdate:relative))%(color:reset)"
+BRANCH_AUTHOR="%(color:blue)%(color:bold)<%(authorname)>%(color:reset)"
+BRANCH_CONTENTS="%(contents:subject)"
+
+BRANCH_FORMAT="$BRANCH_PREFIX}$BRANCH_REF}$BRANCH_HASH}$BRANCH_DATE}$BRANCH_AUTHOR}$BRANCH_CONTENTS"
+
+ANSI_BLACK='\033[30m'
+ANSI_BLACK_BOLD='\033[0;30;1m'
+ANSI_RED='\033[31m'
+ANSI_RED_BOLD='\033[0;31;1m'
+ANSI_GREEN='\033[32m'
+ANSI_GREEN_BOLD='\033[0;32;1m'
+ANSI_YELLOW='\033[33m'
+ANSI_YELLOW_BOLD='\033[0;33;1m'
+ANSI_BLUE='\033[34m'
+ANSI_BLUE_BOLD='\033[0;34;1m'
+ANSI_MAGENTA='\033[35m'
+ANSI_MAGENTA_BOLD='\033[0;35;1m'
+ANSI_CYAN='\033[36m'
+ANSI_CYAN_BOLD='\033[0;36;1m'
+ANSI_WHITE='\033[37m'
+ANSI_WHITE_BOLD='\033[0;37;1m'
+ANSI_RESET='\033[0m'
+
+show_git_head() {
+    git show -p --pretty="tformat:"
+}
 
 pretty_git_log() {
-    git log --graph --abbrev-commit --date=relative --pretty="tformat:${FORMAT}" $* |
-        # remove tags
-        sed -Ee 's/tag: ([a-z]{,1}-?){1,}(-[0-9]{1,})*,? ?//g' | tr -d '()' |
-        # Replace (2 years ago) with (2 years)
-        sed -Ee 's/(^[^<]*) ago\)/\1)/' |
-        # Replace (2 years, 5 months) with (2 years)
-        sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?\)/\1)/' |
-        # fix for columns max 2048 char limit
-        cut -c-2047 |
-        # Line columns up based on } delimiter
-        column -s '}' -t |
-        # delete everything after COLUMNS to prevent horizontal paging. stupid less...
-        cut -c -$SHOWCOL |
-        # Page only if we need to
-        less -FXRS -h80
+    git log --graph --color=always --pretty="tformat:${LOG_FORMAT}" $* | pretty_git_format
+}
+
+pretty_git_branch() {
+    git branch -v --color=always --format=${BRANCH_FORMAT} $* | pretty_git_format
+}
+
+pretty_git_branch_sorted() {
+    git branch -v --color=always --format=${BRANCH_FORMAT} --sort=-committerdate $* | pretty_git_format
+}
+
+pretty_git_format() {
+    # Replace (2 years ago) with (2 years)
+    sed -Ee 's/(^[^<]*) ago\)/\1)/' |
+    # Replace (2 years, 5 months) with (2 years)
+    sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?\)/\1)/' |
+    # Line columns up based on } delimiter
+    column -s '}' -t |
+    # Color merge commits specially
+    sed -Ee "s/(Merge (branch|remote-tracking branch|pull request) .*$)/$(printf $ANSI_RED)\1$(printf $ANSI_RESET)/" |
+    # Page only if we're asked to.
+    if [ -n "$GIT_NO_PAGER" ]; then
+        cut -c-${COLUMNS:-180}
+    else
+        less --quit-if-one-screen --no-init --RAW-CONTROL-CHARS --chop-long-lines
+    fi
 }
 
 add_wildcard(){
@@ -69,27 +116,6 @@ delete_all_my_branches_interactive(){
     done
 }
 
-what_the_hell_just_happened(){
-    ref=${1:-"HEAD"}
-
-    old=$ref@{1}
-    new=$ref
-
-    log() {
-        git log --graph --pretty=short -1 $1
-    }
-
-    echo "Old revision:"
-    log $old
-    echo
-    echo "New revision:"
-    log $new
-    echo
-    echo "Changes:"
-    git diff --stat --summary $old $new
-}
-
-
 TIMESINCE="function timeSince(date) {\
     var seconds = Math.floor((new Date() - date) / 1000);\
     var interval = Math.floor(seconds / 31536000);\
@@ -104,54 +130,3 @@ TIMESINCE="function timeSince(date) {\
     if (interval > 1) return interval + \" minutes\";\
     return Math.floor(seconds) + \" seconds\";\
 }";
-
-current_pulls_into_here(){
-
-    # need underscore? npm install -g underscore-cli
-    _underscore() { underscore "$@" 2> /dev/null; }
-
-    current_repo="$(git config --get remote.origin.url | sed 's/github.com\//api.github.com\/repos\//')"
-    current_branch="$(git rev-parse --abbrev-ref HEAD)"
-
-    curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $current_repo/pulls \
-    | _underscore filter "value.state === 'open' && value.base.ref === \"$current_branch\"" \
-    | _underscore map "$TIMESINCE;; value.html_url + ' (' + timeSince(new Date(value.created_at)) +') ' + value.base.ref + ' <~ ' + value.head.ref " --outfmt 'text'
-
-}
-
-current_pulls_into_here_with_colorful_status(){
-
-    local      YELLOW="\033[0;33m"
-    local         RED="\033[0;31m"
-    local       GREEN="\033[0;32m"
-    local  LIGHT_GRAY="\033[0;37m"
-
-    # need underscore? npm install -g underscore-cli
-    _underscore() { underscore "$@" 2> /dev/null; }
-
-    repo_here="$(git config --get remote.origin.url | sed 's/github.com\//api.github.com\/repos\//')"
-    branch_here="$(git rev-parse --abbrev-ref HEAD)"
-
-    current_branch=${1:-$branch_here}
-    current_repo=${2:-$repo_here}
-
-    for pr in $(curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $current_repo/pulls \
-        | _underscore filter "value.state === 'open' && value.base.ref === \"$current_branch\"" \
-        | _underscore map "$TIMESINCE;; value.statuses_url + ' ' + value.html_url + ' (' + timeSince(new Date(value.created_at)) +') ' + value.base.ref + ' <~ ' + value.head.ref " --outfmt 'text' | tr ' ' "#"); do
-
-        current_state=$(curl --silent -H "Authorization: token $GITHUB_API_TOKEN" $(echo $pr | tr '#' ' ' | awk '{print $1}') | _underscore reduceRight "value.state" | tr -d '"')
-        pr=$(echo $pr | sed 's/^[^#]*#//g')
-        case "$current_state" in
-            ("success") printf "$GREEN" ;;
-            ("failure") printf "$RED" ;;
-            ("pending") printf "$YELLOW" ;;
-            (*) printf "$LIGHT_GRAY" ;;
-        esac
-
-        printf $pr | tr '#' ' '
-        echo "$LIGHT_GRAY"
-
-    done
-}
-
-
