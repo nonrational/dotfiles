@@ -6,7 +6,6 @@
 [core]
     # Use custom `.gitignore` and `.gitattributes`
     attributesfile = ~/.gitattributes
-    excludesfile = /opt/boxen/config/git/gitignore
     quotepath = false
 
     # Treat spaces before tabs and all kinds of trailing whitespace as an error
@@ -76,15 +75,18 @@
     pall = "!for r in $(git remote); do git push $r $(git rev-parse --abbrev-ref HEAD); done"
 
 [color]
-    ui = true
+  diff = always
+  status = always
+  branch = always
+  interactive = always
+  ui = true
+  pager = true
 [gist]
     browse = true
     private = true
 [hub]
     protocol = https
     user = nonrational
-[credential]
-	helper = /opt/boxen/bin/boxen-git-credential
 [push]
 	default = simple
 [git-up "bundler"]
