@@ -30,11 +30,16 @@
     df = "diff --name-only"
     dc = diff --cached
 
-    r = !git l -20
-    rl = !git l -200
-    la = !git l --all
+    head = !git r -1
+    h = !git head
+    hp = "!. ~/.githelpers && show_git_head"
+    r = !GIT_NO_PAGER=1 git l -20
     ra = !git r --all
     l = "!. ~/.githelpers && pretty_git_log"
+    la = !git l --all
+    b = "!. ~/.githelpers && pretty_git_branch"
+    bs = "!. ~/.githelpers && pretty_git_branch_sorted"
+
     amend = commit --amend
     mad = add *
     aa = add --all .
@@ -76,10 +81,10 @@
     pall = "!for r in $(git remote); do git push $r $(git rev-parse --abbrev-ref HEAD); done"
 
 [color]
-  diff = always
-  status = always
-  branch = always
-  interactive = always
+  diff = auto
+  status = auto
+  branch = auto
+  interactive = auto
   ui = true
   pager = true
 [gist]
