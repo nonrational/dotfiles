@@ -9,56 +9,26 @@ my_uname=`uname`;
 # set -x
 
 if [ "$my_uname" == "Darwin" ]; then
-    [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
+    [[ -s "$HOME/.bootstrap/env.sh" ]] && . "$HOME/.bootstrap/env.sh"
 
-    brewery=`brew --prefix`
+    # brewery=`brew --prefix`
     # [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
     # [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
-    [ -f /Users/norton/.travis/travis.sh ] && source /Users/norton/.travis/travis.sh
 
+    export GOPATH=$HOME/go
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
 
-    # give the VM a semi-ridiculous amount of memory.
-    LOTS_O_MEM='-Xmx1024m -Xms256m -XX:MaxPermSize=128m'
-    # make JVM GC sweep permgen as well.
-    GC_PERMGEN='-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC'
-    DO_DUMPS='-XX:+HeapDumpOnOutOfMemoryError'
-    NO_DOCK_ICON="-Djava.awt.headless=true"
-
     [[ "`which gfind`" ]] && alias find="gfind"
     [[ "`which gsleep`" ]] && alias sleep="gsleep"
     [[ "`which aws`" ]] && complete -C aws_completer aws
-    # [[ "`which jenv`" ]] || export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
-    export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMP"
-    export JAVA_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
-    export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
-
-    export GOPATH=$HOME/go
-
-    alias jj='autojump'
     alias ls="/bin/ls -F"
     alias top='top -o cpu'
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     alias respec="rspec --only-failures"
-
-    function gradle(){
-        if [[ -f ./gradlew ]]; then
-            (echo ./gradlew $@ 2>&1; ./gradlew $@)
-        else
-            (echo $(which gradle) $@ 2>&1; $(which gradle) $@)
-        fi
-    }
-
-    function kali(){
-        if ! VBoxManage list runningvms | grep kali; then
-            nohup VBoxHeadless --startvm kali --vrde off >/dev/null 2>&1 &
-        fi
-        ssh -Y -p31339 root@127.0.0.1
-    }
 
 elif [ "$my_uname" == "Linux" ]; then
 
@@ -119,10 +89,6 @@ alias ddate="date '+%Y%m%d%'"
 alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
-note(){
-    atom /Users/norton/Dropbox\ \(Betterment\)/Notes/$(cdate).md
-}
-
 rpg(){
     size=${1:-12}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
 }
@@ -137,6 +103,11 @@ parse_git_branch() {
 
 basher(){
     env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
+}
+
+rerake(){
+    RAILS_ENV=test rake db:reset
+    rake
 }
 
 uninstall-all-rbenv-gems-for-current-ruby-version() {
@@ -184,9 +155,6 @@ fi
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
-
-# added by travis gem
-[ -f /Users/norton/.travis/travis.sh ] && source /Users/norton/.travis/travis.sh
 
 # set +x
 # exec 2>&3 3>&-

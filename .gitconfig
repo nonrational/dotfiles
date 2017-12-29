@@ -22,8 +22,9 @@
     # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
     precomposeunicode = false
 [alias]
-    push = "!git push || $(git push 2>&1 | tail -n2 | head -n1)"
+    pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
     pull = pull --ff-only
+    stup = !sh -c 'git stash && git pull && git stash pop'
     ci = commit -v
     co = checkout
     df = "diff --name-only"
@@ -39,7 +40,6 @@
     aa = add --all .
     st = status
     stp = status --porcelain
-    sync = !sh -c \"git pull && git push\"
 
     drb = !git svn rebase
     dci = "!. ~/.githelpers && dcommit_from_master"
@@ -74,7 +74,6 @@
     stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 
     pall = "!for r in $(git remote); do git push $r $(git rev-parse --abbrev-ref HEAD); done"
-    pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
 
 [color]
     ui = true
