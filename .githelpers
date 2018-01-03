@@ -65,7 +65,7 @@ pretty_git_log() {
     # Hack colors back into pretty-git-log
     sed -Ee "s/( <[A-Za-z ]+> )/$(printf $ANSI_BLUE_BOLD)\1$(printf $ANSI_RESET)/"  |  # author
     sed -Ee "s/( \([0-9]+ [a-z]+\) )/$(printf $ANSI_GREEN)\1$(printf $ANSI_RESET)/" |  # relative date
-    sed -Ee "s/( [a-f0-9]{7} )/$(printf $ANSI_YELLOW)\1$(printf $ANSI_RESET)/"      |  # abbrev hash
+    sed -Ee "s/( [a-f0-9]{7,12} )/$(printf $ANSI_YELLOW)\1$(printf $ANSI_RESET)/"      |  # abbrev hash
     sed -Ee "s/(  \([^\)]+\) )/$(printf $ANSI_RED_BOLD)\1$(printf $ANSI_RESET)/"       # refs
 }
 
