@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+raw_sha256_stdout = `openssl x509 -noout -fingerprint -sha256 -inform pem -in #{ARGV[0]}`
+
+puts raw_sha256_stdout.split('=')[1].split(':').first(2).join
+
