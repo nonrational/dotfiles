@@ -27,6 +27,7 @@
     stup = !sh -c 'git stash && git pull && git stash pop'
     ci = commit -v
     co = checkout
+    cb = "!git stash && git checkout $* && git stash pop"
     df = "diff --name-only"
     dc = diff --cached
 

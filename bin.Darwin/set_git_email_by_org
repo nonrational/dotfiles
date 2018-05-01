@@ -8,7 +8,7 @@ for srcdir in $HOME/src $HOME/my; do
 
         printf "$repo_name :"
 
-        if grep -i mealpass .git/config > /dev/null; then
+        if grep -i bymealpal .git/config > /dev/null; then
             git config user.email alan@mealpal.com
             echo "alan@mealpal.com"
         elif grep nonrational .git/config > /dev/null; then
