@@ -19,7 +19,6 @@ brew "git"
 brew "gnu-sed"
 brew "gnu-tar"
 brew "gnupg"
-brew "go"
 brew "heroku/brew/heroku"
 brew "hub"
 brew "memcached", restart_service: true
@@ -55,4 +54,5 @@ cask "istat-menus"
 cask "google-cloud-sdk"
 cask "bartender"
 cask "wavebox"
+cask "vox"
 
