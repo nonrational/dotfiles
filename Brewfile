@@ -53,6 +53,6 @@ cask "sublime-text"
 cask "istat-menus"
 cask "google-cloud-sdk"
 cask "bartender"
-cask "wavebox"
 cask "vox"
+cask "wavebox"
 
