@@ -66,7 +66,7 @@ pretty_git_format() {
 git_page_maybe() {
     # Page only if we're asked to.
     if [ -n "$GIT_NO_PAGER" ]; then
-        cat
+        cat | cut -c -$(($(tput cols) + 15))
     else
         # Page only if needed.
         less --quit-if-one-screen --no-init --RAW-CONTROL-CHARS --chop-long-lines
