@@ -20,10 +20,10 @@
 # used to split on them. A } in the commit subject or any other field will
 # break this.
 
-LOG_HASH="%C(yellow)%h%Creset"
-LOG_RELATIVE_TIME="%Cgreen(%ar)%Creset"
-LOG_AUTHOR="%C(bold blue)<%an>%Creset"
-LOG_REFS="%C(bold red)%d%Creset"
+LOG_AUTHOR="%C(always,bold blue)<%an>%C(always,reset)"
+LOG_HASH="%C(always,yellow)%h%C(always,reset)"
+LOG_REFS="%C(always,bold red)%d%C(always,reset)"
+LOG_RELATIVE_TIME="%C(always,green)(%ar)%C(always,reset)"
 LOG_SUBJECT="%s"
 
 LOG_FORMAT="$LOG_HASH}$LOG_RELATIVE_TIME}$LOG_AUTHOR}$LOG_REFS $LOG_SUBJECT"
@@ -43,7 +43,7 @@ show_git_head() {
 }
 
 pretty_git_log() {
-    git log --graph --color=never --pretty="tformat:${LOG_FORMAT}" $* | pretty_git_format | color-git-log | git_page_maybe
+    git log --graph --pretty="tformat:${LOG_FORMAT}" $* | pretty_git_format | git_page_maybe
 }
 
 pretty_git_branch() {

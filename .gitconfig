@@ -79,8 +79,12 @@
     lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
     stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 
+    copper = "! rubocop -a `git st -s -- '*.rb' '*.rake' | awk '{printf $2\" \"}'`"
+
     pall = "!for r in $(git remote); do git push $r $(git rev-parse --abbrev-ref HEAD); done"
 
+[status]
+    relativePaths = true
 [color]
   diff = auto
   status = auto
