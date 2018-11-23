@@ -1,5 +1,3 @@
-colors ir_black
-
 " some common helpful settings "
 set nomodeline
 set nocompatible
