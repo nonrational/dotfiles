@@ -27,7 +27,6 @@ brew "node-build"
 brew "nodenv"
 brew "openssl"
 brew "parallel"
-brew "postgresql@9.5", restart_service: true
 brew "pyenv"
 brew "rbenv"
 brew "readline"
