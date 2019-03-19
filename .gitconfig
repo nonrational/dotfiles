@@ -106,7 +106,12 @@
     # Include summaries of merged commits in newly created merge commit messages
     log = true
     keepBackup = false;
-    tool = p4merge
+    tool = smerge
+[mergetool "smerge"]
+    cmd = smerge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+    keepTemporaries = false
+    trustExitCode = false
+    keepBackup = false
 [mergetool "p4merge"]
     cmd = p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
     keepTemporaries = false
