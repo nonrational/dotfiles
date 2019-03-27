@@ -180,7 +180,8 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFin
 
 # Enable Do Not Disturb All The Time
 defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturb -boolean true
-defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturbDate -date "`date -u +\"%Y-%m-%d %H:%M:%S +000\"`"
+defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui dndEnd -float 1379
+defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui dndStart -float 1380
 
 # Disable “natural” (Lion-style) scrolling
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
