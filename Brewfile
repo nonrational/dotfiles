@@ -42,6 +42,7 @@ cask "bartender"
 cask "boostnote"
 cask "brave"
 cask "calibre"
+cask "copyclip" # copyclip 2 - paid
 cask "divvy"
 cask "dropbox"
 # cask "droplr"
@@ -53,6 +54,7 @@ cask "iterm2"
 cask "java"
 cask "karabiner-elements" # make caps behave like esc
 cask "licecap" # record gifs
+cask "skitch"
 cask "slack"
 cask "spotify"
 cask "sublime-text"
