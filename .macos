@@ -157,6 +157,21 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool
 defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
+# Trackpad: set preferred swiping behavior
+# default 1
+defaults write NSGlobalDomain AppleEnableSwipeNavigateWithScrolls -int 0
+# default 2
+defaults write NSGlobalDomain TrackpadThreeFingerHorizSwipeGesture -int 1
+# default 2
+defaults write NSGlobalDomain TrackpadThreeFingerVertSwipeGesture -int 1
+# default 3
+defaults write NSGlobalDomain TrackpadTwoFingerFromRightEdgeSwipeGesture -int 0
+
+defaults write com.apple.dock showAppExposeGestureEnabled -int 1
+defaults write com.apple.dock showLaunchpadGestureEnabled -int 0
+defaults write com.apple.dock showMissionControlGestureEnabled -int 1
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerFromRightEdgeSwipeGesture -int 0
+
 # Trackpad: map bottom right corner to right-click
 # defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
 # defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
