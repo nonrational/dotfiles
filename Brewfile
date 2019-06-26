@@ -19,6 +19,7 @@ brew "git"
 brew "gnu-sed"
 brew "gnu-tar"
 brew "gnupg"
+brew "goenv"
 brew "heroku/brew/heroku"
 brew "hub"
 brew "memcached", restart_service: true
