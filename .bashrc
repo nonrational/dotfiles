@@ -9,11 +9,14 @@ my_uname=`uname`;
 # set -x
 
 if [ "$my_uname" == "Darwin" ]; then
-    [[ -s "$HOME/.bootstrap/env.sh" ]] && . "$HOME/.bootstrap/env.sh"
 
-    # brewery=`brew --prefix`
-    # [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
-    # [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
+    if [[ -s "$HOME/.bootstrap/env.sh" ]]; then
+        source "$HOME/.bootstrap/env.sh"
+    else
+        brewery=`brew --prefix`
+        [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
+        [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
+    fi
 
     export GOPATH=$HOME/go
     export EDITNOW='subl'
