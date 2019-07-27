@@ -5,7 +5,7 @@ log_and_exec(){
     sh $1
 }
 
-log_and_exec 00-install-osx-prefs.sh
+# log_and_exec 00-install-osx-prefs.sh
 
 log_and_exec 01-install-development-headers.sh
 
