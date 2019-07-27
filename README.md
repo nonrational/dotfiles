@@ -7,9 +7,8 @@ How To
 
 ```
 xcode-select -install
-mkdir ~/my
-cd ~/my
-git clone https://github.com/nonrational/dotfiles
+
+git clone https://github.com/nonrational/dotfiles .dotfiles
 
 ./install-everything.sh
 
