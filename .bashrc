@@ -17,6 +17,10 @@ if [ "$my_uname" == "Darwin" ]; then
       [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
     fi
 
+    for lang in rb py go; do
+      command -v "${lang}env" > /dev/null && eval "$(${lang}env init -)"
+    done
+
     export GOPATH=$HOME/go
     export EDITNOW='subl'
     export EDITOR='subl -w'
@@ -31,6 +35,15 @@ if [ "$my_uname" == "Darwin" ]; then
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     alias respec="rspec --only-failures"
+
+    alias puma-dev-setup='sudo puma-dev -d test:localhost:loc.al -setup'
+    alias puma-dev-install='puma-dev -d test:localhost:loc.al -install'
+    alias puma-dev-uninstall='puma-dev -uninstall -d test:localhost:loc.al'
+
+    function puma-dev-ln () {
+        echo ln -sf $1 "~/.puma-dev/$(basename $1)"
+        echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
+    }
 
 elif [ "$my_uname" == "Linux" ]; then
 
