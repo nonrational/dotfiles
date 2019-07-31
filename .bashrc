@@ -45,6 +45,8 @@ if [ "$my_uname" == "Darwin" ]; then
         echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
     }
 
+    alias git='hub'
+
 elif [ "$my_uname" == "Linux" ]; then
 
     # use GNU ls with --color
