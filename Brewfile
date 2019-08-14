@@ -4,6 +4,9 @@ tap "homebrew/bundle"
 tap "homebrew/core"
 tap "homebrew/services"
 
+# tap 'nonrational/puma'
+# brew 'nonrational/puma/puma-dev'
+
 brew "autojump"
 brew "awscli"
 brew "bash"
@@ -37,6 +40,7 @@ brew "xz"
 
 cask "1password"
 cask "appcleaner"
+cask "audiobookbinder"
 cask "bartender"
 cask "brave-browser"
 cask "calibre"
@@ -58,4 +62,5 @@ cask "ticktick"
 cask "vlc"
 cask "vox"
 cask "wavebox"
+cask "windscribe"
 
