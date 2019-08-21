@@ -3,4 +3,6 @@
 
 [[ -s $HOME/.bashrc ]] && . $HOME/.bashrc
 
+[[ ! -z "$GOPATH" ]] && export PATH="$GOPATH/bin:$PATH"
+
 export PATH="$HOME/bin:$PATH"
