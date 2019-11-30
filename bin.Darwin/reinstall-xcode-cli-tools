@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# This location may be different defendant on how the CLI tools were installed.
+sudo rm -rf /Library/Developer/CommandLineTools
+
+xcode-select --install
+
+pkgutil --pkg-info=com.apple.pkg.CLTools_Executables
