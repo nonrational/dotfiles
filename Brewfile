@@ -50,7 +50,7 @@ cask "brave-browser"
 cask "calibre"
 cask "daisydisk"
 cask "divvy"
-cask "dropbox"
+# cask "dropbox"
 cask "firefox"
 cask "google-chrome"
 cask "google-cloud-sdk"
@@ -74,4 +74,4 @@ cask "windscribe"
 mas "TickTick", id: 966085870
 mas "CopyClip", id: 595191960
 mas "Amphetamine", id: 937984704
-mas "1Password 7", id: 1333542190
+# mas "1Password 7", id: 1333542190
