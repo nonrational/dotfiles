@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+while gulp build-development; do fswatch -1 src gulp;  done

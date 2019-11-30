@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require 'rails'
+
+if ARGV.empty?
+  puts %x(sudo systemsetup setusingnetworktime on)
+else
+  puts %x(sudo systemsetup setusingnetworktime off)
+  apple_time = DateTime.parse(ARGV.first).utc.in_time_zone('America/New_York').strftime('%m%d%H%M%Y');
+  puts %x(sudo date #{apple_time})
+end
+
+
+
+

@@ -1,0 +1,3 @@
+[submodule "etc/tomorrow-theme"]
+	path = etc/tomorrow-theme
+	url = https://github.com/chriskempson/tomorrow-theme

@@ -8,8 +8,6 @@ Backup
 *.swp
 .vim/.netrwhist
 
-Sublime\ Text\ 2/Settings/Auto\ Save\ Session.sublime_session
-Sublime\ Text\ 2/Settings/Session.sublime_session
 *.cache
 *.pyc
 

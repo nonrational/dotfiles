@@ -1,65 +1,57 @@
 # sourced on new screens, non-login shells.
 # echo sourcing .bashrc
 host=`uname -n | sed -e 's/\.local//g'`;
-uname=`uname`;
+my_uname=`uname`;
 
-if [ "$uname" == "Darwin" ]; then
-    [[ -s "/opt/boxen/env.sh" ]] && source "/opt/boxen/env.sh"
+# rm -f /tmp/bashstart.*.log
+# PS4='+ $(date "+%s.%N")\011 '
+# exec 3>&2 2>/tmp/bashstart.$$.log
+# set -x
 
+if [ "$my_uname" == "Darwin" ]; then
     brewery=`brew --prefix`
-    [[ -s $brewery/etc/autojump.sh ]]     && . $brewery/etc/autojump.sh
-    [[ -s $brewery/etc/bash_completion ]] && . $brewery/etc/bash_completion
 
-    # export RBENV_ROOT="$brewery/var/rbenv"
-    # if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+    [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
 
+    if [[ "$0" == "-bash" ]]; then
+      [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
+    fi
+
+    for lang in rb py go nod; do
+      command -v "${lang}env" > /dev/null && eval "$(${lang}env init -)"
+    done
+
+    export GOPATH=$HOME/go
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
-    export HISTCONTROL=ignoredups
 
-    alias gradle="gradle -PassumeOffline"
+    [[ "`which gfind`" ]] && alias find="gfind"
+    [[ "`which gsleep`" ]] && alias sleep="gsleep"
+    [[ "`which aws`" ]] && complete -C aws_completer aws
 
-    # give the VM a semi-ridiculous amount of memory.
-    LOTS_O_MEM='-Xmx1024m -Xms256m -XX:MaxPermSize=128m'
-    # make JVM GC sweep permgen as well.
-    GC_PERMGEN='-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC'
-
-    DO_DUMPS='-XX:+HeapDumpOnOutOfMemoryError'
-    # don't show the java dock icon
-    # this breaks osx.gradle being able to auto-connect VPN.
-    # argh.
-    NO_DOCK_ICON="-Djava.awt.headless=true"
-
-    export JAVA_HOME=`/usr/libexec/java_home`
-    export GRADLE_HOME=`find $brewery/Cellar/gradle/ -name libexec`
-    export GRADLE_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
-    export JAVA_OPTS="$LOTS_O_MEM $GC_PERMGEN $NO_DOCK_ICON $DO_DUMPS"
-    export CATALINA_OPTS="$LOTS_O_MEM $GC_PERMGEN $DO_DUMPS"
-
-    # preview man
-    pman() {
-        man -t "${1}" | open -f -a /Applications/Preview.app/
-    }
-
-    alias jj='autojump'
-    # use BSD ls with no --color
-    alias ls='ls -F'
+    alias ls="/bin/ls -F"
     alias top='top -o cpu'
     alias opena="open -n -a"
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     alias wget='wget --content-disposition'
-    [[ "`which gfind`" ]] && alias find="gfind"
-    [[ "`which gsleep`" ]] && alias sleep="gsleep"
+    alias respec="rspec --only-failures"
+    alias git='hub'
 
-    [[ "`which aws`" ]] && complete -C aws_completer aws
+    alias puma-dev-setup='sudo puma-dev -d test:localhost:loc.al -setup'
+    alias puma-dev-install='puma-dev -d test:localhost:loc.al -install'
+    alias puma-dev-uninstall='puma-dev -uninstall -d test:localhost:loc.al'
 
-
-elif [ "$uname" == "Linux" ]; then
-
+    function puma-dev-ln () {
+        echo ln -sf $1 "~/.puma-dev/$(basename $1)"
+        echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
+    }
+elif [ "$my_uname" == "Linux" ]; then
     # use GNU ls with --color
     alias ls='ls --color -F'
     alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+    alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
+    alias wget='wget --content-disposition'
 
     export EDITNOW='vim'
     export EDITOR='vim'
@@ -69,17 +61,21 @@ elif [ "$uname" == "Linux" ]; then
     if [[ -s /etc/bash_completion ]] && ! shopt -oq posix; then
         . /etc/bash_completion;
     fi
-
 fi
 
 export CLICOLOR=1
 export TERM=xterm-color
-export HISTCONTROL="ignoredups"
 export HISTIGNORE="[   ]*:&:bg:fg:exit"
+export HISTCONTROL=ignoredups:erasedups  # no duplicate entries
+export HISTSIZE=100000                   # big big history
+export HISTFILESIZE=100000               # big big history
+shopt -s histappend                      # append to history, don't overwrite it
+
+# Save and reload the history after each command finishes
+# export PROMPT_COMMAND="$PROMPT_COMMAND; \history -a;"
 
 # do close spelling matches with cd
 shopt -s cdspell
-shopt -s histappend
 shopt -s nocaseglob
 shopt -s checkwinsize
 
@@ -87,28 +83,56 @@ shopt -s checkwinsize
 alias ll='ls -l'
 alias la='ls -hlA'
 alias l='ls'
+alias rm='rm -v'
 alias df='df -h'
 alias du='du -h'
 alias grep="grep --color"
-alias become="sudo su -"
+alias hist="history|tail"
+alias psa="ps auxwww"
 
 alias hosts='sudo $EDITNOW /etc/hosts'
-alias pjs='sudo jps -mlvV | grep -v "Bootstrap\|Jps\|\/opt\/dell\/srvadmin"'
 
 # fun aliases
 alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
-alias scg='curl -s http://www.madsci.org/cgi-bin/cgiwrap/~lynn/jardin/SCG | grep "<h2>" -A4 | tr "\n" " " | sed -e "s/<h2>[ \t]*//" -e "s/\<.*$//g"'
-alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
 alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
+alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
+
+alias nukelock="find -maxdepth 2 -name Gemfile.lock | xargs git checkout"
+alias pry-watch='while clear && sleep 1; do pry-remote -w; done'
 
 #aliases for my local stuff
 alias ddate="date '+%Y%m%d%'"
 alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
+rpg(){
+    size=${1:-12}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
+}
+
+git-rm-banch(){
+    git branch -D $1 && git push origin :$1
+}
 
 parse_git_branch() {
     git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+basher(){
+    env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
+}
+
+rerake(){
+    RAILS_ENV=test rake db:reset
+    rake
+}
+
+uninstall-all-rbenv-gems-for-current-ruby-version() {
+  list=`gem list --no-versions`
+  for gem in $list; do
+    gem uninstall $gem -aIx
+  done
+  gem list
+  gem install bundler
 }
 
 uber_prompt() {
@@ -134,7 +158,7 @@ linux_prompt="[\u@\h \W]"
 darwin_prompt="\u@\h:\W"
 me_prompt="\h:\W"
 
-if [ "$uname" == "Darwin" ]; then
+if [ "$my_uname" == "Darwin" ]; then
     if [ "$myself" == 'norton' -o "$myself" == 'anorton' ]; then
         uber_prompt $me_prompt;
     else
@@ -147,6 +171,6 @@ fi
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
-alias bleed="~/gocode/bin/Heartbleed"
 
-alias slaves='aws ec2 describe-instances --filters "Name=tag:Name,Values=*jenkins-slave*" | underscore flatten | underscore pluck "Instances" | underscore flatten | underscore map "value.PrivateIpAddress" --outfmt 'text' 2> /dev/null'
+# set +x
+# exec 2>&3 3>&-

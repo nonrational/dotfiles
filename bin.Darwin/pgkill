@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# kill all connections to the postgres server
+
+where="where pg_stat_activity.datname = '$1'"
+echo "killing all connections to database '$1'"
+
+cat <<-EOF | psql
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+${where}
+EOF

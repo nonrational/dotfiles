@@ -3,16 +3,6 @@
 
 [[ -s $HOME/.bashrc ]] && . $HOME/.bashrc
 
-if [[ -d $HOME/bin ]]; then
-    for bindir in `find $HOME/bin/ -maxdepth 1 -type d | sort -r`; do
-        export PATH=${bindir%/}:$PATH
-    done
-fi
+[[ ! -z "$GOPATH" ]] && export PATH="$GOPATH/bin:$PATH"
 
-[[ -d $JAVA_HOME/bin ]] && export PATH=$JAVA_HOME/bin:$PATH
-[[ -d "/usr/local/heroku/bin" ]] && export PATH="$PATH:/usr/local/heroku/bin"
-[[ -d "/usr/local/share/npm/bin/" ]] && export PATH="$PATH:/usr/local/share/npm/bin/"
-if [[ -d "$HOME/go" ]]; then
-  export GOPATH=$HOME/go
-  export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
-fi
+export PATH="./bin:$HOME/bin:$PATH"

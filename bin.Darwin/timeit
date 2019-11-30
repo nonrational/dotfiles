@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+require 'benchmark'
+
+class TimeIt
+  def initialize(argv)
+    @command = argv.join(' ')
+    @timings = []
+  end
+
+  def run(count)
+    count.times do
+      printf '.'
+      timings << Benchmark.realtime { system(command) }
+    end
+    puts
+    puts sum / count
+  end
+
+  private
+
+  def sum
+    timings.inject(0.0) { |result, el| result + el }
+  end
+
+  attr_reader :command, :timings
+end
+
+puts TimeIt.new(ARGV).run(20)
