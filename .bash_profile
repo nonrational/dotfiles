@@ -5,4 +5,4 @@
 
 [[ ! -z "$GOPATH" ]] && export PATH="$GOPATH/bin:$PATH"
 
-export PATH="$HOME/bin:$PATH"
+export PATH="./bin:$HOME/bin:$PATH"
