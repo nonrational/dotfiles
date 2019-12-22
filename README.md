@@ -1,19 +1,15 @@
-Why?
-----
+## Why?
+
 Because storing cross-machine config is cumbersome. Installing Git is &mdash; for the most part &mdash; easy.
 
-How To
---------
+## macOS
 
 ```
 xcode-select -install
 
 git clone https://github.com/nonrational/dotfiles .dotfiles
 
-./install-everything.sh
+cd .dotfiles
+./setup-macos.sh
 
 ```
-
-Notes
--------
-If you find a smarter way to do something, [let me know](mailto:me@alannorton.com)!
