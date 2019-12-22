@@ -136,6 +136,20 @@ uninstall-all-rbenv-gems-for-current-ruby-version() {
   gem install bundler
 }
 
+function virtualenv_prompt() {
+    local reset_color="\[\e[m\]"
+    local magenta="\[\e[35m\]"
+    local yellow="\[\e[33m\]"
+    local green="\[\e[32m\]"
+
+    if [ -n "$VIRTUAL_ENV" ]; then
+        pyver=$(python -V 2>&1 | cut -f2 -d' ')
+        echo "(${magenta}venv${reset_color}:${yellow}${VIRTUAL_ENV##*/}$reset_color|${green}${pyver}${reset_color}) "
+    fi
+}
+
+export LIBTCOD_DLL_PATH="/usr/local/lib;/usr/lib;$HOME/.local/lib;$HOME/lib"
+
 uber_prompt() {
     local        BLUE="\[\033[0;34m\]"
     local      YELLOW="\[\033[0;33m\]"
@@ -146,6 +160,7 @@ uber_prompt() {
     local       WHITE="\[\033[1;37m\]"
     local  LIGHT_GRAY="\[\033[0;37m\]"
     PS1="$LIGHT_GRAY$*$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
+    PS1="$(virtualenv_prompt)${PS1}"
     PS2='> '
     PS4='+ '
 }
