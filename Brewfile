@@ -29,6 +29,7 @@ brew "netcat"
 brew "node-build"
 brew "nodenv"
 brew "openssl"
+brew "p7zip"
 brew "parallel"
 brew "pyenv"
 brew "rbenv"
@@ -38,10 +39,12 @@ brew "readline"
 brew "rename"
 brew "ruby-build"
 brew "shellcheck"
+brew "tmux"
 brew "wget"
 brew "xz"
 
 # cask "1password"
+cask "android-file-transfer"
 cask "appcleaner"
 cask "atom"
 cask "audiobookbinder"
@@ -71,7 +74,7 @@ cask "vox"
 cask "wavebox"
 cask "windscribe"
 
-mas "TickTick", id: 966085870
-mas "CopyClip", id: 595191960
 mas "Amphetamine", id: 937984704
+mas "CopyClip", id: 595191960
+mas "TickTick", id: 966085870
 # mas "1Password 7", id: 1333542190
