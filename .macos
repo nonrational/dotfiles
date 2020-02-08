@@ -643,6 +643,11 @@ defaults write com.apple.terminal StringEncodings -array 4
 #defaults write com.apple.terminal FocusFollowsMouse -bool true
 #defaults write org.x.X11 wm_ffm -bool true
 
+# Indirect GLX was disabled by default in Xorg 1.17, starting from XQuartz version 2.7.9,
+# to enable indirect GLX and to allow remote visualization on the cluster you will have to issue at the terminal command prompt of your mac:
+defaults write org.macosforge.xquartz.X11 enable_iglx -bool true
+defaults write org.x.X11 enable_test_extensions -boolean true
+
 # Enable Secure Keyboard Entry in Terminal.app
 # See: https://security.stackexchange.com/a/47786/8918
 defaults write com.apple.terminal SecureKeyboardEntry -bool true

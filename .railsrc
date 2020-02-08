@@ -4,4 +4,6 @@
 --skip-spring
 --skip-test
 --webpack
+--full
+--dummy-path=spec/dummy
 --template=~/.dotfiles/rails_template.rb

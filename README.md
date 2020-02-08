@@ -4,7 +4,7 @@ Because storing cross-machine config is cumbersome. Installing Git is &mdash; fo
 
 ## macOS
 
-```
+```shell
 xcode-select -install
 
 git clone https://github.com/nonrational/dotfiles .dotfiles
