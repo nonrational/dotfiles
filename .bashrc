@@ -21,7 +21,6 @@ if [ "$my_uname" == "Darwin" ]; then
       command -v "${lang}env" > /dev/null && eval "$(${lang}env init -)"
     done
 
-    export GOPATH=$HOME/go
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
