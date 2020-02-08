@@ -3,6 +3,10 @@
 
 [[ -s $HOME/.bashrc ]] && . $HOME/.bashrc
 
-[[ ! -z "$GOPATH" ]] && export PATH="$GOPATH/bin:$PATH"
+if command -v goenv > /dev/null; then
+  # https://github.com/syndbg/goenv/issues/30
+  export GOBIN_PATH="$HOME/go/$(goenv version-name)"
+  export PATH="$GOBIN_PATH/bin:$PATH"
+fi
 
 export PATH="./bin:$HOME/bin:$PATH"
