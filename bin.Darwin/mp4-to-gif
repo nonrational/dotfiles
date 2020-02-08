@@ -1,0 +1,2 @@
+ffmpeg -i "$@" -s 600x400 -pix_fmt rgb24 -r 10 -f gif - \
+  | gifsicle --optimize=0 --delay=3 > "${@}.gif"
