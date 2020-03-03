@@ -4,8 +4,8 @@ tap "homebrew/bundle"
 tap "homebrew/core"
 tap "homebrew/services"
 
-# tap 'nonrational/puma'
-# brew 'nonrational/puma/puma-dev'
+# tap 'puma/puma'
+# brew 'puma/puma/puma-dev'
 
 brew "autojump"
 brew "awscli"
