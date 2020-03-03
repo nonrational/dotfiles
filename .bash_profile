@@ -9,4 +9,8 @@ if command -v goenv > /dev/null; then
   export PATH="$GOBIN_PATH/bin:$PATH"
 fi
 
+if [ -d /usr/local/flutter.git ]; then
+  export PATH="$PATH:/usr/local/flutter.git/bin"
+fi
+
 export PATH="./bin:$HOME/bin:$PATH"
