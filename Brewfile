@@ -23,7 +23,7 @@ brew "gitup"
 brew "gnu-sed"
 brew "gnu-tar"
 brew "gnupg"
-brew "goenv"
+brew "goenv", args: ["HEAD"]
 brew "heroku/brew/heroku"
 brew "hub"
 brew "mas"
