@@ -76,11 +76,12 @@ cask "sublime-text"
 cask "texmaker"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
+cask "visual-studio-code"
 cask "vlc"
 cask "vox"
 cask "wavebox"
 cask "windscribe"
-cask "x-quartz"
+cask "xquartz"
 
 mas "Amphetamine", id: 937984704
 mas "CopyClip", id: 595191960
