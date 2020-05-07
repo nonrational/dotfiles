@@ -1,6 +1,6 @@
 [user]
     name = Alan Norton
-    email = me@alannorton.com
+    email = git@nonration.al
 [github]
     user = nonrational
 [core]
@@ -107,16 +107,13 @@
     log = true
     keepBackup = false;
     tool = smerge
+    prompt = false
 [mergetool "smerge"]
     cmd = smerge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
     keepTemporaries = false
     trustExitCode = false
     keepBackup = false
-[mergetool "p4merge"]
-    cmd = p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
-    keepTemporaries = false
-    trustExitCode = false
-    keepBackup = false
+    prompt = false
 [gc]
 	auto = 0
 [filter "lfs"]
