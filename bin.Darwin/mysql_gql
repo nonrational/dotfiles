@@ -1,3 +1,0 @@
-#!/bin/bash
-
-mysql -uroot -e "SET GLOBAL general_log = 'ON';"
