@@ -1,6 +1,8 @@
 # osx sources this on every new Terminal.app tab/window but NOT on new bash's
 # so, screen will *not* source this on new screen creation (ctrl+a,c)
 
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
 [[ -s $HOME/.bashrc ]] && . $HOME/.bashrc
 
 if command -v goenv > /dev/null; then
