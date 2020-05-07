@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-launchctl unload -F /System/Library/LaunchAgents/com.apple.Dock.plist
-launchctl   load -F /System/Library/LaunchAgents/com.apple.Dock.plist
-launchctl start com.apple.Dock.agent
