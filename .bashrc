@@ -17,7 +17,7 @@ if [ "$my_uname" == "Darwin" ]; then
       [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
     fi
 
-    for lang in rb py go nod; do
+    for lang in rb py go nod j; do
       command -v "${lang}env" > /dev/null && eval "$(${lang}env init -)"
     done
 

@@ -15,4 +15,6 @@ if [ -d /usr/local/flutter.git ]; then
   export PATH="$PATH:/usr/local/flutter.git/bin"
 fi
 
+export PATH="$HOME/.jenv/bin:$PATH"
+
 export PATH="./bin:$HOME/bin:$PATH"
