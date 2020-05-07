@@ -1,17 +1,27 @@
-tap "homebrew/cask"
+tap "clojure/tools"
 tap "heroku/brew"
 tap "homebrew/bundle"
+tap "homebrew/cask"
 tap "homebrew/core"
 tap "homebrew/services"
+# tap "dflemstr/tools"
 
 # tap 'puma/puma'
 # brew 'puma/puma/puma-dev'
 
+#   __                            _
+#  / _| ___  _ __ _ __ ___  _   _| | __ _
+# | |_ / _ \| '__| '_ ` _ \| | | | |/ _` |
+# |  _| (_) | |  | | | | | | |_| | | (_| |
+# |_|  \___/|_|  |_| |_| |_|\__,_|_|\__,_|
+#
 brew "autojump"
 brew "awscli"
 brew "bash"
 brew "bash-completion"
+brew "circleci", args: ["--ignore-dependencies"]
 brew "coreutils"
+brew "clojure/tools/clojure"
 brew "ffmpeg"
 brew "figlet"
 brew "findutils"
@@ -26,6 +36,8 @@ brew "gnupg"
 brew "goenv", args: ["HEAD"]
 brew "heroku/brew/heroku"
 brew "hub"
+brew "jenv"
+brew "jq"
 brew "mas"
 brew "netcat"
 brew "node-build"
@@ -40,18 +52,26 @@ brew "rbenv-gemset"
 brew "rclone"
 brew "readline"
 brew "rename"
+# brew "rq", args: ["HEAD"]
 brew "ruby-build"
 brew "shellcheck"
 brew "tmux"
+brew "watch"
 brew "wget"
 brew "xz"
 
-# cask "1password"
+#                _
+#   ___ __ _ ___| | __
+#  / __/ _` / __| |/ /
+# | (_| (_| \__ \   <
+#  \___\__,_|___/_|\_\
+#
 cask "android-file-transfer"
 cask "appcleaner"
 cask "atom"
 cask "audiobookbinder"
 cask "bartender"
+cask "blackhole"
 cask "brave-browser"
 cask "calibre"
 cask "daisydisk"
@@ -59,6 +79,7 @@ cask "discord"
 cask "divvy"
 cask "docker"
 # cask "dropbox"
+cask "figma"
 cask "firefox"
 cask "google-chrome"
 cask "google-cloud-sdk"
@@ -66,7 +87,8 @@ cask "istat-menus"
 cask "iterm2"
 cask "kap"
 cask "karabiner-elements"
-cask "macvim"
+cask "keybase"
+# cask "macvim"
 cask "skitch"
 cask "slack"
 cask "spotify"
@@ -74,6 +96,7 @@ cask "steam"
 cask "sublime-merge"
 cask "sublime-text"
 cask "texmaker"
+cask "veracrypt"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
 cask "visual-studio-code"
@@ -82,6 +105,13 @@ cask "vox"
 cask "wavebox"
 cask "windscribe"
 cask "xquartz"
+
+#                        _
+#   __ _ _ __  _ __  ___| |_ ___  _ __ ___
+#  / _` | '_ \| '_ \/ __| __/ _ \| '__/ _ \
+# | (_| | |_) | |_) \__ \ || (_) | | |  __/
+#  \__,_| .__/| .__/|___/\__\___/|_|  \___|
+#       |_|   |_|
 
 mas "Amphetamine", id: 937984704
 mas "CopyClip", id: 595191960
