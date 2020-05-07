@@ -41,6 +41,8 @@ if [ "$my_uname" == "Darwin" ]; then
     alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
     alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
 
+    alias vboxup='VBoxManage list runningvms | grep ubuntu-18.04 || VBoxManage startvm ubuntu-18.04 --type headless'
+
     function puma-dev-ln () {
         echo ln -sf $1 "~/.puma-dev/$(basename $1)"
         echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
