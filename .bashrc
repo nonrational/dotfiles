@@ -35,9 +35,11 @@ if [ "$my_uname" == "Darwin" ]; then
     alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     alias respec="rspec --only-failures"
 
-    alias puma-dev-setup='sudo puma-dev -d test:localhost:loc.al -setup'
-    alias puma-dev-install='puma-dev -d test:localhost:loc.al -install'
-    alias puma-dev-uninstall='puma-dev -uninstall -d test:localhost:loc.al'
+    # allow PUMA_DEV_BIN="./puma-dev" for installing dev versions
+    export PUMA_DEV_BIN='puma-dev'
+    alias puma-dev-setup="sudo $PUMA_DEV_BIN -d test:localhost:loc.al -setup"
+    alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
+    alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
 
     function puma-dev-ln () {
         echo ln -sf $1 "~/.puma-dev/$(basename $1)"
