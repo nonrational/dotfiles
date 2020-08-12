@@ -41,7 +41,7 @@ symlink(){
             rm -rf "$trg"
             ln -sv "$src" "$trg"
         else
-            echo "[error] unable to push $src; $trg exists."
+            echo "[error] unable to symlink $src; $trg exists."
         fi
     else
         mkdir -p "$(dirname "$trg")"
@@ -50,16 +50,16 @@ symlink(){
 }
 
 exclusion_patterns=(".git" ".gitignore" ".github" ".DS_Store" "." ".." ".AppleDouble");
-exclusion_list=( "${exclusion_patterns[@]}" );
+exclusion_list=${exclusion_patterns[@]};
 
 should_symlink() {
-    for e in "${exclusion_list[@]}"; do [[ "$e" == "$1" ]] && echo "1"; done
+    for e in $exclusion_list; do [[ "$e" == "$1" ]] && echo "1"; done
     echo "0"
 }
 
 # Anything that starts with a dot should be linked as is.
 STANDARD_DOT_FILES=( "$DOTS/.*" )
-for dot_file_path in "${STANDARD_DOT_FILES[@]}"; do
+for dot_file_path in $STANDARD_DOT_FILES; do
     dot_file_basename=$(basename "$dot_file_path");
     [[ "$(should_symlink "$dot_file_basename")" == "0" ]] && symlink "$dot_file_basename"
 done
