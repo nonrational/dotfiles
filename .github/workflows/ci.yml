@@ -7,9 +7,14 @@ on:
     branches: [ main ]
 
 jobs:
-  install:
+  install-preferences:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - run: ./setup-macos.sh
+      - run: |
+        sh 20-install-profile.sh
+        sh 30-install-sublime-prefs.sh
+        sh 40-install-iterm2-preferences.sh
+        sh 50-install-karabiner-preferences.sh
+        sh 99-install-osx-prefs.sh
 
