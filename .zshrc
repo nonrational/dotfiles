@@ -44,8 +44,6 @@ alias puma-dev-setup="sudo $PUMA_DEV_BIN -d test:localhost:loc.al -setup"
 alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
 alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
 
-function
-
 alias vboxup='VBoxManage list runningvms | grep ubuntu-18.04 || VBoxManage startvm ubuntu-18.04 --type headless'
 
 function puma-dev-ln () {
