@@ -34,3 +34,9 @@ macos:
 
 restart:
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
+
+vscode-backup:
+	code --list-extensions > vscode--list-extensions.txt
+
+vscode-install:
+	cat vscode--list-extensions.txt | xargs -n 1 code --install-extension
