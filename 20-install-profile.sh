@@ -49,7 +49,7 @@ symlink(){
     fi
 }
 
-exclusion_patterns=(".git" ".gitignore" ".DS_Store" "." ".." ".AppleDouble");
+exclusion_patterns=(".git" ".gitignore" ".github" ".DS_Store" "." ".." ".AppleDouble");
 exclusion_list=( "${exclusion_patterns[@]}" );
 
 should_symlink() {
