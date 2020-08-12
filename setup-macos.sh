@@ -7,7 +7,8 @@ log_and_exec(){
 }
 
 # homebrew & bundle
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+command -v brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
 brew bundle
 
 log_and_exec 20-install-profile.sh
@@ -17,4 +18,4 @@ log_and_exec 50-install-karabiner-preferences.sh
 
 log_and_exec 99-install-osx-prefs.sh
 
-osascript -e 'tell app "loginwindow" to «event aevtrrst»'
+# osascript -e 'tell app "loginwindow" to «event aevtrrst»'
