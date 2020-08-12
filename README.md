@@ -2,14 +2,30 @@
 
 Because storing cross-machine config is cumbersome. Installing Git is &mdash; for the most part &mdash; easy.
 
+# Installation
+
 ## macOS
 
 ```shell
 xcode-select -install
 
-git clone https://github.com/nonrational/dotfiles .dotfiles
+git checkout https://github.com/nonrational/dotfiles .dotfiles
+cd .dotfiles
+sh .macos
+sudo shutdown -r now
 
 cd .dotfiles
 ./setup-macos.sh
-
 ```
+
+## GNU/Linux
+
+```shell
+# TODO
+```
+
+# Development
+
+Since live-copies are symlinked out, just commit and push changes as necessary.
+
+For big refactors, don't try to do it live. Clone a separate copy.
