@@ -3,36 +3,21 @@
 host=`uname -n | sed -e 's/\.local//g'`;
 my_uname=`uname`;
 
-# rm -f /tmp/bashstart.*.log
-# PS4='+ $(date "+%s.%N")\011 '
-# exec 3>&2 2>/tmp/bashstart.$$.log
-# set -x
-
 if [ "$my_uname" == "Darwin" ]; then
     brewery=`brew --prefix`
 
-    [[ -s $brewery/etc/profile.d/autojump.sh ]] && . $brewery/etc/profile.d/autojump.sh
+    [[ -s "$brewery/etc/profile.d/autojump.sh" ]] && . "$brewery/etc/profile.d/autojump.sh"
+    [[ -s "$brewery/opt/asdf/asdf.sh" ]] && . "$brewery/opt/asdf/asdf.sh"
 
     if [[ "$0" == "-bash" ]]; then
       [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
     fi
 
-    for lang in rb py go nod j; do
-      command -v "${lang}env" > /dev/null && eval "$(${lang}env init -)"
-    done
-
     export EDITNOW='subl'
     export EDITOR='subl -w'
     export LESS="$LESS -i -F -R -X"
 
-    [[ "`which gfind`" ]] && alias find="gfind"
-    [[ "`which gsleep`" ]] && alias sleep="gsleep"
-    [[ "`which aws`" ]] && complete -C aws_completer aws
-
     alias ls="/bin/ls -F"
-    alias top='top -o cpu'
-    alias opena="open -n -a"
-    alias crontab="EDITOR=vi VIM_CRONTAB=true crontab"
     alias respec="rspec --only-failures"
 
     # allow PUMA_DEV_BIN="./puma-dev" for installing dev versions
@@ -51,10 +36,8 @@ if [ "$my_uname" == "Darwin" ]; then
     alias git='hub'
 
 elif [ "$my_uname" == "Linux" ]; then
-
     # use GNU ls with --color
     alias ls='ls --color -F'
-    alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
     export EDITNOW='vim'
     export EDITOR='vim'
@@ -93,20 +76,12 @@ alias grep="grep --color"
 alias hist="history|tail"
 alias psa="ps auxwww"
 
-alias hosts='sudo $EDITNOW /etc/hosts'
-
-# fun aliases
-alias wtc='curl -s "http://whatthecommit.com" | grep "<p>" | cut -c4-'
-
-alias hex32="LC_CTYPE=C tr -dc 'A-F0-9' < /dev/urandom | fold -w 32 | head -n1"
 alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
 
-alias nukelock="find -maxdepth 2 -name Gemfile.lock | xargs git checkout"
 alias pry-watch='while clear && sleep 1; do pry-remote -w; done'
 
 #aliases for my local stuff
 alias ddate="date '+%Y%m%d%'"
-alias mdate="date '+%Y-%m-%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
 rpg(){
@@ -125,34 +100,6 @@ basher(){
     env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
 }
 
-rerake(){
-    RAILS_ENV=test rake db:reset
-    rake
-}
-
-uninstall-all-rbenv-gems-for-current-ruby-version() {
-  list=`gem list --no-versions`
-  for gem in $list; do
-    gem uninstall $gem -aIx
-  done
-  gem list
-  gem install bundler
-}
-
-function virtualenv_prompt() {
-    local reset_color="\[\e[m\]"
-    local magenta="\[\e[35m\]"
-    local yellow="\[\e[33m\]"
-    local green="\[\e[32m\]"
-
-    if [ -n "$VIRTUAL_ENV" ]; then
-        pyver=$(python -V 2>&1 | cut -f2 -d' ')
-        echo "(${magenta}venv${reset_color}:${yellow}${VIRTUAL_ENV##*/}$reset_color|${green}${pyver}${reset_color}) "
-    fi
-}
-
-export LIBTCOD_DLL_PATH="/usr/local/lib;/usr/lib;$HOME/.local/lib;$HOME/lib"
-
 uber_prompt() {
     local        BLUE="\[\033[0;34m\]"
     local      YELLOW="\[\033[0;33m\]"
@@ -163,13 +110,8 @@ uber_prompt() {
     local       WHITE="\[\033[1;37m\]"
     local  LIGHT_GRAY="\[\033[0;37m\]"
     PS1="$LIGHT_GRAY$*$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
-    PS1="$(virtualenv_prompt)${PS1}"
     PS2='> '
     PS4='+ '
-}
-
-figcom () {
-    figlet "$@" | sed 's/^/# /g'
 }
 
 myself="`whoami`"
@@ -189,7 +131,7 @@ fi
 
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
-[[ -s $HOME/.local/.bashrc ]] && . $HOME/.local/.bashrc
+[[ -s "$HOME/.local/.bashrc" ]] && . "$HOME/.local/.bashrc"
 
 # set +x
 # exec 2>&3 3>&-
