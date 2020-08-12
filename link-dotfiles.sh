@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env sh
+set -euf -o pipefail
 
 force_delete=0
-
 DOTS="$PWD"
 uname="$(uname)"
 

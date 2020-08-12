@@ -23,16 +23,14 @@
     precomposeunicode = false
 [alias]
     pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
-    pull = pull --ff-only
-    stup = !sh -c 'git stash && git pull && git stash pop'
+
     ci = commit -v
     co = checkout
-    cb = "!git stash && git checkout $* && git stash pop"
+
     df = "diff --name-only"
     dc = diff --cached
 
     head = !git r -1
-    h = !git head
     hp = "!. ~/.githelpers && show_git_head"
     r = !GIT_NO_PAGER=1 git l -20
     ra = !git r --all
@@ -40,48 +38,36 @@
     la = !git l --all
     b = "!. ~/.githelpers && pretty_git_branch"
     bs = "!. ~/.githelpers && pretty_git_branch_sorted"
+    brr = branch --sort=-committerdate
+
+    lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
+    stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 
     amend = commit --amend
-    mad = add *
     aa = add --all .
     st = status
     stp = status --porcelain
-
-    drb = !git svn rebase
-    dci = "!. ~/.githelpers && dcommit_from_master"
-    drevise = "!git rebase -i git-svn"
 
     modified = "!git ls-files --modified"
     deleted = "!git ls-files --deleted"
     untracked = "!git ls-files --others --exclude-standard"
 
     assumed = !sh -c \"git ls-files -v | grep '^[a-z]'\"
-    disregard = update-index --assume-unchanged
+    attend = update-index --no-assume-unchanged
     dismiss = update-index --assume-unchanged
     dissed = !git ls-files -v | grep ^[a-z] || echo "None"
-    attend = update-index --no-assume-unchanged
 
     broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
     spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
-    brr = branch --sort=-committerdate
 
     wtf = "!. ~/.githelpers && what_the_hell_just_happened"
     nuke = "!git reset --hard HEAD && git clean -fd"
-    firm = "!git reset --soft $1 && git reset"
 
     aww = "!. ~/.githelpers && add_wildcard"
     uww = "!. ~/.githelpers && reset_wildcard"
 
-    mall = "!git up && git co qa && git merge master && git push origin qa && git co develop && git merge qa && git push origin develop"
     sup = "!. ~/.githelpers && current_pulls_into_here"
     super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
-
-    lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
-    stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
-
-    copper = "! rubocop -a `git st -s -- '*.rb' '*.rake' | awk '{printf $2\" \"}'`"
-
-    pall = "!for r in $(git remote); do git push $r $(git rev-parse --abbrev-ref HEAD); done"
 
 [status]
     relativePaths = true
@@ -103,7 +89,6 @@
 [git-up "bundler"]
 	check = true
 [merge]
-    # Include summaries of merged commits in newly created merge commit messages
     log = true
     keepBackup = false;
     tool = smerge
@@ -124,3 +109,5 @@
 	renameLimit = 999999
 [rebase]
 	instructionFormat = (%an <%ae>) %s
+[pull]
+	rebase = true
