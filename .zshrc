@@ -1,4 +1,7 @@
 # set -x
+
+# https://scriptingosx.com/2019/07/moving-to-zsh-part-4-aliases-and-functions/
+
 autoload -Uz vcs_info
 precmd() { vcs_info }
 zstyle ':vcs_info:git:*' formats ' %b'
