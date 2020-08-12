@@ -7,10 +7,15 @@ on:
     branches: [ main ]
 
 jobs:
-  install:
+  link:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          sh 20-install-profile.sh
+      - run: make link-dotfiles
+
+  all:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make all
 
