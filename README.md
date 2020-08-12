@@ -7,15 +7,12 @@ Because storing cross-machine config is cumbersome. Installing Git is &mdash; fo
 ## macOS
 
 ```shell
-xcode-select -install
+xcode-select --install
 
 git checkout https://github.com/nonrational/dotfiles .dotfiles
 cd .dotfiles
-sh .macos
-sudo shutdown -r now
-
-cd .dotfiles
 ./setup-macos.sh
+osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 ```
 
 ## GNU/Linux

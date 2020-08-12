@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
+set -euf -o pipefail
 
 log_and_exec(){
     echo $1
     sh $1
 }
 
-# log_and_exec 00-install-osx-prefs.sh
-log_and_exec 01-install-development-headers.sh
-log_and_exec 10-install-homebrew.sh
-
+# homebrew & bundle
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew bundle
 
 log_and_exec 20-install-profile.sh
 log_and_exec 30-install-sublime-prefs.sh
-log_and_exec 31-install-atom-prefs.sh
 log_and_exec 40-install-iterm2-preferences.sh
 log_and_exec 50-install-karabiner-preferences.sh
+
+log_and_exec 99-install-osx-prefs.sh
+
+osascript -e 'tell app "loginwindow" to «event aevtrrst»'
