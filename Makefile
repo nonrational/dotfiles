@@ -17,6 +17,15 @@ asdf:
 link-dotfiles:
 	./link-dotfiles.sh
 
+link-karabiner:
+	ln -s $$PWD/karabiner $$HOME/.config/karabiner
+
+macos:
+	sh .macos
+
+restart:
+	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
+
 sublime:
 	git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
 	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text\ 3
@@ -30,14 +39,6 @@ iterm2-backup:
 iterm2-install:
 	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
 
-karabiner:
-	ln -s $$PWD/karabiner $$HOME/.config/karabiner
-
-macos:
-	sh .macos
-
-restart:
-	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
 vscode-backup:
 	code --list-extensions > $$PWD/etc/vscode--list-extensions.txt
