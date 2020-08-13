@@ -45,7 +45,8 @@ dot_files=$(
         ! -name '.DS_Store' \
         ! -name '.git' \
         ! -name '.github' \
-        ! -name '.gitignore'
+        ! -name '.gitignore' \
+        ! -name '.macos'
 )
 
 # Anything that starts with a dot should be linked as is.
