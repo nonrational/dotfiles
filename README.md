@@ -7,18 +7,21 @@ Because storing cross-machine config is cumbersome. Installing Git is &mdash; fo
 ## macOS
 
 ```shell
+#!/usr/bin/env sh
 xcode-select --install
 
 git checkout https://github.com/nonrational/dotfiles .dotfiles
 cd .dotfiles
-./setup-macos.sh
-osascript -e 'tell app "loginwindow" to «event aevtrrst»'
+make
 ```
 
 ## GNU/Linux
 
 ```shell
-# TODO
+#!/usr/bin/env sh
+git checkout git@github.com:nonrational/dotfiles .dotfiles
+cd .dotfiles
+make link-dotfiles
 ```
 
 # Development
