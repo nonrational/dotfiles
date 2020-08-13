@@ -23,11 +23,10 @@ sublime:
 	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text\ 3
 
 iterm2:
-	cp ./etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
+	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
 
 karabiner:
-	# assumes we're in ~/.dotfiles
-	ln -s $$HOME/.dotfiles/karabiner $$HOME/.config/karabiner
+	ln -s $$PWD/karabiner $$HOME/.config/karabiner
 
 macos:
 	sh .macos
