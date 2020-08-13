@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 set -euf -o pipefail
 
 force_delete=0
@@ -15,25 +15,14 @@ do
     shift
 done
 
-if [ ! -d "$DOTS" ]; then
-    echo "$DOTS does not exist! Aborting..."
-    exit 1
-fi
-
 symlink(){
     file="$1"
     src="$DOTS/$file"
+    trg="${2-"$HOME/$file"}"
 
     if [ ! -e "$src" ]; then
         echo "[error] $src does not exist!"
         return
-    fi
-
-    trg=""
-    if [ "$2" == "" ]; then
-        trg="$HOME/$file"
-    else
-        trg="$2"
     fi
 
     if [ -e "$trg" ]; then
@@ -49,20 +38,20 @@ symlink(){
     fi
 }
 
-exclusion_patterns=(".git" ".gitignore" ".github" ".DS_Store" "." ".." ".AppleDouble");
-exclusion_list=${exclusion_patterns[@]};
-
-should_symlink() {
-    for e in $exclusion_list; do [[ "$e" == "$1" ]] && echo "1"; done
-    echo "0"
-}
+dot_files=$(
+    find . -maxdepth 1 -name '.*' \
+        ! -name '.' \
+        ! -name '.AppleDouble' \
+        ! -name '.DS_Store' \
+        ! -name '.git' \
+        ! -name '.github' \
+        ! -name '.gitignore'
+)
 
 # Anything that starts with a dot should be linked as is.
-STANDARD_DOT_FILES=( "$DOTS/.*" )
-for dot_file_path in $STANDARD_DOT_FILES; do
-    dot_file_basename=$(basename "$dot_file_path");
-    [[ "$(should_symlink "$dot_file_basename")" == "0" ]] && symlink "$dot_file_basename"
+for dotfile in $dot_files; do
+    symlink "$(basename "$dotfile")"
 done
 
 # special cases - these don't start with a dot
-symlink "bin.$uname" ~/bin
+symlink "bin.$uname" $HOME/bin
