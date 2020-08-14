@@ -1,10 +1,10 @@
-init: install-homebrew brew-bundle link-dotfiles link-karabiner iterm2-install macos restart
-post-reboot: sublime vscode-install
+init: brew-install brew-bundle link-dotfiles link-karabiner macos
+	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
-install-homebrew:
-	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh > homebrew-install.sh
-	./homebrew-install.sh
-	rm ./homebrew-install.sh
+init-post-reboot: asdf sublime restore-preferences
+
+brew-install:
+	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh | bash
 
 brew-bundle:
 	brew update
@@ -21,33 +21,29 @@ asdf:
 	asdf install elixir 1.10.4
 
 link-dotfiles:
+	mkdir -p $$HOME/.local
 	./link-dotfiles.sh
 
 link-karabiner:
+	# don't link entire .config directory because it contains secrets sometimes
 	mkdir -p $$HOME/.config
 	ln -s $$PWD/karabiner $$HOME/.config/karabiner
 
 macos:
 	sh .macos
 
-restart:
-	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
-
 sublime:
 	git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
 	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text\ 3
 	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text\ 3
 
-iterm2-backup:
+backup-preferences:
 	cp $$HOME/Library/Preferences/com.googlecode.iterm2.plist $$PWD/etc/com.googlecode.iterm2.plist
-	git add $$PWD/etc/com.googlecode.iterm2.plist
-	git commit -m 'iterm2-backup'
-
-iterm2-install:
-	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
-
-vscode-backup:
 	code --list-extensions > $$PWD/etc/vscode--list-extensions.txt
 
-vscode-install:
+restore-preferences:
+	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
 	cat $$PWD/etc/vscode--list-extensions.txt | xargs -n 1 code --install-extension
+
+
+.PHONY: init init-post-reboot brew-install brew-bundle asdf link-dotfiles link-karabiner macos sublime backup-preferences restore-preferences
