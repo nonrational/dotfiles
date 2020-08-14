@@ -39,10 +39,12 @@ sublime:
 
 backup-preferences:
 	cp $$HOME/Library/Preferences/com.googlecode.iterm2.plist $$PWD/etc/com.googlecode.iterm2.plist
+	cp $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist $$PWD/etc/com.if.Amphetamine.plist
 	code --list-extensions > $$PWD/etc/vscode--list-extensions.txt
 
 restore-preferences:
 	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
+	cp $$PWD/etc/com.if.Amphetamine.plist $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist
 	cat $$PWD/etc/vscode--list-extensions.txt | xargs -n 1 code --install-extension
 
 
