@@ -106,4 +106,4 @@ cask "xquartz"
 mas "Amphetamine", id: 937984704
 mas "CopyClip", id: 595191960
 mas "TickTick", id: 966085870
-# mas "1Password 7", id: 1333542190
+mas "1Password 7", id: 1333542190

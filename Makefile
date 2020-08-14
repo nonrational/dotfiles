@@ -1,7 +1,13 @@
-all: brew asdf link-dotfiles sublime iterm2-install karabiner macos restart
+init: install-homebrew brew-bundle link-dotfiles link-karabiner iterm2-install macos restart
+post-reboot: sublime vscode-install
 
-brew:
-	command -v brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+install-homebrew:
+	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh > homebrew-install.sh
+	./homebrew-install.sh
+	rm ./homebrew-install.sh
+
+brew-bundle:
+	brew update
 	brew bundle
 
 asdf:
@@ -18,6 +24,7 @@ link-dotfiles:
 	./link-dotfiles.sh
 
 link-karabiner:
+	mkdir -p $$HOME/.config
 	ln -s $$PWD/karabiner $$HOME/.config/karabiner
 
 macos:
@@ -38,7 +45,6 @@ iterm2-backup:
 
 iterm2-install:
 	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
-
 
 vscode-backup:
 	code --list-extensions > $$PWD/etc/vscode--list-extensions.txt
