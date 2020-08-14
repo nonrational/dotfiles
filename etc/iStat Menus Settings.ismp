@@ -4,7 +4,13 @@
 <dict>
 	<key>build</key>
 	<string>1113</string>
-    <!-- removed license block -->
+	<key>license</key>
+	<dict>
+		<key>email</key>
+		<string>nortona@gmail.com</string>
+		<key>serial</key>
+		<string>GAWQE-FBMKD-TFXMW-7JCJX-CXHWR-Q34Y3-FQLGX-LBT9C-CUAKL-7QC3C-772UZ-5VC9B-Q22HS-VZEQ6-PPGBT-A</string>
+	</dict>
 	<key>preferences</key>
 	<dict>
 		<key>Battery_MenubarMode</key>
@@ -241,11 +247,11 @@
 		<key>Zarya-TLE</key>
 		<dict>
 			<key>time</key>
-			<real>1589309319.4943819</real>
+			<real>1597348815.565969</real>
 			<key>tle</key>
 			<string>ISS (ZARYA)             
-1 25544U 98067A   19024.69130787  .00000289  00000-0  11946-4 0  9991
-2 25544  51.6429 354.9058 0004630 308.2748  50.7575 15.53168972152956</string>
+1 25544U 98067A   20226.06311231 -.00000151  00000-0  53817-5 0  9996
+2 25544  51.6462  66.9800 0001619  33.8205 104.2288 15.49158227240839</string>
 		</dict>
 	</dict>
 	<key>version</key>
