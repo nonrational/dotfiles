@@ -16,5 +16,6 @@ if [ -d /usr/local/flutter.git ]; then
 fi
 
 export PATH="$HOME/.jenv/bin:$PATH"
-export PATH="/usr/local/opt/awscli@1/bin:$PATH"
 export PATH="./bin:$HOME/bin:$PATH"
+
+. $HOME/src/parallelism/env
