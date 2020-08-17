@@ -15,7 +15,7 @@ tap "homebrew/services"
 #
 brew "autojump"
 brew "asdf"
-brew "awscli"
+brew "awscli@1"
 brew "bash"
 brew "bash-completion"
 # brew "circleci", args: ["--ignore-dependencies"]
@@ -48,6 +48,10 @@ brew "tmux"
 brew "watch"
 brew "wget"
 brew "xz"
+
+# for asdf-nodejs
+brew 'coreutils'
+brew 'gpg'
 
 #                _
 #   ___ __ _ ___| | __
