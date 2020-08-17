@@ -4,6 +4,7 @@
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 [[ -s $HOME/.bashrc ]] && . $HOME/.bashrc
+[[ -s $HOME/src/parallelism/env ]] && . $HOME/src/parallelism/env
 
 if command -v goenv > /dev/null; then
   # https://github.com/syndbg/goenv/issues/30
@@ -18,4 +19,4 @@ fi
 export PATH="$HOME/.jenv/bin:$PATH"
 export PATH="./bin:$HOME/bin:$PATH"
 
-. $HOME/src/parallelism/env
+
