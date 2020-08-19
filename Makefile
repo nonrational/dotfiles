@@ -37,6 +37,10 @@ sublime:
 	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text\ 3
 	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text\ 3
 
+vscode:
+	ln -sf $$PWD/etc/vscode.keybindings.json $$HOME/Library/Application\ Support/Code/User/keybindings.json
+	ln -sf $$PWD/etc/vscode.settings.json $$HOME/Library/Application\ Support/Code/User/settings.json
+
 backup-preferences:
 	cp $$HOME/Library/Preferences/com.googlecode.iterm2.plist $$PWD/etc/com.googlecode.iterm2.plist
 	cp $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist $$PWD/etc/com.if.Amphetamine.plist
