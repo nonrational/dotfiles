@@ -1,0 +1,18 @@
+{
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.detectIndentation": true,
+    "editor.renderWhitespace": "boundary",
+    "files.insertFinalNewline": true,
+    "editor.fontSize": 12,
+    "files.hotExit": "off",
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.tabCloseButton": "right",
+    "editor.tabCompletion": false,
+    "editor.tabSize": 4,
+    "files.trimTrailingWhitespace": true,
+    "editor.wordWrap": "off",
+    "editor.formatOnPaste": true,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "editor.snippetSuggestions": "top",
+    "editor.minimap.enabled": false
+}
