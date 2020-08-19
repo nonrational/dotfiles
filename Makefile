@@ -1,7 +1,7 @@
 init: brew-install brew-bundle link-dotfiles link-karabiner macos
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
-init-post-reboot: asdf sublime restore-preferences
+init-post-reboot: asdf link-sublime link-vscode restore-preferences
 
 brew-install:
 	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh | bash
@@ -20,6 +20,9 @@ asdf:
 	asdf plugin-add elixir
 	asdf install elixir 1.10.4
 
+macos:
+	sh .macos
+
 link-dotfiles:
 	mkdir -p $$HOME/.local
 	./link-dotfiles.sh
@@ -29,15 +32,12 @@ link-karabiner:
 	mkdir -p $$HOME/.config
 	ln -s $$PWD/karabiner $$HOME/.config/karabiner
 
-macos:
-	sh .macos
-
-sublime:
+link-sublime:
 	git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
 	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text\ 3
 	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text\ 3
 
-vscode:
+link-vscode:
 	ln -sf $$PWD/etc/vscode.keybindings.json $$HOME/Library/Application\ Support/Code/User/keybindings.json
 	ln -sf $$PWD/etc/vscode.settings.json $$HOME/Library/Application\ Support/Code/User/settings.json
 
