@@ -1,7 +1,15 @@
 766b.go-outliner
+Arsen.darcula-theme-for-elixir
 avli.clojure
 betterthantomorrow.calva
 borkdude.clj-kondo
 golang.go
+JakeBecker.elixir-ls
+kkalita.dark-plus-elixir
 KnisterPeter.vscode-github
+mjmcloug.vscode-elixir
+ms-vscode.sublime-keybindings
 msyrus.go-doc
+saratravi.elixir-formatter
+szTheory.hex-lens
+vscode-exunit.exunit
