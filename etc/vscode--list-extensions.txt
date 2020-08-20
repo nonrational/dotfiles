@@ -7,7 +7,7 @@ golang.go
 JakeBecker.elixir-ls
 kkalita.dark-plus-elixir
 KnisterPeter.vscode-github
-mjmcloug.vscode-elixir
+mrmlnc.vscode-duplicate
 ms-vscode.sublime-keybindings
 msyrus.go-doc
 saratravi.elixir-formatter

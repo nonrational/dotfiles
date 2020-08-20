@@ -2,19 +2,19 @@
   "entries": {
     "tap": {
       "homebrew/cask": {
-        "revision": "0b4855812c87ab93be72571da4124335af24b6be"
+        "revision": "6479b94013351dd94767a1d71c85f8520cc7d74c"
       },
       "heroku/brew": {
         "revision": "73895eaeed3fb0b3cd90d3dfddb8cfe4178084b1"
       },
       "homebrew/bundle": {
-        "revision": "3e9ebe1c94b361c05178cb69af3de0802272125f"
+        "revision": "40894b3e0cb01c26fd3388309e7e6ae2f35f2593"
       },
       "homebrew/core": {
-        "revision": "3fa96c75567774e871f6bb6523d9f0bdf58c0901"
+        "revision": "3e0c5719ebe18b13e852d8564f7d5357b66743a9"
       },
       "homebrew/services": {
-        "revision": "5794bf15f276cc1d0f0830556081bf6b2f8640dc"
+        "revision": "95a4c434575c715632b7cf19f5fc61413aad1c3b"
       },
       "clojure/tools": {
         "revision": "4af09531532c4d49d917ddbcdfedf9c2996c2287"
@@ -883,7 +883,29 @@
             }
           }
         }
-      }
+      },
+      "awscli@1": {
+        "version": "1.18.120",
+        "bottle": {
+          "cellar": ":any_skip_relocation",
+          "prefix": "/usr/local",
+          "files": {
+            "catalina": {
+              "url": "https://homebrew.bintray.com/bottles/awscli%401-1.18.120.catalina.bottle.tar.gz",
+              "sha256": "b9ad0825aaa6d73857528ece6c2353999782daceb481a3e16b26377fad387bb1"
+            },
+            "mojave": {
+              "url": "https://homebrew.bintray.com/bottles/awscli%401-1.18.120.mojave.bottle.tar.gz",
+              "sha256": "a65df1a126ded52e7a23e08693d62a43473684f6237373c0fbcea37736adfb49"
+            },
+            "high_sierra": {
+              "url": "https://homebrew.bintray.com/bottles/awscli%401-1.18.120.high_sierra.bottle.tar.gz",
+              "sha256": "f237742d73fe19050c929364640adb627b1c91c06a994bb644fcce8ff6c9679d"
+            }
+          }
+        }
+      },
+      "gpg": null
     },
     "cask": {
       "appcleaner": {
@@ -1122,6 +1144,12 @@
         "options": {
           "full_name": "veracrypt"
         }
+      },
+      "keycastr": {
+        "version": "0.9.8",
+        "options": {
+          "full_name": "keycastr"
+        }
       }
     },
     "mas": {
@@ -1131,7 +1159,7 @@
       },
       "CopyClip": {
         "id": "595191960",
-        "version": "1.9.3"
+        "version": "1.9.4"
       },
       "Amphetamine": {
         "id": "937984704",
@@ -1154,9 +1182,9 @@
         "macOS": "10.14.6"
       },
       "catalina": {
-        "HOMEBREW_VERSION": "2.4.11",
+        "HOMEBREW_VERSION": "2.4.12",
         "HOMEBREW_PREFIX": "/usr/local",
-        "Homebrew/homebrew-core": "3fa96c75567774e871f6bb6523d9f0bdf58c0901",
+        "Homebrew/homebrew-core": "3e0c5719ebe18b13e852d8564f7d5357b66743a9",
         "CLT": "11.5.0.0.1.1588476445",
         "Xcode": "11.5",
         "macOS": "10.15.5"
