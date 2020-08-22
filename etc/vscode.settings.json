@@ -27,5 +27,9 @@
         "files.insertFinalNewline": true,
         "files.trimFinalNewlines": true,
         "editor.defaultFormatter": "JakeBecker.elixir-ls"
-    }
+    },
+    "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
+    "editor.fontFamily": "Menlo, Fantasque Sans Mono, Monaco, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons"
 }
