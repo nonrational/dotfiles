@@ -17,32 +17,3 @@ for config in $(find "$HOME/src" -maxdepth 4 -wholename \*.git/config); do
     fi
   )
 done
-
-exit
-
-for srcdir in $HOME/src $HOME/my; do
-    pushd $srcdir > /dev/null
-    for repo in $(gfind -maxdepth 4 -wholename \*.git/config); do
-        repo_dir="$(dirname $repo)/..";
-
-        pushd $repo_dir > /dev/null
-        repo_name=$(echo $repo_dir | sed 's/\/.git\/..//g')
-
-        printf "$repo_name :"
-
-        if grep -i bymealpal .git/config > /dev/null; then
-            git config user.email alan@mealpal.com
-            echo "alan@mealpal.com"
-        elif grep nonrational .git/config > /dev/null; then
-            git config user.email me@alannorton.com
-            echo "me@alannorton.com"
-        else
-            git config user.email me@alannorton.com
-            echo "me@alannorton.com"
-        fi
-
-        popd > /dev/null
-    done
-
-    popd > /dev/null
-done
