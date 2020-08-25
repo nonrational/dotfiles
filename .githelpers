@@ -86,11 +86,7 @@ reset_wildcard(){
 }
 
 delete_remoteless_branches_interactive(){
-    for branch in $(git up | awk '/error:/ {print $1}'); do
-        printf "Delete $branch? ";
-        read ans;
-        [[ "$ans" == "y" ]] && git branch -D $branch;
-    done
+    ruby $HOME/bin/git-broom.rb
 }
 
 delete_all_my_branches_interactive(){
