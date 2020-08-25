@@ -29,5 +29,8 @@
     },
     "workbench.colorTheme": "Base16 Tomorrow Dark",
     "editor.fontFamily": "Panic Sans",
-    "editor.fontLigatures": true
+    "editor.fontLigatures": true,
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact"
+    }
 }
