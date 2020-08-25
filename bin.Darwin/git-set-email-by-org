@@ -1,3 +1,25 @@
+#!/usr/bin/env bash
+
+for config in $(find "$HOME/src" -maxdepth 4 -wholename \*.git/config); do
+  (
+    repo_dir="$(dirname $(dirname $config))";
+    repo_name=$(basename $(echo $repo_dir | sed 's/\/.git\/..//g'))
+
+    cd $repo_dir
+    printf "$repo_name : "
+
+    if grep -i parallel-markets .git/config > /dev/null; then
+      git config user.email alan@parallelmarkets.com
+      echo "alan@parallelmarkets.com"
+    else
+      git config user.email git@nonration.al
+      echo "git@nonration.al"
+    fi
+  )
+done
+
+exit
+
 for srcdir in $HOME/src $HOME/my; do
     pushd $srcdir > /dev/null
     for repo in $(gfind -maxdepth 4 -wholename \*.git/config); do
