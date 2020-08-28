@@ -1150,6 +1150,12 @@
         "options": {
           "full_name": "keycastr"
         }
+      },
+      "postico": {
+        "version": "1.5.14",
+        "options": {
+          "full_name": "postico"
+        }
       }
     },
     "mas": {
