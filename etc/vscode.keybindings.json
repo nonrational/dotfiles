@@ -28,5 +28,9 @@
     {
         "key": "alt+d",
         "command": "editor.action.addSelectionToNextFindMatch"
+    },
+    {
+        "key": "ctrl+q",
+        "command": "workbench.action.navigateToLastEditLocation"
     }
 ]
