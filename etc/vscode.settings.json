@@ -1,20 +1,4 @@
 {
-    "editor.acceptSuggestionOnEnter": "on",
-    "editor.detectIndentation": true,
-    "editor.renderWhitespace": "boundary",
-    "files.insertFinalNewline": true,
-    "editor.fontSize": 12,
-    "files.hotExit": "off",
-    "workbench.editor.enablePreview": false,
-    "workbench.editor.tabCloseButton": "right",
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true,
-    "files.trimTrailingWhitespace": true,
-    "editor.wordWrap": "off",
-    "editor.formatOnPaste": true,
-    "editor.multiCursorModifier": "ctrlCmd",
-    "editor.snippetSuggestions": "top",
-    "editor.minimap.enabled": false,
     "[elixir]": {
         "editor.acceptSuggestionOnEnter": "off",
         "editor.insertSpaces": true,
@@ -27,11 +11,28 @@
         "files.trimFinalNewlines": true,
         "editor.defaultFormatter": "JakeBecker.elixir-ls"
     },
-    "workbench.colorTheme": "Base16 Tomorrow Dark",
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.codeLens": false,
+    "editor.detectIndentation": true,
     "editor.fontFamily": "Panic Sans",
     "editor.fontLigatures": true,
+    "editor.fontSize": 12,
+    "editor.formatOnPaste": true,
+    "editor.insertSpaces": true,
+    "editor.minimap.enabled": false,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "editor.renderWhitespace": "boundary",
+    "editor.snippetSuggestions": "top",
+    "editor.tabSize": 2,
+    "editor.wordWrap": "off",
     "elixirLS.suggestSpecs": false,
     "emmet.includeLanguages": {
         "javascript": "javascriptreact"
-    }
+    },
+    "files.hotExit": "off",
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "workbench.colorTheme": "Base16 Tomorrow Dark",
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.tabCloseButton": "right"
 }
