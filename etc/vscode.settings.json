@@ -30,6 +30,7 @@
     "workbench.colorTheme": "Base16 Tomorrow Dark",
     "editor.fontFamily": "Panic Sans",
     "editor.fontLigatures": true,
+    "elixirLS.suggestSpecs": false,
     "emmet.includeLanguages": {
         "javascript": "javascriptreact"
     }
