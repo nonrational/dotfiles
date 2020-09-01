@@ -34,5 +34,6 @@
     "files.trimTrailingWhitespace": true,
     "workbench.colorTheme": "Base16 Tomorrow Dark",
     "workbench.editor.enablePreview": false,
-    "workbench.editor.tabCloseButton": "right"
+    "workbench.editor.tabCloseButton": "right",
+    "editor.formatOnSave": true
 }

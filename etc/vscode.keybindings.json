@@ -32,5 +32,17 @@
     {
         "key": "ctrl+q",
         "command": "workbench.action.navigateToLastEditLocation"
+    },
+    {
+        "key": "cmd+k cmd+p",
+        "command": "exunit.runPrevious"
+    },
+    {
+        "key": "cmd+r",
+        "command": "workbench.action.gotoSymbol"
+    },
+    {
+        "key": "cmd+r",
+        "command": "-workbench.action.gotoSymbol"
     }
 ]
