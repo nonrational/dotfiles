@@ -35,5 +35,8 @@
     "workbench.colorTheme": "Base16 Tomorrow Dark",
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabCloseButton": "right",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "[html-eex]": {
+        "editor.defaultFormatter": "ouven.vscode-yab-for-eex-leex"
+    }
 }

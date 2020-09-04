@@ -21,28 +21,22 @@
         "when": "editorFocus"
     },
     {
-        "key": "ctrl+shift+k",
-        "command": "-editor.action.deleteLines",
-        "when": "editorFocus"
-    },
-    {
         "key": "alt+d",
         "command": "editor.action.addSelectionToNextFindMatch"
     },
     {
         "key": "ctrl+q",
-        "command": "workbench.action.navigateToLastEditLocation"
+        "command": "workbench.action.navigateToLastEditLocation",
+        "when": "editorFocus"
     },
     {
         "key": "cmd+k cmd+p",
-        "command": "exunit.runPrevious"
+        "command": "exunit.runPrevious",
+        "when": "editorFocus"
     },
     {
         "key": "cmd+r",
-        "command": "workbench.action.gotoSymbol"
-    },
-    {
-        "key": "cmd+r",
-        "command": "-workbench.action.gotoSymbol"
+        "command": "workbench.action.gotoSymbol",
+        "when": "editorFocus"
     }
 ]
