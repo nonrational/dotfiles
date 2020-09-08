@@ -30,7 +30,7 @@ brew "git"
 # brew "gitup"
 brew "gnu-sed"
 brew "gnu-tar"
-brew "gnupg"
+brew "gpg"
 brew "heroku/brew/heroku"
 brew "hub"
 brew "jq"
@@ -48,10 +48,6 @@ brew "tmux"
 brew "watch"
 brew "wget"
 brew "xz"
-
-# for asdf-nodejs
-brew 'coreutils'
-brew 'gpg'
 
 #                _
 #   ___ __ _ ___| | __
