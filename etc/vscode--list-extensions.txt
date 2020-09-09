@@ -9,8 +9,13 @@ JakeBecker.elixir-ls
 KnisterPeter.vscode-github
 monokai.theme-monokai-pro-vscode
 mrmlnc.vscode-duplicate
+ms-azuretools.vscode-docker
 ms-vscode.sublime-keybindings
 msyrus.go-doc
+ouven.vscode-yab-for-eex-leex
 saratravi.elixir-formatter
+sharat.vscode-brewfile
+shd101wyy.markdown-preview-enhanced
+stefanjarina.vscode-eex-snippets
 szTheory.hex-lens
 vscode-exunit.exunit
