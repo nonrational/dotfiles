@@ -21,7 +21,6 @@
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
     "editor.multiCursorModifier": "ctrlCmd",
-    "editor.renderWhitespace": "boundary",
     "editor.snippetSuggestions": "top",
     "editor.tabSize": 2,
     "editor.wordWrap": "off",
