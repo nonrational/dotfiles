@@ -30,7 +30,7 @@
         "when": "editorFocus"
     },
     {
-        "key": "cmd+k cmd+p",
+        "key": "alt+t alt+t",
         "command": "exunit.runPrevious",
         "when": "editorFocus"
     },
@@ -38,5 +38,10 @@
         "key": "cmd+r",
         "command": "workbench.action.gotoSymbol",
         "when": "editorFocus"
+    },
+    {
+        "key": "alt+t alt+f",
+        "command": "workbench.action.tasks.runTask",
+        "args": "mix test"
     }
 ]

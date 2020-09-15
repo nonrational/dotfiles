@@ -16,6 +16,7 @@ ouven.vscode-yab-for-eex-leex
 saratravi.elixir-formatter
 sharat.vscode-brewfile
 shd101wyy.markdown-preview-enhanced
+sleistner.vscode-fileutils
 stefanjarina.vscode-eex-snippets
 szTheory.hex-lens
 vscode-exunit.exunit
