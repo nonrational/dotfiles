@@ -30,18 +30,26 @@
         "when": "editorFocus"
     },
     {
-        "key": "alt+t alt+t",
-        "command": "exunit.runPrevious",
+        "key": "cmd+r",
+        "command": "workbench.action.gotoSymbol",
         "when": "editorFocus"
     },
     {
-        "key": "cmd+r",
-        "command": "workbench.action.gotoSymbol",
+        "key": "alt+t alt+r",
+        "command": "exunit.runPrevious",
         "when": "editorFocus"
     },
     {
         "key": "alt+t alt+f",
         "command": "workbench.action.tasks.runTask",
         "args": "mix test"
+    },
+    {
+        "key": "alt+t alt+c",
+        "command": "exunit.runTestFile"
+    },
+    {
+        "key": "alt+t alt+t",
+        "command": "exunit.runAll"
     }
 ]
