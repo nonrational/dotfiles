@@ -1,2 +1,2 @@
 # parallel
-import_file("~/src/parallelize/.iex.exs")
+# import_file("~/src/parallelize/.iex.exs")

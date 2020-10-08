@@ -31,6 +31,7 @@
     dc = diff --cached
 
     f = "fetch --tags --force --prune"
+    ri = "rebase -i"
 
     head = !git r -1
     hp = "!. ~/.githelpers && show_git_head"
@@ -54,10 +55,7 @@
     deleted = "!git ls-files --deleted"
     untracked = "!git ls-files --others --exclude-standard"
 
-    assumed = !sh -c \"git ls-files -v | grep '^[a-z]'\"
-    attend = update-index --no-assume-unchanged
-    dismiss = update-index --assume-unchanged
-    dissed = !git ls-files -v | grep ^[a-z] || echo "None"
+    is-it-just-me = "!$EDITOR .git/info/exclude"
 
     broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
     spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"

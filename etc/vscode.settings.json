@@ -17,7 +17,6 @@
     "editor.fontFamily": "Panic Sans",
     "editor.fontLigatures": true,
     "editor.fontSize": 12,
-    "editor.formatOnPaste": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
     "editor.multiCursorModifier": "ctrlCmd",
@@ -34,10 +33,13 @@
     "workbench.colorTheme": "Base16 Tomorrow Dark",
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabCloseButton": "right",
-    "editor.formatOnSave": true,
     "[html-eex]": {
         "editor.defaultFormatter": "ouven.vscode-yab-for-eex-leex"
     },
     "window.zoomLevel": 0,
     "go.useLanguageServer": true,
+    "vim.easymotion": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
 }

@@ -1,4 +1,4 @@
-// Place your key bindings in this file to override the defaultsauto[]
+// Place your key bindings in this file to override the defaults
 [
     {
         "key": "cmd+d",
@@ -51,5 +51,18 @@
     {
         "key": "alt+t alt+t",
         "command": "exunit.runAll"
+    },
+    {
+        "key": "ctrl+`",
+        "command": "workbench.action.terminal.focus",
+        "when": "editorFocus"
+    },
+    {
+        "key": "shift+cmd+o",
+        "command": "workbench.action.showEditorsInActiveGroup"
+    },
+    {
+        "key": "shift+cmd+o",
+        "command": "-workbench.action.gotoSymbol"
     }
 ]
