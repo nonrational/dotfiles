@@ -24,6 +24,8 @@
 [alias]
     pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
 
+    bump = "commit --allow-empty -m'ci-bump'"
+
     ci = commit -v
     co = checkout
 
@@ -32,6 +34,7 @@
 
     f = "fetch --tags --force --prune"
     ri = "rebase -i"
+    rio = "!git f && git rebase -i origin/master"
 
     head = !git r -1
     hp = "!. ~/.githelpers && show_git_head"
@@ -55,7 +58,13 @@
     deleted = "!git ls-files --deleted"
     untracked = "!git ls-files --others --exclude-standard"
 
+    # ignore untracked files in this specific repo
     is-it-just-me = "!$EDITOR .git/info/exclude"
+
+    # ignore changes to files that are never going to be committed
+    regard = update-index --no-assume-unchanged
+    disregard = update-index --assume-unchanged
+    dissed = !git ls-files -v | grep ^[a-z] || echo "None"
 
     broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
     spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
