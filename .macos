@@ -816,6 +816,9 @@ hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x70
 defaults write org.macosforge.xquartz.X11 enable_iglx -bool true
 defaults write org.x.X11 enable_test_extensions -boolean true
 
+# disable mouse acceleration
+defaults write .GlobalPreferences com.apple.mouse.scaling -1
+
 ###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################

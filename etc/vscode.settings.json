@@ -16,7 +16,6 @@
     "editor.detectIndentation": true,
     "editor.fontFamily": "Panic Sans",
     "editor.fontLigatures": true,
-    "editor.fontSize": 12,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
     "editor.multiCursorModifier": "ctrlCmd",
@@ -39,7 +38,12 @@
     "window.zoomLevel": 0,
     "go.useLanguageServer": true,
     "vim.easymotion": true,
+    "terminal.integrated.shellArgs.osx": ["-l"],
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "debug.console.fontFamily": "Panic Sans",
+    "debug.console.fontSize": 11,
+    "terminal.integrated.fontFamily": "Panic Sans",
 }
