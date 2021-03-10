@@ -9,7 +9,8 @@ if [ "$my_uname" == "Darwin" ]; then
     [[ -s "$brewery/etc/profile.d/autojump.sh" ]] && . "$brewery/etc/profile.d/autojump.sh"
     [[ -s "$brewery/opt/asdf/asdf.sh" ]] && . "$brewery/opt/asdf/asdf.sh"
 
-    if [[ "$0" == "-bash" ]]; then
+    # if we're running bash, source homebrew bash completion
+    if [[ "$BASH_VERSINFO" -gt 0 ]]; then
       [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
     fi
 

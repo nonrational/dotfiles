@@ -32,10 +32,6 @@
     "workbench.colorTheme": "Base16 Tomorrow Dark",
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabCloseButton": "right",
-    "[html-eex]": {
-        "editor.defaultFormatter": "ouven.vscode-yab-for-eex-leex"
-    },
-    "window.zoomLevel": 0,
     "go.useLanguageServer": true,
     "vim.easymotion": true,
     "terminal.integrated.shellArgs.osx": ["-l"],
@@ -46,4 +42,10 @@
     "debug.console.fontFamily": "Panic Sans",
     "debug.console.fontSize": 11,
     "terminal.integrated.fontFamily": "Panic Sans",
+    "terminal.external.osxExec": "iTerm.app",
+    "terminal.integrated.automationShell.osx": "-l",
+    "workbench.editor.tabSizing": "shrink",
+    "files.exclude": {
+        "**/__generated__/**": true
+    },
 }

@@ -64,5 +64,9 @@
     {
         "key": "shift+cmd+o",
         "command": "-workbench.action.gotoSymbol"
+    },
+    {
+        "key": "ctrl+alt+c",
+        "command": "extension.changeCase.camel"
     }
 ]
