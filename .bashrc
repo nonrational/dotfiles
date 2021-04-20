@@ -102,7 +102,7 @@ basher(){
 }
 
 reset_known_host() {
-    if [ "$1" != "" ]; do
+    if [ "$1" != "" ]; then
         grep -v "$1" $HOME/.ssh/known_hosts > $HOME/.ssh/known_hosts.tmp
         mv -v $HOME/.ssh/known_hosts.tmp $HOME/.ssh/known_hosts
     else
