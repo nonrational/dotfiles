@@ -101,6 +101,15 @@ basher(){
     env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
 }
 
+reset_known_host() {
+    if [ "$1" != "" ]; do
+        grep -v "$1" $HOME/.ssh/known_hosts > $HOME/.ssh/known_hosts.tmp
+        mv -v $HOME/.ssh/known_hosts.tmp $HOME/.ssh/known_hosts
+    else
+        echo "No pattern provided"
+    fi
+}
+
 uber_prompt() {
     local        BLUE="\[\033[0;34m\]"
     local      YELLOW="\[\033[0;33m\]"
