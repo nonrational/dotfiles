@@ -30,6 +30,7 @@
     co = checkout
 
     df = "diff --name-only"
+    dfo = "df origin/master"
     dc = diff --cached
 
     f = "fetch --tags --force --prune"
