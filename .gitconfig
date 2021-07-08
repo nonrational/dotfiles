@@ -24,6 +24,8 @@
 [alias]
     pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
 
+    pro = "!hub pr show || hub browse"
+
     bump = "commit --allow-empty -m'ci-bump'"
 
     ci = commit -v
