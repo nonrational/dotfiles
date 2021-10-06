@@ -41,7 +41,7 @@
 
     head = !git r -1
     hp = "!. ~/.githelpers && show_git_head"
-    r = !GIT_NO_PAGER=1 git l -20
+    r = !GIT_NO_PAGER=1 git l -10
     ra = !git r --all
     l = "!. ~/.githelpers && pretty_git_log"
     la = !git l --all

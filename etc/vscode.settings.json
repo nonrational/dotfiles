@@ -15,7 +15,6 @@
     "editor.codeLens": false,
     "editor.detectIndentation": true,
     "editor.fontFamily": "Panic Sans",
-    "editor.fontLigatures": true,
     "editor.insertSpaces": true,
     "editor.minimap.enabled": false,
     "editor.multiCursorModifier": "ctrlCmd",
@@ -34,7 +33,6 @@
     "workbench.editor.tabCloseButton": "right",
     "go.useLanguageServer": true,
     "vim.easymotion": true,
-    "terminal.integrated.shellArgs.osx": ["-l"],
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
@@ -52,4 +50,6 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.printWidth": 120,
 }
