@@ -1,55 +1,70 @@
 {
-    "[elixir]": {
-        "editor.acceptSuggestionOnEnter": "off",
-        "editor.insertSpaces": true,
-        "editor.tabSize": 2,
-        "editor.wordBasedSuggestions": true,
-        "editor.formatOnType": true,
-        "editor.trimAutoWhitespace": false,
-        "files.trimTrailingWhitespace": true,
-        "files.insertFinalNewline": true,
-        "files.trimFinalNewlines": true,
-        "editor.defaultFormatter": "JakeBecker.elixir-ls"
-    },
-    "editor.acceptSuggestionOnEnter": "on",
-    "editor.codeLens": false,
-    "editor.detectIndentation": true,
-    "editor.fontFamily": "Panic Sans",
+  "[elixir]": {
+    "editor.acceptSuggestionOnEnter": "off",
     "editor.insertSpaces": true,
-    "editor.minimap.enabled": false,
-    "editor.multiCursorModifier": "ctrlCmd",
-    "editor.snippetSuggestions": "top",
     "editor.tabSize": 2,
-    "editor.wordWrap": "off",
-    "elixirLS.suggestSpecs": false,
-    "emmet.includeLanguages": {
-        "javascript": "javascriptreact"
-    },
-    "files.hotExit": "off",
-    "files.insertFinalNewline": true,
+    "editor.wordBasedSuggestions": true,
+    "editor.formatOnType": true,
+    "editor.trimAutoWhitespace": false,
     "files.trimTrailingWhitespace": true,
-    "workbench.colorTheme": "Base16 Tomorrow Dark",
-    "workbench.editor.enablePreview": false,
-    "workbench.editor.tabCloseButton": "right",
-    "go.useLanguageServer": true,
-    "vim.easymotion": true,
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "javascript.updateImportsOnFileMove.enabled": "always",
-    "debug.console.fontFamily": "Panic Sans",
-    "debug.console.fontSize": 11,
-    "terminal.integrated.fontFamily": "Panic Sans",
-    "terminal.external.osxExec": "iTerm.app",
-    "terminal.integrated.automationShell.osx": "-l",
-    "workbench.editor.tabSizing": "shrink",
-    "files.exclude": {
-        "**/__generated__/**": true
-    },
-    "[javascriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "prettier.printWidth": 120,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "editor.defaultFormatter": "JakeBecker.elixir-ls"
+  },
+  "workbench.colorCustomizations": {
+    "tab.activeBorderTop": "#0A84FF" // Active Tab Top Highlighting
+  },
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.codeLens": false,
+  "editor.detectIndentation": true,
+  "editor.fontFamily": "Panic Sans",
+  "editor.insertSpaces": true,
+  "editor.minimap.enabled": false,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.snippetSuggestions": "top",
+  "editor.tabSize": 2,
+  "editor.wordWrap": "off",
+  "elixirLS.suggestSpecs": false,
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "files.hotExit": "off",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "workbench.colorTheme": "Base16 Tomorrow Dark",
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.tabCloseButton": "right",
+  "go.useLanguageServer": true,
+  "vim.easymotion": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "debug.console.fontFamily": "Panic Sans",
+  "debug.console.fontSize": 11,
+  "terminal.integrated.fontFamily": "Panic Sans",
+  "terminal.external.osxExec": "iTerm.app",
+  "workbench.editor.tabSizing": "shrink",
+  "files.exclude": {
+    "**/__generated__/**": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.printWidth": 180,
+  "go.toolsManagement.autoUpdate": true,
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  },
+  "go.coverOnTestPackage": false,
+  "go.formatTool": "gofmt",
+  "standard.enable": false,
+  "[solidity]": {
+    "editor.defaultFormatter": "JuanBlanco.solidity"
+  },
+  "prettier.requireConfig": true,
+  "solidity.compileUsingLocalVersion": "soljson-v0.8.13+commit.abaa5c0e.js",
+  "solidity.compileUsingRemoteVersion": "soljson-v0.8.13+commit.abaa5c0e.js"
 }
