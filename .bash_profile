@@ -11,4 +11,3 @@ if [ -d /usr/local/flutter.git ]; then
 fi
 
 export PATH="./bin:$HOME/bin:$HOME/.local/bin:/usr/local/sbin:$PATH"
-

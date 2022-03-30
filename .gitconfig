@@ -38,6 +38,7 @@
     f = "fetch --tags --force --prune"
     ri = "rebase -i"
     rio = "!git f && git rebase -i origin/master"
+    mov = "branch -m"
 
     head = !git r -1
     hp = "!. ~/.githelpers && show_git_head"
@@ -60,6 +61,7 @@
     modified = "!git ls-files --modified"
     deleted = "!git ls-files --deleted"
     untracked = "!git ls-files --others --exclude-standard"
+    new = untracked
 
     # ignore untracked files in this specific repo
     is-it-just-me = "!$EDITOR .git/info/exclude"
