@@ -58,6 +58,8 @@
     st = status
     stp = status --porcelain
 
+    up = "!git f && hub sync"
+
     modified = "!git ls-files --modified"
     deleted = "!git ls-files --deleted"
     untracked = "!git ls-files --others --exclude-standard"

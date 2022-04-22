@@ -66,5 +66,7 @@
   },
   "prettier.requireConfig": true,
   "solidity.compileUsingLocalVersion": "soljson-v0.8.13+commit.abaa5c0e.js",
-  "solidity.compileUsingRemoteVersion": "soljson-v0.8.13+commit.abaa5c0e.js"
+  "solidity.compileUsingRemoteVersion": "soljson-v0.8.13+commit.abaa5c0e.js",
+  "markdown-preview-enhanced.codeBlockTheme": "monokai.css",
+  "markdown-preview-enhanced.previewTheme": "github-dark.css"
 }
