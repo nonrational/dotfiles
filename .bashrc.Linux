@@ -1,0 +1,12 @@
+# use GNU ls with --color
+alias ls='ls --color -F'
+
+export EDITOR='vim'
+export EDITNOW='vim'
+
+sif "/usr/share/autojump/autojump.sh"
+sif "${HOME}/.bash_aliases"
+
+if ! shopt -oq posix; then
+  sif /etc/bash_completion;
+fi

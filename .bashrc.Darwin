@@ -1,0 +1,26 @@
+brewery=`brew --prefix`
+
+[[ -s "$brewery/etc/profile.d/autojump.sh" ]] && . "$brewery/etc/profile.d/autojump.sh"
+[[ -s "$brewery/opt/asdf/asdf.sh" ]] && . "$brewery/opt/asdf/asdf.sh"
+
+if [[ "$0" == "-bash" ]]; then
+  [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
+fi
+
+export EDITNOW='subl'
+export EDITOR='subl -w'
+export LESS="$LESS -i -F -R -X"
+
+alias ls="/bin/ls -F"
+alias git='hub'
+
+# allow PUMA_DEV_BIN="./puma-dev" for installing dev versions
+export PUMA_DEV_BIN='puma-dev'
+alias puma-dev-setup="sudo $PUMA_DEV_BIN -d test:localhost:loc.al -setup"
+alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
+alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
+
+function puma-dev-ln () {
+    echo ln -sf $1 "~/.puma-dev/$(basename $1)"
+    echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
+}
