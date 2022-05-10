@@ -15,13 +15,10 @@ brew-bundle:
 
 asdf:
 	asdf plugin-add golang
-	asdf install golang 1.14.7
-
 	asdf plugin-add ruby
-	asdf install ruby 2.7.1
-
+	asdf plugin-add nodejs
+	asdf plugin-add erlang
 	asdf plugin-add elixir
-	asdf install elixir 1.10.4
 
 macos:
 	sh .macos

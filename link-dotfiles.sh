@@ -46,6 +46,7 @@ dot_files=$(
         ! -name '.git' \
         ! -name '.github' \
         ! -name '.gitignore' \
+        ! -name '.gitmodules' \
         ! -name '.macos'
 )
 
