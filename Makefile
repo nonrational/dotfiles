@@ -1,3 +1,6 @@
+default:
+	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
+
 init: brew-install brew-bundle link-dotfiles link-karabiner macos
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 

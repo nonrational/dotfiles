@@ -31,7 +31,7 @@ if &term == "xterm-color"
   fixdel
 endif
 
-" set bg=dark
+set bg=dark
 
 "stop recording accidentally"
 nmap q :

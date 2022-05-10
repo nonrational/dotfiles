@@ -1,54 +1,14 @@
 # sourced on new screens, non-login shells.
 # echo sourcing .bashrc
 host=`uname -n | sed -e 's/\.local//g'`;
-my_uname=`uname`;
+platform=`uname`;
 
-if [ "$my_uname" == "Darwin" ]; then
-    brewery=`brew --prefix`
+sif() {
+  [[ -s "$1" ]] && source "$1"
+}
 
-    [[ -s "$brewery/etc/profile.d/autojump.sh" ]] && . "$brewery/etc/profile.d/autojump.sh"
-    [[ -s "$brewery/opt/asdf/asdf.sh" ]] && . "$brewery/opt/asdf/asdf.sh"
-
-    # if we're running bash, source homebrew bash completion
-    if [[ "$BASH_VERSINFO" -gt 0 ]]; then
-      [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
-    fi
-
-    export EDITNOW='subl'
-    export EDITOR='subl -w'
-    export LESS="$LESS -i -F -R -X"
-
-    alias ls="/bin/ls -F"
-    alias respec="rspec --only-failures"
-
-    # allow PUMA_DEV_BIN="./puma-dev" for installing dev versions
-    export PUMA_DEV_BIN='puma-dev'
-    alias puma-dev-setup="sudo $PUMA_DEV_BIN -d test:localhost:loc.al -setup"
-    alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
-    alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
-
-    alias vboxup='VBoxManage list runningvms | grep ubuntu-18.04 || VBoxManage startvm ubuntu-18.04 --type headless'
-
-    function puma-dev-ln () {
-        echo ln -sf $1 "~/.puma-dev/$(basename $1)"
-        echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
-    }
-
-    alias git='hub'
-
-elif [ "$my_uname" == "Linux" ]; then
-    # use GNU ls with --color
-    alias ls='ls --color -F'
-
-    export EDITNOW='vim'
-    export EDITOR='vim'
-
-    [[ -s /usr/share/autojump/autojump.sh ]] && . /usr/share/autojump/autojump.sh
-    [[ -s ~/.bash_aliases ]] && . ~/.bash_aliases;
-    if [[ -s /etc/bash_completion ]] && ! shopt -oq posix; then
-        . /etc/bash_completion;
-    fi
-fi
+sif ".bashrc.${platform}"
+sif ".bashrc.${host}"
 
 export CLICOLOR=1
 export TERM=xterm-color
@@ -129,7 +89,7 @@ linux_prompt="[\u@\h \W]"
 darwin_prompt="\u@\h:\W"
 me_prompt="\h:\W"
 
-if [ "$my_uname" == "Darwin" ]; then
+if [ "$platform" == "Darwin" ]; then
     if [ "$myself" == 'norton' -o "$myself" == 'anorton' ]; then
         uber_prompt $me_prompt;
     else
