@@ -10,8 +10,6 @@ sif() {
 sif ".bashrc.${platform}"
 sif ".bashrc.${host}"
 
-export CLICOLOR=1
-export TERM=xterm-color
 export HISTIGNORE="[   ]*:&:bg:fg:exit"
 export HISTCONTROL=ignoredups:erasedups  # no duplicate entries
 export HISTSIZE=100000                   # big big history
@@ -83,21 +81,6 @@ uber_prompt() {
     PS2='> '
     PS4='+ '
 }
-
-myself="`whoami`"
-linux_prompt="[\u@\h \W]"
-darwin_prompt="\u@\h:\W"
-me_prompt="\h:\W"
-
-if [ "$platform" == "Darwin" ]; then
-    if [ "$myself" == 'norton' -o "$myself" == 'anorton' ]; then
-        uber_prompt $me_prompt;
-    else
-        uber_prompt $darwin_prompt;
-    fi
-else
-    uber_prompt $linux_prompt
-fi
 
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "

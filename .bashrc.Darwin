@@ -11,6 +11,9 @@ export EDITNOW='subl'
 export EDITOR='subl -w'
 export LESS="$LESS -i -F -R -X"
 
+export CLICOLOR=1
+export TERM=xterm-color
+
 alias ls="/bin/ls -F"
 alias git='hub'
 
@@ -24,3 +27,15 @@ function puma-dev-ln () {
     echo ln -sf $1 "~/.puma-dev/$(basename $1)"
     echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
 }
+
+myself="`whoami`"
+darwin_prompt="\u@\h:\W"
+me_prompt="\h:\W"
+
+if [ "$platform" == "Darwin" ]; then
+    if [ "$myself" == 'norton' -o "$myself" == 'anorton' ]; then
+        uber_prompt $me_prompt;
+    else
+        uber_prompt $darwin_prompt;
+    fi
+fi
