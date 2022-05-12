@@ -1,72 +1,76 @@
 // Place your key bindings in this file to override the defaults
 [
-    {
-        "key": "cmd+d",
-        "command": "-editor.action.addSelectionToNextFindMatch",
-        "when": "editorFocus"
-    },
-    {
-        "key": "cmd+d",
-        "command": "editor.action.deleteLines",
-        "when": "textInputFocus && !editorReadonly"
-    },
-    {
-        "key": "shift+cmd+k",
-        "command": "-editor.action.deleteLines",
-        "when": "textInputFocus && !editorReadonly"
-    },
-    {
-        "key": "cmd+d",
-        "command": "editor.action.deleteLines",
-        "when": "editorFocus"
-    },
-    {
-        "key": "alt+d",
-        "command": "editor.action.addSelectionToNextFindMatch"
-    },
-    {
-        "key": "ctrl+q",
-        "command": "workbench.action.navigateToLastEditLocation",
-        "when": "editorFocus"
-    },
-    {
-        "key": "cmd+r",
-        "command": "workbench.action.gotoSymbol",
-        "when": "editorFocus"
-    },
-    {
-        "key": "alt+t alt+r",
-        "command": "exunit.runPrevious",
-        "when": "editorFocus"
-    },
-    {
-        "key": "alt+t alt+f",
-        "command": "workbench.action.tasks.runTask",
-        "args": "mix test"
-    },
-    {
-        "key": "alt+t alt+c",
-        "command": "exunit.runTestFile"
-    },
-    {
-        "key": "alt+t alt+t",
-        "command": "exunit.runAll"
-    },
-    {
-        "key": "ctrl+`",
-        "command": "workbench.action.terminal.focus",
-        "when": "editorFocus"
-    },
-    {
-        "key": "shift+cmd+o",
-        "command": "workbench.action.showEditorsInActiveGroup"
-    },
-    {
-        "key": "shift+cmd+o",
-        "command": "-workbench.action.gotoSymbol"
-    },
-    {
-        "key": "ctrl+alt+c",
-        "command": "extension.changeCase.camel"
-    }
+  {
+    "key": "cmd+d",
+    "command": "-editor.action.addSelectionToNextFindMatch",
+    "when": "editorFocus"
+  },
+  {
+    "key": "cmd+d",
+    "command": "editor.action.deleteLines",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "shift+cmd+k",
+    "command": "-editor.action.deleteLines",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+d",
+    "command": "editor.action.deleteLines",
+    "when": "editorFocus"
+  },
+  {
+    "key": "alt+d",
+    "command": "editor.action.addSelectionToNextFindMatch"
+  },
+  {
+    "key": "ctrl+q",
+    "command": "workbench.action.navigateToLastEditLocation",
+    "when": "editorFocus"
+  },
+  {
+    "key": "cmd+r",
+    "command": "workbench.action.gotoSymbol",
+    "when": "editorFocus"
+  },
+  {
+    "key": "alt+t alt+r",
+    "command": "exunit.runPrevious",
+    "when": "editorFocus"
+  },
+  {
+    "key": "alt+t alt+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "mix test"
+  },
+  {
+    "key": "alt+t alt+c",
+    "command": "exunit.runTestFile"
+  },
+  {
+    "key": "alt+t alt+t",
+    "command": "exunit.runAll"
+  },
+  {
+    "key": "alt+t alt+x",
+    "command": "exunit.runTest"
+  },
+  {
+    "key": "ctrl+`",
+    "command": "workbench.action.terminal.focus",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+cmd+o",
+    "command": "workbench.action.showEditorsInActiveGroup"
+  },
+  {
+    "key": "shift+cmd+o",
+    "command": "-workbench.action.gotoSymbol"
+  },
+  {
+    "key": "ctrl+alt+c",
+    "command": "extension.changeCase.camel"
+  }
 ]

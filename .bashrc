@@ -68,20 +68,6 @@ reset_known_host() {
     fi
 }
 
-uber_prompt() {
-    local        BLUE="\[\033[0;34m\]"
-    local      YELLOW="\[\033[0;33m\]"
-    local         RED="\[\033[0;31m\]"
-    local   LIGHT_RED="\[\033[1;31m\]"
-    local       GREEN="\[\033[0;32m\]"
-    local LIGHT_GREEN="\[\033[1;32m\]"
-    local       WHITE="\[\033[1;37m\]"
-    local  LIGHT_GRAY="\[\033[0;37m\]"
-    PS1="$LIGHT_GRAY$*$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
-    PS2='> '
-    PS4='+ '
-}
-
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
 [[ -s "$HOME/.local/.bashrc" ]] && . "$HOME/.local/.bashrc"
