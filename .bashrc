@@ -1,14 +1,8 @@
 # sourced on new screens, non-login shells.
 # echo sourcing .bashrc
-host=`uname -n | sed -e 's/\.local//g'`;
+
+host=`uname -n | sed -e 's/\.lan$//g' -e 's/\.local$//g'`;
 platform=`uname`;
-
-sif() {
-  [[ -s "$1" ]] && source "$1"
-}
-
-sif ".bashrc.${platform}"
-sif ".bashrc.${host}"
 
 export HISTIGNORE="[   ]*:&:bg:fg:exit"
 export HISTCONTROL=ignoredups:erasedups  # no duplicate entries
@@ -51,10 +45,6 @@ git-rm-banch(){
     git branch -D $1 && git push origin :$1
 }
 
-parse_git_branch() {
-    git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
-}
-
 basher(){
     env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
 }
@@ -70,7 +60,13 @@ reset_known_host() {
 
 # if there are settings for a particular machine, put them in .local.bashrc
 # i.e. PS1="[\u@\h \W]\$ "
-[[ -s "$HOME/.local/.bashrc" ]] && . "$HOME/.local/.bashrc"
+source_if_exists() {
+  [[ -s "$1" ]] && source "$1"
+}
+
+source_if_exists "$HOME/.bashrc.${platform}"
+source_if_exists "$HOME/.bashrc.${host}"
+source_if_exists "$HOME/.local/.bashrc"
 
 # set +x
 # exec 2>&3 3>&-

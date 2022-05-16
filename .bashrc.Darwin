@@ -1,11 +1,4 @@
-brewery=`brew --prefix`
-
-[[ -s "$brewery/etc/profile.d/autojump.sh" ]] && . "$brewery/etc/profile.d/autojump.sh"
-[[ -s "$brewery/opt/asdf/asdf.sh" ]] && . "$brewery/opt/asdf/asdf.sh"
-
-if [[ "$0" == "-bash" ]]; then
-  [[ -s "$brewery/etc/bash_completion" ]] && . "$brewery/etc/bash_completion"
-fi
+#!/usr/bin/env bash
 
 export EDITNOW='subl'
 export EDITOR='subl -w'
@@ -23,33 +16,28 @@ alias puma-dev-setup="sudo $PUMA_DEV_BIN -d test:localhost:loc.al -setup"
 alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
 alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
 
-function puma-dev-ln () {
-    echo ln -sf $1 "~/.puma-dev/$(basename $1)"
-    echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
+puma-dev-ln () {
+  echo ln -sf $1 "~/.puma-dev/$(basename $1)"
+  echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
+}
+
+parse_git_branch() {
+  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
 uber_prompt() {
-    local        BLUE="\[\033[0;34m\]"
-    local      YELLOW="\[\033[0;33m\]"
-    local         RED="\[\033[0;31m\]"
-    local   LIGHT_RED="\[\033[1;31m\]"
-    local       GREEN="\[\033[0;32m\]"
-    local LIGHT_GREEN="\[\033[1;32m\]"
-    local       WHITE="\[\033[1;37m\]"
-    local  LIGHT_GRAY="\[\033[0;37m\]"
-    PS1="$LIGHT_GRAY$*$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
-    PS2='> '
-    PS4='+ '
+  local        BLUE="\[\033[0;34m\]"
+  local      YELLOW="\[\033[0;33m\]"
+  local         RED="\[\033[0;31m\]"
+  local   LIGHT_RED="\[\033[1;31m\]"
+  local       GREEN="\[\033[0;32m\]"
+  local LIGHT_GREEN="\[\033[1;32m\]"
+  local       WHITE="\[\033[1;37m\]"
+  local  LIGHT_GRAY="\[\033[0;37m\]"
+
+  PS1="$LIGHT_GRAY$*$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
+  PS2='> '
+  PS4='+ '
 }
 
-myself="`whoami`"
-darwin_prompt="\u@\h:\W"
-me_prompt="\h:\W"
-
-if [ "$platform" == "Darwin" ]; then
-    if [ "$myself" == 'norton' -o "$myself" == 'anorton' ]; then
-        uber_prompt $me_prompt;
-    else
-        uber_prompt $darwin_prompt;
-    fi
-fi
+uber_prompt "\h:\W"
