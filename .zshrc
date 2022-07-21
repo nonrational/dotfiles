@@ -82,3 +82,5 @@ if type brew &>/dev/null; then
 fi
 
 export PATH="/usr/local/opt/sqlite/bin:$PATH"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

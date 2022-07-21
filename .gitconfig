@@ -22,7 +22,7 @@
     # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
     precomposeunicode = false
 [alias]
-    pp = "!git push || $(git push 2>&1 >/dev/null | tail -n2 | head -n1)"
+    pp = push
 
     pro = "!hub pr show || hub browse"
 
@@ -88,22 +88,23 @@
 [status]
     relativePaths = true
 [color]
-  diff = auto
-  status = auto
-  branch = auto
-  interactive = auto
-  ui = true
-  pager = true
+    diff = auto
+    status = auto
+    branch = auto
+    interactive = auto
+    ui = true
+    pager = true
 [gist]
     browse = true
     private = true
 [hub]
     protocol = https
     user = nonrational
+[pull]
+    rebase = true
 [push]
 	default = simple
-[git-up "bundler"]
-	check = true
+    autoSetupRemote = true
 [merge]
     log = true
     keepBackup = false;
@@ -125,5 +126,4 @@
 	renameLimit = 999999
 [rebase]
 	instructionFormat = (%an <%ae>) %s
-[pull]
-	rebase = true
+
