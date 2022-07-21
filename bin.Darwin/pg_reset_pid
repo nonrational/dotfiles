@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rm -i /usr/local/var/postgresql@11/postmaster.pid
+tail /usr/local/var/log/postgresql@11.log
