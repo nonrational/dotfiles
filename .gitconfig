@@ -27,6 +27,7 @@
     pro = "!hub pr show || hub browse"
 
     bump = "commit --allow-empty -m'ci-bump'"
+    buu = "branch --unset-upstream"
 
     ci = commit -v
     co = checkout

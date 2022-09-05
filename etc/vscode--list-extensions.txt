@@ -15,13 +15,17 @@ ms-vscode.makefile-tools
 ms-vscode.sublime-keybindings
 ms-vsliveshare.vsliveshare
 msyrus.go-doc
+NomicFoundation.hardhat-solidity
 NooThaiThinh.scs-cy-helper
+Orta.playdate
 pgourlain.erlang
+pomdtr.excalidraw-editor
 redhat.vscode-yaml
 sharat.vscode-brewfile
 shd101wyy.markdown-preview-enhanced
 sleistner.vscode-fileutils
 stefanjarina.vscode-eex-snippets
+sumneko.lua
 vscode-exunit.exunit
 vscodevim.vim
 wmaurer.change-case

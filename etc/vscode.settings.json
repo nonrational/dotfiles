@@ -24,7 +24,6 @@
   "editor.snippetSuggestions": "top",
   "editor.tabSize": 2,
   "editor.wordWrap": "off",
-  "elixirLS.suggestSpecs": false,
   "emmet.includeLanguages": {
     "javascript": "javascriptreact"
   },
@@ -71,5 +70,11 @@
   "markdown-preview-enhanced.previewTheme": "github-dark.css",
   "workbench.startupEditor": "none",
   "solidity.defaultCompiler": "localNodeModule",
-  "hardhat.telemetry": true
+  "hardhat.telemetry": true,
+  "files.associations": {
+    "*.env": "shellscript"
+  },
+  "[lua]": {
+    "editor.defaultFormatter": "sumneko.lua"
+  }
 }
