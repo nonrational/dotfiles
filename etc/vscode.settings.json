@@ -67,7 +67,7 @@
   "solidity.compileUsingLocalVersion": "soljson-v0.8.13+commit.abaa5c0e.js",
   "solidity.compileUsingRemoteVersion": "soljson-v0.8.13+commit.abaa5c0e.js",
   "markdown-preview-enhanced.codeBlockTheme": "monokai.css",
-  "markdown-preview-enhanced.previewTheme": "github-dark.css",
+  "markdown-preview-enhanced.previewTheme": "atom-light.css",
   "workbench.startupEditor": "none",
   "solidity.defaultCompiler": "localNodeModule",
   "hardhat.telemetry": true,
@@ -76,5 +76,25 @@
   },
   "[lua]": {
     "editor.defaultFormatter": "sumneko.lua"
-  }
+  },
+  "githubPullRequests.pullBranch": "never",
+  "cSpell.userWords": [
+    "accreditations",
+    "automagically",
+    "bacc",
+    "bmuller",
+    "creds",
+    "duplicative",
+    "Ecto",
+    "HDYEE",
+    "quoteblock'ing",
+    "represneting",
+    "standups",
+    "tada",
+    "Totp",
+    "tundora",
+    "Unsubmitted",
+    "Upsell",
+    "Webflow"
+  ]
 }
