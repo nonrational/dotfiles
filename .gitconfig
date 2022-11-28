@@ -3,6 +3,12 @@
 	email = git@nonration.al
 [github]
     user = nonrational
+[gpg]
+    format = ssh
+[gpg "ssh"]
+    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+[commit]
+    gpgsign = true
 [core]
     # Use custom `.gitignore` and `.gitattributes`
     attributesfile = ~/.gitattributes
@@ -23,7 +29,6 @@
     precomposeunicode = false
 [alias]
     pp = push
-
     pro = "!hub pr show || hub browse"
 
     bump = "commit --allow-empty -m'ci-bump'"
@@ -85,7 +90,6 @@
 
     sup = "!. ~/.githelpers && current_pulls_into_here"
     super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
-
 [status]
     relativePaths = true
 [color]
