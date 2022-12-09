@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# load direnv
+eval "$(direnv hook bash)"
+
 export ERL_AFLAGS="-kernel shell_history enabled"
 export PATH="/usr/local/opt/postgresql@11/bin:$PATH"
 

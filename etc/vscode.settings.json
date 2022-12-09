@@ -15,7 +15,6 @@
     "tab.activeBorderTop": "#0A84FF" // Active Tab Top Highlighting
   },
   "editor.acceptSuggestionOnEnter": "on",
-  "editor.codeLens": false,
   "editor.detectIndentation": true,
   "editor.fontFamily": "Panic Sans",
   "editor.insertSpaces": true,
@@ -96,5 +95,6 @@
     "Unsubmitted",
     "Upsell",
     "Webflow"
-  ]
+  ],
+  "githubPullRequests.commentExpandState": "collapseAll"
 }
