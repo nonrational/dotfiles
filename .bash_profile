@@ -9,6 +9,7 @@ source_if_exists() {
 
 # homebrew config
 export PATH="./bin:$HOME/bin:$HOME/.local/bin:/usr/local/sbin:$PATH"
+
 source_if_exists "/usr/local/opt/asdf/libexec/asdf.sh"
 source_if_exists "/usr/local/etc/profile.d/autojump.sh"
 source_if_exists "/usr/local/etc/bash_completion"
