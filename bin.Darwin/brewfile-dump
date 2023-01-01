@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+pushd /tmp
+HOMEBREW_NO_AUTO_UPDATE=1 brew bundle dump
+popd
+
+uname=$(uname -n)
+
+mv /tmp/Brewfile "$PWD/Brewfile.${uname%.*}"
