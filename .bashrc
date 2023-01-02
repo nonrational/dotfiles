@@ -70,5 +70,3 @@ source_if_exists "$HOME/.local/.bashrc"
 
 # set +x
 # exec 2>&3 3>&-
-
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
