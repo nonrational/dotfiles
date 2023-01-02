@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+[ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
+[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh"
+[ -f ~/.fzf.bash ] && . ~/.fzf.bash
+
 export EDITNOW='subl'
 export EDITOR='subl -w'
 export LESS="$LESS -i -F -R -X"

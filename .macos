@@ -80,7 +80,7 @@ defaults write com.apple.helpviewer DevMode -bool true
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 
 # Disable Notification Center and remove the menu bar icon
-launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/nullX
+launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
 
 # Disable automatic capitalization as it’s annoying when typing code
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
@@ -207,7 +207,7 @@ sudo systemsetup -setcomputersleep Off > /dev/null
 sudo pmset -a hibernatemode 0
 
 # Remove the sleep image file to save disk space
-sudo rm /private/var/vm/sleepimage
+sudo rm -f /private/var/vm/sleepimage
 # Create a zero-byte file instead…
 sudo touch /private/var/vm/sleepimage
 # …and make sure it can’t be rewritten
@@ -327,7 +327,7 @@ defaults write com.apple.finder WarnOnEmptyTrash -bool false
 defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 
 # Show the ~/Library folder
-chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library
+chflags nohidden ~/Library
 
 # Show the /Volumes folder
 sudo chflags nohidden /Volumes
@@ -634,7 +634,7 @@ defaults write com.apple.Terminal ShowLineMarks -int 0
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 # Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
+hash tmutil &> /dev/null && sudo tmutil disable
 
 ###############################################################################
 # Activity Monitor                                                            #

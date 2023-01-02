@@ -8,6 +8,7 @@ source_if_exists() {
 }
 
 # homebrew config
+export PATH="/opt/homebrew/bin:$PATH"
 export PATH="./bin:$HOME/bin:$HOME/.local/bin:/usr/local/sbin:$PATH"
 
 source_if_exists "/usr/local/opt/asdf/libexec/asdf.sh"
