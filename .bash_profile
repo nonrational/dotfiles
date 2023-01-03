@@ -1,8 +1,14 @@
 # on macos, iterm and tmux will source this for every new window or pane.
 # screen will *not* source this on new screen creation (ctrl+a,c)
 
+BASH_REPORT_MISSING_SOURCES=false
+
 source_if_exists() {
-  [ -s "$1" ] && source "$1"
+  if [[ -s "$1" ]]; then
+    source "$1"
+  elif $BASH_REPORT_MISSING_SOURCES; then
+    echo "Skipping $1"
+  fi
 }
 
 prepend_path_if_exists() {
@@ -18,9 +24,13 @@ prepend_path_if_exists "$HOME/bin"
 # always prefer the current directory's bin
 export PATH="./bin:$PATH"
 
-source_if_exists "/usr/local/opt/asdf/libexec/asdf.sh"
-source_if_exists "/usr/local/etc/profile.d/autojump.sh"
-source_if_exists "/usr/local/etc/bash_completion"
+export HOMEBREW_ROOT="$(brew --prefix)"
+
+source_if_exists "${HOMEBREW_ROOT}/opt/asdf/libexec/asdf.sh"
+source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/autojump.sh"
+source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/bash_completion.sh"
+source_if_exists "${HOMEBREW_ROOT}/etc/bash_completion"
+source_if_exists "$HOME/.fzf.bash"
 
 source_if_exists "$HOME/.bashrc"
 

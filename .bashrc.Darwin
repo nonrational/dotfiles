@@ -2,10 +2,6 @@
 
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
-[ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
-[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh"
-[ -f ~/.fzf.bash ] && . ~/.fzf.bash
-
 export EDITNOW='subl'
 export EDITOR='subl -w'
 export LESS="$LESS -i -F -R -X"
@@ -15,17 +11,6 @@ export TERM=xterm-color
 
 alias ls="/bin/ls -F"
 alias git='hub'
-
-# allow PUMA_DEV_BIN="./puma-dev" for installing dev versions
-export PUMA_DEV_BIN='puma-dev'
-alias puma-dev-setup="sudo $PUMA_DEV_BIN -d test:localhost:loc.al -setup"
-alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
-alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
-
-puma-dev-ln () {
-  echo ln -sf $1 "~/.puma-dev/$(basename $1)"
-  echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
-}
 
 parse_git_branch() {
   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
