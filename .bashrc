@@ -38,28 +38,26 @@ alias ddate="date '+%Y%m%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
 rpg(){
-    size=${1:-12}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
+  size=${1:-12}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
 }
 
 git-rm-banch(){
-    git branch -D $1 && git push origin :$1
+  git branch -D $1 && git push origin :$1
 }
 
 basher(){
-    env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
+  env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
 }
 
 reset_known_host() {
-    if [ "$1" != "" ]; then
-        grep -v "$1" $HOME/.ssh/known_hosts > $HOME/.ssh/known_hosts.tmp
-        mv -v $HOME/.ssh/known_hosts.tmp $HOME/.ssh/known_hosts
-    else
-        echo "No pattern provided"
-    fi
+  if [ "$1" != "" ]; then
+    grep -v "$1" $HOME/.ssh/known_hosts > $HOME/.ssh/known_hosts.tmp
+    mv -v $HOME/.ssh/known_hosts.tmp $HOME/.ssh/known_hosts
+  else
+    echo "No pattern provided"
+  fi
 }
 
-# if there are settings for a particular machine, put them in .local.bashrc
-# i.e. PS1="[\u@\h \W]\$ "
 source_if_exists() {
   [[ -s "$1" ]] && source "$1"
 }

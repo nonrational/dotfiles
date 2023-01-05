@@ -7,13 +7,13 @@ export ERL_AFLAGS="-kernel shell_history enabled"
 export PATH="/usr/local/opt/postgresql@11/bin:$PATH"
 
 alias standup="subl ~/Documents/standup.md"
-alias fmcode="code ~/src/futurism.code-workspace"
+alias fmcode="code ~/wrk/futurism.code-workspace"
 alias fmstart="tmuxinator start futurism"
 alias fmstop="tmuxinator stop futurism"
 
 fmcov() {
   (
-    cd $HOME/src/pm-backend
+    cd $HOME/wrk/pm-backend
     for f in $(git df origin/master); do
       coverf="cover/Elixir.$(head -n1 $f | awk '{print $2}').html"
 
