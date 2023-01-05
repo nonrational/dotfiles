@@ -16,15 +16,18 @@ parse_git_branch() {
   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
+# ... using \001 and \002 instead of \[ and \] can solve this issue.
+# https://unix.stackexchange.com/a/447520/442723
 uber_prompt() {
-  local        BLUE="\[\033[0;34m\]"
-  local      YELLOW="\[\033[0;33m\]"
-  local         RED="\[\033[0;31m\]"
-  local   LIGHT_RED="\[\033[1;31m\]"
-  local       GREEN="\[\033[0;32m\]"
-  local LIGHT_GREEN="\[\033[1;32m\]"
-  local       WHITE="\[\033[1;37m\]"
-  local  LIGHT_GRAY="\[\033[0;37m\]"
+  local        BLUE="\001\033[0;34m\002"
+  local      YELLOW="\001\033[0;33m\002"
+  local         RED="\001\033[0;31m\002"
+  local   LIGHT_RED="\001\033[1;31m\002"
+  local       GREEN="\001\033[0;32m\002"
+  local LIGHT_GREEN="\001\033[1;32m\002"
+  local       WHITE="\001\033[1;37m\002"
+  local  LIGHT_GRAY="\001\033[0;37m\002"
+
 
   PS1="$LIGHT_GRAY$*$GREEN\$(parse_git_branch)$LIGHT_GRAY\$ "
   PS2='> '
