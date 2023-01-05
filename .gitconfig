@@ -1,135 +1,138 @@
 [user]
-	name = Alan Norton
-	email = git@nonration.al
-    signingkey = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmN/6GdgNQlyyp0FsEVmh3suhU8BCruvS8wxr1z4NCJzG9qQ7VWTwKzo94nc+Wm5FnA5AWt1d/WJWVZroJ1slIOLq0avmWFrhemt+Fk9L5afV3NwcJGZIdhSCZkuaLutkwwpPe9een3QATkCzX85Rg7LjPlzwtO3Sk480SJQnUkSfJY871S0risH5y8Ehm0kjoEx1j684j7lgrv8QmVmn1kJNLSIkhMASm+i36mCgaH7nI5Jqncp81DTUiOdh8I86zJViGQ0n6xQjzvrGrMTV6oyizUJcTuirduBKlESdiWeSH7TQt0xDFDM08tU3i5Eoz6sZaLtWlerA4Jkmv1Kd7GQyIP0K2ShzZBWtiJO31DTp7hpCdDY9o2ZlcX374YcJdZFp1eC5wbn2kLBB5f1/iJQeYWJwmhvM+BTRIvq0HIFdkIwAa2QBQnfAhv+M0wxu1HCAHh3I8mf1bGHJr6oJoTVsrT+/+zfYbU90SOm4sPgsVCzhZUo5QnXRca2MaeEQsrjnqnc8Uqn+NqeWxGc+jdlXkwpldkQGBSrOWAfL+CtMsAtxnQ2qKt6ZSGBL0y2NYvZb0XyLSoOPEHFtQEPe7BYWdK/V914ZGWg3kQSRy0w18/ng+3L5HRZl+6Gjz2dFoAkCwxmEwD2QsWC8NfnGDJ7sLTAMmgtxsnQ9ENDQS4w==
+  name = Alan Norton
+  email = git@nonration.al
+  signingkey = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmN/6GdgNQlyyp0FsEVmh3suhU8BCruvS8wxr1z4NCJzG9qQ7VWTwKzo94nc+Wm5FnA5AWt1d/WJWVZroJ1slIOLq0avmWFrhemt+Fk9L5afV3NwcJGZIdhSCZkuaLutkwwpPe9een3QATkCzX85Rg7LjPlzwtO3Sk480SJQnUkSfJY871S0risH5y8Ehm0kjoEx1j684j7lgrv8QmVmn1kJNLSIkhMASm+i36mCgaH7nI5Jqncp81DTUiOdh8I86zJViGQ0n6xQjzvrGrMTV6oyizUJcTuirduBKlESdiWeSH7TQt0xDFDM08tU3i5Eoz6sZaLtWlerA4Jkmv1Kd7GQyIP0K2ShzZBWtiJO31DTp7hpCdDY9o2ZlcX374YcJdZFp1eC5wbn2kLBB5f1/iJQeYWJwmhvM+BTRIvq0HIFdkIwAa2QBQnfAhv+M0wxu1HCAHh3I8mf1bGHJr6oJoTVsrT+/+zfYbU90SOm4sPgsVCzhZUo5QnXRca2MaeEQsrjnqnc8Uqn+NqeWxGc+jdlXkwpldkQGBSrOWAfL+CtMsAtxnQ2qKt6ZSGBL0y2NYvZb0XyLSoOPEHFtQEPe7BYWdK/V914ZGWg3kQSRy0w18/ng+3L5HRZl+6Gjz2dFoAkCwxmEwD2QsWC8NfnGDJ7sLTAMmgtxsnQ9ENDQS4w==
 [github]
-    user = nonrational
+  user = nonrational
+[include]
+  path = ~/.local/.gitconfig
 [gpg]
-    format = ssh
+  format = ssh
 [gpg "ssh"]
-    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 [commit]
-    gpgsign = true
+  gpgsign = true
 [core]
-    # Use custom `.gitignore` and `.gitattributes`
-    attributesfile = ~/.gitattributes
-    quotepath = false
-    excludesfile = ~/.gitignore_global
+  # Use custom `.gitignore` and `.gitattributes`
+  attributesfile = ~/.gitattributes
+  quotepath = false
+  excludesfile = ~/.gitignore_global
 
-    # Treat spaces before tabs and all kinds of trailing whitespace as an error
-    # [default] trailing-space: looks for spaces at the end of a line
-    # [default] space-before-tab: looks for spaces before tabs at the beginning of a line
-    whitespace = space-before-tab,-indent-with-non-tab,trailing-space
+  # Treat spaces before tabs and all kinds of trailing whitespace as an error
+  # [default] trailing-space: looks for spaces at the end of a line
+  # [default] space-before-tab: looks for spaces before tabs at the beginning of a line
+  whitespace = space-before-tab,-indent-with-non-tab,trailing-space
 
-    # Make `git rebase` safer on macOS
-    # More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
-    trustctime = false
+  # Make `git rebase` safer on macOS
+  # More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
+  trustctime = false
 
-    # Prevent showing files whose names contain non-ASCII symbols as unversioned.
-    # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
-    precomposeunicode = false
+  # Prevent showing files whose names contain non-ASCII symbols as unversioned.
+  # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
+  precomposeunicode = false
 [alias]
-    pp = push
-    pro = "!hub pr show || hub browse"
+  pp = push
+  pro = "!hub pr show || hub browse"
 
-    bump = "commit --allow-empty -m'ci-bump'"
-    buu = "branch --unset-upstream"
+  bump = "commit --allow-empty -m'ci-bump'"
+  buu = "branch --unset-upstream"
 
-    ci = commit -v
-    co = checkout
+  ci = commit -v
+  co = checkout
 
-    df = "diff --name-only"
-    dfo = "df origin/master"
-    dc = diff --cached
+  df = "diff --name-only"
+  dfo = "df origin/master"
+  dc = diff --cached
 
-    f = "fetch --tags --force --prune"
-    ri = "rebase -i"
-    rio = "!git f && git rebase -i origin/master"
-    mov = "branch -m"
+  f = "fetch --tags --force --prune"
+  ri = "rebase -i"
+  rio = "!git f && git rebase -i origin/master"
+  mov = "branch -m"
 
-    head = !git r -1
-    hp = "!. ~/.githelpers && show_git_head"
-    r = !GIT_NO_PAGER=1 git l -10
-    ra = !git r --all
-    l = "!. ~/.githelpers && pretty_git_log"
-    la = !git l --all
-    b = "!. ~/.githelpers && pretty_git_branch"
-    bs = "!. ~/.githelpers && pretty_git_branch_sorted"
-    brr = branch --sort=-committerdate
+  head = !git r -1
+  hp = "!. ~/.githelpers && show_git_head"
+  r = !GIT_NO_PAGER=1 git l -10
+  ra = !git r --all
+  l = "!. ~/.githelpers && pretty_git_log"
+  la = !git l --all
+  b = "!. ~/.githelpers && pretty_git_branch"
+  bs = "!. ~/.githelpers && pretty_git_branch_sorted"
+  brr = branch --sort=-committerdate
 
-    lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
-    stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
+  lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
+  stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 
-    amend = commit --amend
-    aa = add --all .
-    st = status
-    stp = status --porcelain
+  amend = commit --amend
+  aa = add --all .
+  st = status
+  stp = status --porcelain
 
-    up = "!git f && hub sync"
+  up = "!git f && hub sync"
 
-    modified = "!git ls-files --modified"
-    deleted = "!git ls-files --deleted"
-    untracked = "!git ls-files --others --exclude-standard"
-    new = untracked
+  modified = "!git ls-files --modified"
+  deleted = "!git ls-files --deleted"
+  untracked = "!git ls-files --others --exclude-standard"
+  new = untracked
 
-    # ignore untracked files in this specific repo
-    is-it-just-me = "!$EDITOR .git/info/exclude"
+  # ignore untracked files in this specific repo
+  is-it-just-me = "!$EDITOR .git/info/exclude"
 
-    # ignore changes to files that are never going to be committed
-    regard = update-index --no-assume-unchanged
-    disregard = update-index --assume-unchanged
-    dissed = !git ls-files -v | grep ^[a-z] || echo "None"
+  # ignore changes to files that are never going to be committed
+  regard = update-index --no-assume-unchanged
+  disregard = update-index --assume-unchanged
+  dissed = !git ls-files -v | grep ^[a-z] || echo "None"
 
-    broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
-    spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
+  broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
+  spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
 
-    wtf = "!. ~/.githelpers && what_the_hell_just_happened"
-    nuke = "!git reset --hard HEAD && git clean -fd"
+  wtf = "!. ~/.githelpers && what_the_hell_just_happened"
+  nuke = "!git reset --hard HEAD && git clean -fd"
 
-    aww = "!. ~/.githelpers && add_wildcard"
-    uww = "!. ~/.githelpers && reset_wildcard"
+  aww = "!. ~/.githelpers && add_wildcard"
+  uww = "!. ~/.githelpers && reset_wildcard"
 
-    sup = "!. ~/.githelpers && current_pulls_into_here"
-    super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
+  sup = "!. ~/.githelpers && current_pulls_into_here"
+  super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
 [status]
-    relativePaths = true
+  relativePaths = true
 [color]
-    diff = auto
-    status = auto
-    branch = auto
-    interactive = auto
-    ui = true
-    pager = true
+  diff = auto
+  status = auto
+  branch = auto
+  interactive = auto
+  ui = true
+  pager = true
 [gist]
-    browse = true
-    private = true
+  browse = true
+  private = true
 [hub]
-    protocol = https
-    user = nonrational
+  protocol = https
+  user = nonrational
 [pull]
-    rebase = true
+  rebase = true
 [push]
-	default = simple
-    autoSetupRemote = true
+  default = simple
+  autoSetupRemote = true
 [merge]
-    log = true
-    keepBackup = false;
-    tool = smerge
-    prompt = false
+  log = true
+  keepBackup = false;
+  tool = smerge
+  prompt = false
 [mergetool "smerge"]
-    cmd = smerge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
-    keepTemporaries = false
-    trustExitCode = false
-    keepBackup = false
-    prompt = false
+  cmd = smerge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+  keepTemporaries = false
+  trustExitCode = false
+  keepBackup = false
+  prompt = false
 [gc]
-	auto = 0
+  auto = 0
 [filter "lfs"]
-	clean = git-lfs clean %f
-	smudge = git-lfs smudge %f
-	required = true
+  clean = git-lfs clean %f
+  smudge = git-lfs smudge %f
+  required = true
 [diff]
-	renameLimit = 999999
+  renameLimit = 999999
 [rebase]
-	instructionFormat = (%an <%ae>) %s
+  instructionFormat = (%an <%ae>) %s
+
 
