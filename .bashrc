@@ -1,5 +1,4 @@
 # sourced on new screens, non-login shells.
-# echo sourcing .bashrc
 
 host=`uname -n | sed -e 's/\.lan$//g' -e 's/\.local$//g'`;
 platform=`uname`;
@@ -65,6 +64,3 @@ source_if_exists() {
 source_if_exists "$HOME/.bashrc.${platform}"
 source_if_exists "$HOME/.bashrc.${host}"
 source_if_exists "$HOME/.local/.bashrc"
-
-# set +x
-# exec 2>&3 3>&-

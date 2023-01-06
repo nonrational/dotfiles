@@ -4,7 +4,7 @@
 eval "$(direnv hook bash)"
 
 export ERL_AFLAGS="-kernel shell_history enabled"
-export PATH="/usr/local/opt/postgresql@11/bin:$PATH"
+export PATH="$PATH:/usr/local/opt/postgresql@11/bin"
 
 alias standup="subl ~/Documents/standup.md"
 alias fmcode="code ~/wrk/futurism.code-workspace"
