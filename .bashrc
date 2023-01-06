@@ -44,10 +44,6 @@ git-rm-banch(){
   git branch -D $1 && git push origin :$1
 }
 
-basher(){
-  env -i PATH=$PATH HOME=$HOME TERM=xterm-color "$(command -v bash)" --noprofile --norc
-}
-
 reset_known_host() {
   if [ "$1" != "" ]; then
     grep -v "$1" $HOME/.ssh/known_hosts > $HOME/.ssh/known_hosts.tmp
