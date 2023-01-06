@@ -86,7 +86,7 @@ reset_wildcard(){
 }
 
 delete_remoteless_branches_interactive(){
-    ruby $HOME/bin/git-broom.rb
+    python3 $HOME/bin/git-broom.py
 }
 
 delete_all_my_branches_interactive(){
