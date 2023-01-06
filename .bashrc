@@ -28,12 +28,8 @@ alias grep="grep --color"
 alias hist="history|tail"
 alias psa="ps auxwww"
 
-alias prpg="LC_CTYPE=C tr -dc 'A-Za-z0-9_-' < /dev/urandom | fold -w 16 | head -n1"
-
 alias pry-watch='while clear && sleep 1; do pry-remote -w; done'
 
-#aliases for my local stuff
-alias ddate="date '+%Y%m%d%'"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
 rpg(){
