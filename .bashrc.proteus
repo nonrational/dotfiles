@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+export ERL_AFLAGS="-kernel shell_history enabled"
+export PATH="$PATH:/usr/local/opt/postgresql@11/bin"
+
+alias standup="subl ~/Documents/standup.md"
+alias fmcode="code ~/wrk/futurism.code-workspace"
+alias fmstart="tmuxinator start futurism"
+alias fmstop="tmuxinator stop futurism"
+
+fmcov() {
+  (
+    cd $HOME/wrk/pm-backend
+    for f in $(git df origin/master); do
+      coverf="cover/Elixir.$(head -n1 $f | awk '{print $2}').html"
+
+      if [ -f "$coverf" ]; then
+        open "$coverf"
+      fi
+    done
+  )
+}
