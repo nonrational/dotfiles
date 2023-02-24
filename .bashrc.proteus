@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export ERL_AFLAGS="-kernel shell_history enabled"
-export PATH="$PATH:/usr/local/opt/postgresql@11/bin"
+export PATH="$PATH:/opt/homebrew/opt/postgresql@11/bin"
 
 alias standup="subl ~/Documents/standup.md"
 alias fmcode="code ~/wrk/futurism.code-workspace"
