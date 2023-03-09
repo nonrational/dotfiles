@@ -759,13 +759,8 @@ defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool t
 #           |_|   |_|                                nonrational
 ################################################################
 
-# Enable Do Not Disturb All The Time
-defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturb -boolean true
-defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui dndEnd -float 119 # 01:59
-defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui dndStart -float 120 # 02:00
-
-# Remove Time, Battery, Airplay from Menu Bar
-defaults write com.apple.systemuiserver menuExtras -array "/System/Library/CoreServices/Menu Extras/AirPort.menu"
+# Use analog clock in menubar
+defaults write com.apple.menuextra.clock IsAnalog -bool true
 
 # Use all F1, F2 as standard keys
 defaults write -g com.apple.keyboard.fnState -bool true
