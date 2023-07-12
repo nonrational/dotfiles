@@ -12,7 +12,10 @@ xcode-select --install
 
 git clone https://github.com/nonrational/dotfiles .dotfiles
 cd .dotfiles
-make init
+
+make brew-install
+make brew-bundle
+make macos-setup
 ```
 
 ## GNU/Linux
