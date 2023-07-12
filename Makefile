@@ -1,7 +1,7 @@
 default:
 	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
 
-init: brew-install brew-bundle link-dotfiles link-karabiner macos
+macos-setup: link-dotfiles link-karabiner macos
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
 init-post-reboot: asdf link-sublime link-vscode restore-preferences disable-restore-apps-on-login
@@ -10,6 +10,7 @@ brew-install:
 	/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 brew-bundle:
+	eval "$(/opt/homebrew/bin/brew shellenv)"
 	brew update
 	brew bundle
 
