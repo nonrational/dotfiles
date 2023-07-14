@@ -6,6 +6,8 @@
   user = nonrational
 [include]
   path = ~/.local/.gitconfig
+[includeIf "gitdir:~/wrk/**"]
+  path = ~/wrk/.gitconfig
 [gpg]
   format = ssh
 [gpg "ssh"]
