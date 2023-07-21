@@ -3,6 +3,15 @@
 
 BASH_REPORT_MISSING_SOURCES=true
 
+# Copied from https://github.com/scop/bash-completion/bash_completion
+# Fixes https://github.com/Backblaze/B2_Command_Line_Tool/issues/500
+_have()
+{
+    # Completions for system administrator commands are installed as well in
+    # case completion is attempted via `sudo command ...'.
+    PATH=$PATH:/usr/sbin:/sbin:/usr/local/sbin type $1 &>/dev/null
+}
+
 prepend_new_path_if_exists() {
   [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]] && export PATH="$1:$PATH"
 }
