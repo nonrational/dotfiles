@@ -35,3 +35,9 @@ uber_prompt() {
 }
 
 uber_prompt "\h:\W"
+
+scutil_set_hostname() {
+  sudo scutil --set HostName "${1}.local"
+  sudo scutil --set LocalHostName "$1"
+  sudo scutil --set ComputerName "$1"
+}
