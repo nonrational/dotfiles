@@ -15,7 +15,18 @@ cd .dotfiles
 
 make brew-install
 make brew-bundle
-make macos-setup
+
+# set modern bash as the default shell
+(($(grep bash /etc/shells | wc -l)<2)) && which -a bash | head -n1 | sudo tee -a /etc/shells
+chsh -l $(which -a bash | head -n1)
+
+make link-dotfiles
+make link-karabiner
+make restore-preferences
+
+make macos-reset-dock
+make macos-disable-restore-apps-on-login
+make macos
 ```
 
 ## GNU/Linux
@@ -25,6 +36,7 @@ make macos-setup
 
 git clone git@github.com:nonrational/dotfiles .dotfiles
 cd .dotfiles
+
 make link-dotfiles
 ```
 
