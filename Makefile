@@ -1,11 +1,6 @@
 default:
 	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
 
-macos-setup: link-dotfiles link-karabiner macos
-	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
-
-init-post-reboot: asdf link-sublime restore-preferences disable-restore-apps-on-login
-
 brew-install:
 	/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -14,12 +9,13 @@ brew-bundle:
 	brew update
 	brew bundle
 
+macos:
+	sh .macos
+	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
+
 macos-reset-dock:
 	defaults write com.apple.dock persistent-apps -array
 	killall Dock
-
-macos:
-	sh .macos
 
 link-dotfiles:
 	mkdir -p $$HOME/.local
