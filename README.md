@@ -18,7 +18,7 @@ make brew-bundle
 
 # set modern bash as the default shell
 (($(grep bash /etc/shells | wc -l)<2)) && which -a bash | head -n1 | sudo tee -a /etc/shells
-chsh -l $(which -a bash | head -n1)
+chsh -s $(which -a bash | head -n1)
 
 make link-dotfiles
 make link-karabiner

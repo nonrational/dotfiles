@@ -5,7 +5,7 @@ brew-install:
 	/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 brew-bundle:
-	eval "$(/opt/homebrew/bin/brew shellenv)"
+	eval "$$(/opt/homebrew/bin/brew shellenv)"
 	brew update
 	brew bundle
 
@@ -36,7 +36,9 @@ backup-preferences:
 	cp $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist $$PWD/etc/com.if.Amphetamine.plist
 
 restore-preferences:
+	@mkdir -p $$HOME/Library/Preferences/
 	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
+	@mkdir -p $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/
 	cp $$PWD/etc/com.if.Amphetamine.plist $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist
 
 macos-disable-restore-apps-on-login:
