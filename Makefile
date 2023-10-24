@@ -34,12 +34,14 @@ link-sublime:
 backup-preferences:
 	cp $$HOME/Library/Preferences/com.googlecode.iterm2.plist $$PWD/etc/com.googlecode.iterm2.plist
 	cp $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist $$PWD/etc/com.if.Amphetamine.plist
+	defaults export com.manytricks.Moom $$PWD/etc/com.manytricks.Moom.plist
 
 restore-preferences:
 	@mkdir -p $$HOME/Library/Preferences/
 	cp $$PWD/etc/com.googlecode.iterm2.plist $$HOME/Library/Preferences/com.googlecode.iterm2.plist
 	@mkdir -p $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/
 	cp $$PWD/etc/com.if.Amphetamine.plist $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist
+	defaults import com.manytricks.Moom $$PWD/etc/com.manytricks.Moom.plist
 
 macos-disable-restore-apps-on-login:
 	# See https://apple.stackexchange.com/a/322787
