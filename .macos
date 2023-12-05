@@ -290,6 +290,11 @@ defaults write NSGlobalDomain com.apple.springing.enabled -bool true
 # Remove the spring loading delay for directories
 defaults write NSGlobalDomain com.apple.springing.delay -float 0
 
+# To speed up SMB file browsing, you can prevent macOS from reading .DS_Store files on SMB shares.
+# This makes the Finder use only basic information to immediately display each folder's contents
+# in alphanumeric order.
+# https://support.apple.com/en-us/HT208209
+#
 # Avoid creating .DS_Store files on network or USB volumes
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
