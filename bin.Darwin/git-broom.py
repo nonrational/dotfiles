@@ -6,8 +6,8 @@ import subprocess
 
 subprocess.run('git fetch origin --prune --tags -f'.split(), stdout=subprocess.PIPE, text=True)
 
-remote_branches_ps = subprocess.run(['git branch --remote | grep "origin" | grep -v "HEAD" | cut -c10- | egrep -v "^master$\|^main$"'], shell=True, stdout=subprocess.PIPE, text=True)
-local_branches_ps = subprocess.run(['git branch | grep -v "HEAD" | cut -c3- | egrep -v "^master$\|^main$"'], shell=True, stdout=subprocess.PIPE, text=True)
+remote_branches_ps = subprocess.run([r'git branch --remote | grep "origin" | grep -v "HEAD" | cut -c10- | egrep -v "^master$\|^main$"'], shell=True, stdout=subprocess.PIPE, text=True)
+local_branches_ps = subprocess.run([r'git branch | grep -v "HEAD" | cut -c3- | egrep -v "^master$\|^main$"'], shell=True, stdout=subprocess.PIPE, text=True)
 
 local_branches = local_branches_ps.stdout.split('\n')
 remote_branches = remote_branches_ps.stdout.split('\n')
