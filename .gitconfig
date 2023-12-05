@@ -93,8 +93,7 @@
   aww = "!. ~/.githelpers && add_wildcard"
   uww = "!. ~/.githelpers && reset_wildcard"
 
-  sup = "!. ~/.githelpers && current_pulls_into_here"
-  super = "!. ~/.githelpers && current_pulls_into_here_with_colorful_status"
+  yolo = !git commit --allow-empty -m \"$(curl -s https://whatthecommit.com/index.txt)\"
 [status]
   relativePaths = true
 [color]
@@ -129,9 +128,10 @@
 [gc]
   auto = 0
 [filter "lfs"]
-  clean = git-lfs clean %f
-  smudge = git-lfs smudge %f
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
   required = true
+  process = git-lfs filter-process
 [diff]
   renameLimit = 999999
 [rebase]
@@ -139,4 +139,4 @@
 
 
 [advice]
-	skippedCherryPicks = false
+  skippedCherryPicks = false
