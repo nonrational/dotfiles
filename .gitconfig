@@ -41,6 +41,7 @@
 
   ci = commit -v
   co = checkout
+  col = "!. ~/.githelpers && checkout_first_matching"
 
   df = "diff --name-only"
   dfo = "df origin/master"
