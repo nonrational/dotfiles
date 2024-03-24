@@ -85,6 +85,14 @@ reset_wildcard(){
     git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
 }
 
+switch_wildcard() {
+    if [ -z "$1" ]; then
+        echo "No pattern provided"
+    else
+        git branch -a | egrep "$1" | head -1 | xargs git switch
+    fi
+}
+
 delete_remoteless_branches_interactive(){
     python3 $HOME/bin/git-broom.py
 }
@@ -95,14 +103,6 @@ delete_all_my_branches_interactive(){
         read ans;
         [[ "$ans" == "y" ]] && git branch -D $branch && git push origin :$branch
     done
-}
-
-checkout_first_matching() {
-    if [ -z "$1" ]; then
-        echo "No pattern provided"
-    else
-        git branch | egrep "$1" | head -1 | xargs git checkout
-    fi
 }
 
 TIMESINCE="function timeSince(date) {\
