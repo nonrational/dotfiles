@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]; then
+  echo "Usage: speed-up <input-file>"
+  exit 1
+fi
+
+input_file="$1"
+output_file="${input_file%.*}.faster.${input_file##*.}"
+
+ffmpeg -i "$input_file" -filter_complex "[0:v]setpts=0.625*PTS[v];[0:a]atempo=1.6[a]" -map "[v]" -map "[a]" "$output_file"

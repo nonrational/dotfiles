@@ -41,7 +41,6 @@
 
   ci = commit -v
   co = checkout
-  col = "!. ~/.githelpers && checkout_first_matching"
 
   df = "diff --name-only"
   dfo = "df origin/master"
@@ -93,6 +92,7 @@
 
   aww = "!. ~/.githelpers && add_wildcard"
   uww = "!. ~/.githelpers && reset_wildcard"
+  sww = "!. ~/.githelpers && switch_wildcard"
 
   yolo = !git commit --allow-empty -m \"$(curl -s https://whatthecommit.com/index.txt)\"
 [status]
