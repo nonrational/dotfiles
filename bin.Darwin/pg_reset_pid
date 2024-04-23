@@ -1,4 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
-rm -i /usr/local/var/postgresql@11/postmaster.pid
-tail /usr/local/var/log/postgresql@11.log
+HOMEBREW_PG_PKG=$(brew list | grep postgresql)
+HOMEBREW_PG_PATH=$(echo "${HOMEBREW_PG_PKG}" | xargs brew info | awk '/LC_ALL/ {print $4}')
+
+if [ ! -d "${HOMEBREW_PG_PATH}" ]; then
+  echo "${HOMEBREW_PG_PATH} does not exist."
+  exit 1
+fi
+
+echo "${HOMEBREW_PG_PATH}"
+
+rm -i "${HOMEBREW_PG_PATH}/postmaster.pid"
+tail "${HOMEBREW_PG_PATH}/../../var/log/${HOMEBREW_PG_PKG}.log"
