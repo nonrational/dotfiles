@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-curl --silent https://raw.githubusercontent.com/nerdydrew/Random-Pokemon-Generator/master/dex/all.json \
-| jq -r --arg i $((RANDOM % 898)) '.[$i|tonumber].name'
+curl --silent https://raw.githubusercontent.com/nerdydrew/Random-Pokemon-Generator/main/public/dex/all.json \
+    | jq -r --arg i $((RANDOM % 898)) '.[$i|tonumber].name'
