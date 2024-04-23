@@ -1,11 +1,33 @@
 #!/usr/bin/env bash
 
+AUDIO=1
+PARAMS=""
+while (( "$#" )); do
+  case "$1" in
+    -s|--no-audio)
+      AUDIO=0
+      shift
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
+
 if [ -z "$1" ]; then
   echo "Usage: speed-up <input-file>"
   exit 1
 fi
 
 input_file="$1"
-output_file="${input_file%.*}.faster.${input_file##*.}"
 
-ffmpeg -i "$input_file" -filter_complex "[0:v]setpts=0.625*PTS[v];[0:a]atempo=1.6[a]" -map "[v]" -map "[a]" "$output_file"
+if [[ $AUDIO -eq 1 ]]; then
+  output_file="${input_file%.*}.faster.${input_file##*.}"
+  ffmpeg -i "$input_file" -filter_complex "[0:v]setpts=0.625*PTS[v];[0:a]atempo=1.6[a]" -map "[v]" -map "[a]" "$output_file"
+else
+  output_file="${input_file%.*}.faster.silent.${input_file##*.}"
+  ffmpeg -i "$input_file" -filter_complex "[0:v]setpts=0.625*PTS[v]" -map "[v]" -an "$output_file"
+fi
