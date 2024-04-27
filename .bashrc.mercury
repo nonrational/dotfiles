@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# Copied from https://github.com/scop/bash-completion/bash_completion
+# Fixes https://github.com/Backblaze/B2_Command_Line_Tool/issues/500
+_have()
+{
+    # Completions for system administrator commands are installed as well in
+    # case completion is attempted via `sudo command ...'.
+    PATH=$PATH:/usr/sbin:/sbin:/usr/local/sbin type $1 &>/dev/null
+}
+
 # enable the 1password ssh agent
 export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 

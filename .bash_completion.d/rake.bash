@@ -6,6 +6,10 @@
 # Fixing it to restrict changes to rakecomplete only.
 # export COMP_WORDBREAKS=${COMP_WORDBREAKS/\:/}
 
+# Troubleshooting ===
+# If completion isn't working, ensure you've bundled and that bare `rake` works.
+# After that, you may need to `rm .rake_tasks~`.
+
 _rakecomplete() {
     local cur
     _get_comp_words_by_ref -n : cur

@@ -3,17 +3,14 @@
 
 BASH_REPORT_MISSING_SOURCES=true
 
-# Copied from https://github.com/scop/bash-completion/bash_completion
-# Fixes https://github.com/Backblaze/B2_Command_Line_Tool/issues/500
-_have()
-{
-    # Completions for system administrator commands are installed as well in
-    # case completion is attempted via `sudo command ...'.
-    PATH=$PATH:/usr/sbin:/sbin:/usr/local/sbin type $1 &>/dev/null
-}
-
 prepend_new_path_if_exists() {
-  [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]] && export PATH="$1:$PATH"
+  if [ -d "$1" ]; then
+    # Pop the path off PATH (with pipes) before prepending it to PATH. ;)
+    # This is preferable to no-op'ing if the path already exists, to ensure that system paths
+    # don't take precedence in tmux or screen-like environments.
+    local CLEAN_PATH=$(echo "${PATH}:" | sed -e "s|$1:||" -e 's|:$||')
+    export PATH="$1:$CLEAN_PATH"
+  fi
 }
 
 # don't bother adding paths if it'll do no good.
@@ -39,7 +36,7 @@ if command -v brew &> /dev/null; then
   source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/bash_completion.sh"
 fi
 
-source_if_exists "$HOME/.fzf.bash"
+source_if_exists "$HOME/.fzf.bash" # fzf --bash > ~/.fzf.bash
 source_if_exists "$HOME/.bashrc"
 
 # always prefer the current directory's bin

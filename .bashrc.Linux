@@ -66,6 +66,7 @@ source_if_exists() {
   [[ -s "$1" ]] && source "$1"
 }
 
+source_if_exists "$HOME/.fzf.bash"
 source_if_exists "$HOME/.homesick/repos/homeshick/homeshick.sh"
 source_if_exists "$HOME/.homesick/repos/homeshick/completions/homeshick-completion.bash"
 source_if_exists "$HOME/.asdf/asdf.sh"

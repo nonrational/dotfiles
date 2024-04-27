@@ -4,8 +4,7 @@ export ERL_AFLAGS="-kernel shell_history enabled"
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
 export PATH="$HOME/.parallelize/bin:$PATH"
 
-
-alias standup="subl ~/Documents/standup.md"
+alias standup="subl ~/.parallelize/standup.md"
 alias fmcode="code ~/wrk/futurism.code-workspace"
 alias fmstart="tmuxinator start futurism"
 alias fmstop="tmuxinator stop futurism"
