@@ -3,9 +3,6 @@ tap "homebrew/services"
 
 tap "1password/tap"
 
-# tap 'puma/puma'
-# brew 'puma/puma/puma-dev'
-
 #   __                            _
 #  / _| ___  _ __ _ __ ___  _   _| | __ _
 # | |_ / _ \| '__| '_ ` _ \| | | | |/ _` |
@@ -29,6 +26,7 @@ brew "gnu-sed"
 brew "gnu-tar"
 brew "gnupg"
 brew "hub"
+brew "just"
 brew "mas"
 brew "openssl"
 brew "rclone"

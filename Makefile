@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 default:
 	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
 
@@ -5,9 +7,8 @@ brew-install:
 	/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 brew-bundle:
-	eval "$$(/opt/homebrew/bin/brew shellenv)"
-	brew update
-	brew bundle
+	/opt/homebrew/bin/brew shellenv > /tmp/brew-shell.env
+	source /tmp/brew-shell.env && which brew && brew update && brew bundle
 
 macos:
 	sh .macos

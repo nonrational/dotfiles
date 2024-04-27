@@ -16,9 +16,19 @@ cd .dotfiles
 make brew-install
 make brew-bundle
 
+# close terminal
+# grant iterm full disk access
+# auth with 1password
+# safari auth to github
+
 # set modern bash as the default shell
-(($(grep bash /etc/shells | wc -l)<2)) && which -a bash | head -n1 | sudo tee -a /etc/shells
-chsh -s $(which -a bash | head -n1)
+
+if [ -f /opt/homebrew/bin/bash ]; then
+    echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells
+    chsh -s '/opt/homebrew/bin/bash'
+else
+    echo 'Unable to set default shell to `/opt/homebrew/bin/bash`'
+fi
 
 make link-dotfiles
 make link-karabiner
@@ -27,6 +37,9 @@ make restore-preferences
 make macos-reset-dock
 make macos-disable-restore-apps-on-login
 make macos
+# restart
+
+# enable 1password shell integration / ssh agent
 ```
 
 ## GNU/Linux
