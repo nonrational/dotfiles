@@ -39,7 +39,7 @@ if command -v brew &> /dev/null; then
   source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/bash_completion.sh"
 fi
 
-source_if_exists "$HOME/.fzf.bash"
+source_if_exists "$HOME/.fzf.bash" # fzf --bash > ~/.fzf.bash
 source_if_exists "$HOME/.bashrc"
 
 # always prefer the current directory's bin
