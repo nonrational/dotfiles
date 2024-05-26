@@ -1,13 +1,15 @@
-Backup
+/Backup
+/Brewfile.lock.json
+
 .DS_Store
 .svn
 .git
 .DS_Store
 .AppleDouble
 .viminfo
-*.swp
 .vim/.netrwhist
 
+*.swp
 *.cache
 *.pyc
 
