@@ -3,7 +3,7 @@
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 export EDITNOW='subl'
-export EDITOR='subl -w'
+export EDITOR='subl -w -n'
 export LESS="$LESS -i -F -R -X"
 
 export CLICOLOR=1
