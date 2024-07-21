@@ -782,6 +782,10 @@ defaults write com.apple.coreservices.uiagent CSUILastOSVersionWhereSafariRecomm
 # Disable "floating thumbnail" preview and screenshot delay
 defaults write com.apple.screencapture show-thumbnail -bool false
 
+# More compact spacing for menu bar items.
+defaults write -globalDomain NSStatusItemSpacing -int 6
+defaults write -globalDomain NSStatusItemSelectionPadding -int 12
+
 ###############################################################
 #                            _                      _        _
 #   _____  ___ __   ___ _ __(_)_ __ ___   ___ _ __ | |_ __ _| |
