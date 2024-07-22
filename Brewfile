@@ -56,7 +56,6 @@ cask "docker"
 cask "dropbox"
 cask "firefox"
 cask "google-chrome"
-cask "hiddenbar"
 cask "istat-menus"
 cask "iterm2"
 cask "karabiner-elements"
@@ -83,3 +82,4 @@ cask "wavebox"
 #
 mas "Amphetamine", id: 937984704
 mas "CopyClip", id: 595191960
+mas "Hidden Bar", id: 1452453066
