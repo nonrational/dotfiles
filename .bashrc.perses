@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 export ERL_AFLAGS="-kernel shell_history enabled"
+export KERL_BUILD_DOCS="yes"
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
 export PATH="$HOME/.parallelize/bin:$PATH"
 
