@@ -57,9 +57,12 @@
   ra = !git r --all
   l = "!. ~/.githelpers && pretty_git_log"
   la = !git l --all
+
+  lb = !git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", substr($2, 1, length($2)-1), $1)}'
   b = "!. ~/.githelpers && pretty_git_branch"
   bs = "!. ~/.githelpers && pretty_git_branch_sorted"
   brr = branch --sort=-committerdate
+
 
   lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
   stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
