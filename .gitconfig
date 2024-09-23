@@ -39,6 +39,10 @@
   bump = "commit --allow-empty -m'ci-bump'"
   buu = "branch --unset-upstream"
 
+  bc = "branch --show-current"
+  bmx = "!. ~/.githelpers && rename_branch_regex"
+  bcp = "!git branch --show-current | pbcopy"
+
   ci = commit -v
   co = checkout
 

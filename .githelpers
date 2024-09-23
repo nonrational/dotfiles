@@ -38,84 +38,95 @@ BRANCH_CONTENTS="%(contents:subject)"
 BRANCH_FORMAT="$BRANCH_PREFIX^$BRANCH_REF^$BRANCH_HASH^$BRANCH_DATE^$BRANCH_AUTHOR^$BRANCH_CONTENTS"
 
 show_git_head() {
-    pretty_git_log -1
-    git show -p --pretty="tformat:"
+  pretty_git_log -1
+  git show -p --pretty="tformat:"
 }
 
 pretty_git_log() {
-    git log --graph --pretty="tformat:${LOG_FORMAT}" $* | pretty_git_format | git_page_maybe
+  git log --graph --pretty="tformat:${LOG_FORMAT}" $* | pretty_git_format | git_page_maybe
 }
 
 pretty_git_branch() {
-    git branch -v --color=always --format=${BRANCH_FORMAT} $* | pretty_git_format
+  git branch -v --color=always --format=${BRANCH_FORMAT} $* | pretty_git_format
 }
 
 pretty_git_branch_sorted() {
-    git branch -v --format=${BRANCH_FORMAT} --sort=-committerdate $* | head -n${1:-5} | pretty_git_format
+  git branch -v --format=${BRANCH_FORMAT} --sort=-committerdate $* | head -n${1:-5} | pretty_git_format
 }
 
 pretty_git_format() {
-    # Replace (2 years ago) with (2 years)
-    sed -Ee 's/(^[^<]*) ago\)/\1)/' |
-    # Replace (2 years, 5 months) with (2 years)
-    sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?\)/\1)/' |
-    # Line columns up based on } delimiter
-    column -s '^' -t
+  # Replace (2 years ago) with (2 years)
+  sed -Ee 's/(^[^<]*) ago\)/\1)/' |
+  # Replace (2 years, 5 months) with (2 years)
+  sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?\)/\1)/' |
+  # Line columns up based on } delimiter
+  column -s '^' -t
 }
 
 git_page_maybe() {
-    # Page only if we're asked to.
-    if [ -n "$GIT_NO_PAGER" ]; then
-        cat
-    else
-        # Page only if needed.
-        less --quit-if-one-screen --no-init --RAW-CONTROL-CHARS --chop-long-lines
-    fi
+  # Page only if we're asked to.
+  if [ -n "$GIT_NO_PAGER" ]; then
+    cat
+  else
+    # Page only if needed.
+    less --quit-if-one-screen --no-init --RAW-CONTROL-CHARS --chop-long-lines
+  fi
 }
 
 add_wildcard(){
-    git ls-files --modified | grep -i $1 | xargs -I{} git add {}
-    git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git add {}
-    git ls-files --deleted | grep -i $1 | xargs -I{} git rm {}
+  git ls-files --modified | grep -i $1 | xargs -I{} git add {}
+  git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git add {}
+  git ls-files --deleted | grep -i $1 | xargs -I{} git rm {}
 }
 
 reset_wildcard(){
-    git ls-files --modified | grep -i $1 | xargs -I{} git checkout {}
-    git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git checkout {}
-    git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
+  git ls-files --modified | grep -i $1 | xargs -I{} git checkout {}
+  git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git checkout {}
+  git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
 }
 
 switch_wildcard() {
-    if [ -z "$1" ]; then
-        echo "No pattern provided"
-    else
-        git branch -a | egrep "$1" | head -1 | xargs git switch
-    fi
+  if [ -z "$1" ]; then
+    echo "No pattern provided"
+  else
+    git branch -a | egrep "$1" | head -1 | xargs git switch
+  fi
 }
 
 delete_remoteless_branches_interactive(){
-    python3 $HOME/bin/git-broom.py
+  python3 $HOME/bin/git-broom.py
 }
 
-delete_all_my_branches_interactive(){
-    for branch in $(git branch | egrep '^\W*(aln|anorton|alan)/'); do
-        printf "Delete $branch, both local and origin? ";
-        read ans;
-        [[ "$ans" == "y" ]] && git branch -D $branch && git push origin :$branch
-    done
+delete_all_my_branches_interactive(){ ]
+  for branch in $(git branch | egrep '^\W*(aln|anorton|alan)/'); do
+    printf "Delete $branch, both local and origin? ";
+    read ans;
+    [[ "$ans" == "y" ]] && git branch -D $branch && git push origin :$branch
+  done
+}
+
+rename_branch_regex(){
+  if [ -z "$1" ]; then
+    echo "No pattern provided"
+  else
+    local new_name=$(git branch --show-current | sed -e "$1")
+    git branch --unset-upstream 2> /dev/null
+    git branch -m "$new_name"
+    echo "$new_name"
+  fi
 }
 
 TIMESINCE="function timeSince(date) {\
-    var seconds = Math.floor((new Date() - date) / 1000);\
-    var interval = Math.floor(seconds / 31536000);\
-    if (interval > 1) return interval + \" years\";\
-    interval = Math.floor(seconds / 2592000);\
-    if (interval > 1) return interval + \" months\";\
-    interval = Math.floor(seconds / 86400);\
-    if (interval > 1) return interval + \" days\";\
-    interval = Math.floor(seconds / 3600);\
-    if (interval > 1) return interval + \" hours\";\
-    interval = Math.floor(seconds / 60);\
-    if (interval > 1) return interval + \" minutes\";\
-    return Math.floor(seconds) + \" seconds\";\
+  var seconds = Math.floor((new Date() - date) / 1000);\
+  var interval = Math.floor(seconds / 31536000);\
+  if (interval > 1) return interval + \" years\";\
+  interval = Math.floor(seconds / 2592000);\
+  if (interval > 1) return interval + \" months\";\
+  interval = Math.floor(seconds / 86400);\
+  if (interval > 1) return interval + \" days\";\
+  interval = Math.floor(seconds / 3600);\
+  if (interval > 1) return interval + \" hours\";\
+  interval = Math.floor(seconds / 60);\
+  if (interval > 1) return interval + \" minutes\";\
+  return Math.floor(seconds) + \" seconds\";\
 }";
