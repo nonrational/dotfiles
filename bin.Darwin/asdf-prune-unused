@@ -1,66 +1,69 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 
-# https://github.com/asdf-vm/asdf/issues/819#issuecomment-852449294
-
-# Unoffical Bash "strict mode"
-# http://redsymbol.net/articles/unofficial-bash-strict-mode/
-set -euo pipefail
-#ORIGINAL_IFS=$IFS
-IFS=$'\t\n' # Stricter IFS settings
-
-# Function used to convert lines like this:
+# Note: You probably want to set a global python version before running this script.
 #
-# ruby 2.0.0
-# ruby 3.0.0
-# elixir 1.10.0
-#
-# To lines like this:
-#
-# ruby 2.0.0 3.0.0
-# elixir 1.10.0
-join_multiple() {
-  local last=''
-  local n=''
+# asdf install python latest
+# asdf global python latest
 
-  while IFS=' ' read -r word definition; do
+import subprocess
+import os
 
-    if [ "$last" == "$word" ]; then
-      printf " %s" "$definition"
-    else
-      if [ -n "$n" ]; then echo; else n=1; fi
-      printf "%s\\t%s" "$word" "$definition"
-      last="$word"
-    fi
-  done < "${1:-/dev/stdin}"
-  echo
-}
+def strip_stars(version):
+  return version.replace('*', '').strip()
 
-# Find command often crashes due to permission issues
-version_files="$(find . -maxdepth 3 -name .tool-versions || true)"
+def find_tool_version_paths_in(dirname):
+  dirname = os.path.expanduser(dirname)
+  version_files = subprocess.run(['find', dirname, '-maxdepth', '3', '-name', '.tool-versions'], stdout=subprocess.PIPE, text=True)
+  versions_in_use = version_files.stdout.splitlines()
+  return versions_in_use
 
-# Combine all .tool-version file contents into one variable
-versions_in_use="$(
-while read -r filename; do
-  cat "$filename";
-done <<< "$version_files"
-)"
+def get_installed_versions(tool_name):
+  result = subprocess.run(['asdf', 'list', tool_name], stdout=subprocess.PIPE, text=True)
+  versions = [strip_stars(line) for line in result.stdout.splitlines()]
+  return versions
 
-# Loop over each line of the .tool-versions file
-while read -r line; do
-  IFS=$' \t' read -r -a tool_and_versions <<< "$line"
-  # Split out the tool name and versions
-  tool_name="${tool_and_versions[0]}"
-  global_versions=("${tool_and_versions[@]:1}")
+def get_in_use_versions_by_tool_name():
+  global_paths = [os.path.expanduser('~/.tool-versions')]
+  tool_version_paths = global_paths + find_tool_version_paths_in('~/wrk') + find_tool_version_paths_in('~/src')
 
-  # Loop over each version of the tool name
-  for version in $(asdf list "$tool_name"); do
-    # Trim off leading/trailing tab/spaces
-    trimmed_version=$(echo "$version" | xargs)
-    # When version not in `global_versions` array from .tool-versions file
-    if [[ ! " ${global_versions[*]} " =~ ${trimmed_version} ]]; then
-      # Remove the version here if you want
-      echo "> asdf uninstall $tool_name $trimmed_version"
-      asdf uninstall $tool_name $trimmed_version
-    fi
-  done
-done < <(echo "$versions_in_use" | sort -k1 | sort -u | join_multiple)
+  in_use_map = {}
+
+  for path in tool_version_paths:
+    with open(path, 'r') as file:
+      lines = file.readlines()
+      for line in lines:
+        tool_name, tool_version = line.strip().split()
+        tool_version = strip_stars(tool_version)
+        versions_in_use = in_use_map.get(tool_name, [])
+        versions_in_use.append(tool_version)
+        in_use_map[tool_name] = list(set(versions_in_use))
+
+  return in_use_map
+
+if __name__ == "__main__":
+  in_use_map = get_in_use_versions_by_tool_name()
+
+  commands = []
+
+  for tool_name, versions in in_use_map.items():
+    print(f'Checking {tool_name}...')
+    installed_versions = get_installed_versions(tool_name)
+
+    print(f'     In-Use: {", ".join(versions)}')
+    print(f'  Installed: {", ".join(installed_versions)}')
+
+    unused = set(installed_versions) - set(versions)
+
+    print(f'  Unused: {", ".join(unused)}')
+
+    for v in unused:
+      commands.append(f'asdf uninstall {tool_name} {v}')
+
+  if commands:
+    response = input("🧹 Do you want to uninstall the unused versions? (y/n): ").strip().lower()
+    if response in ['y', 'yes']:
+      for c in commands:
+        print(f'> {c}')
+        subprocess.run(c, shell=True)
+  else:
+    print("✨ No unused versions to uninstall.")
