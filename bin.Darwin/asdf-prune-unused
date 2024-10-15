@@ -1,9 +1,4 @@
-#!/usr/bin/env python
-
-# Note: You probably want to set a global python version before running this script.
-#
-# asdf install python latest
-# asdf global python latest
+#!/usr/bin/python3
 
 import subprocess
 import os
