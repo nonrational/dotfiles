@@ -38,27 +38,41 @@ def get_in_use_versions_by_tool_name():
 if __name__ == "__main__":
   in_use_map = get_in_use_versions_by_tool_name()
 
-  commands = []
+  uninstall_commands = []
+  install_missing_commands = []
 
   for tool_name, versions in in_use_map.items():
     print(f'Checking {tool_name}...')
     installed_versions = get_installed_versions(tool_name)
 
+    versions.sort()
+    installed_versions.sort()
+
     print(f'     In-Use: {", ".join(versions)}')
     print(f'  Installed: {", ".join(installed_versions)}')
 
     unused = set(installed_versions) - set(versions)
-
     print(f'  Unused: {", ".join(unused)}')
 
-    for v in unused:
-      commands.append(f'asdf uninstall {tool_name} {v}')
+    missing = set(versions) - set(installed_versions)
+    print(f'  Missing: {", ".join(missing)}')
 
-  if commands:
-    response = input("🧹 Do you want to uninstall the unused versions? (y/n): ").strip().lower()
+    for v in unused:
+      uninstall_commands.append(f'asdf uninstall {tool_name} {v}')
+
+    for v in missing:
+      install_missing_commands.append(f'asdf install {tool_name} {v}')
+
+  if uninstall_commands:
+    response = input("🧹 Do you want to uninstall unused versions? (y/n): ").strip().lower()
     if response in ['y', 'yes']:
-      for c in commands:
+      for c in uninstall_commands:
         print(f'> {c}')
         subprocess.run(c, shell=True)
-  else:
-    print("✨ No unused versions to uninstall.")
+
+  if install_missing_commands:
+    response = input("🔧 Do you want to install missing versions? (y/n): ").strip().lower()
+    if response in ['y', 'yes']:
+      for c in install_missing_commands:
+        print(f'> {c}')
+        subprocess.run(c, shell=True)
