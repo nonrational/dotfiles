@@ -45,8 +45,8 @@ brew "xz"
 #
 cask "1password"
 cask "1password-cli"
+cask "aldente"
 cask "appcleaner"
-# cask "appflowy"
 cask "arc"
 # cask "bartender"
 # cask "charles"
@@ -54,6 +54,7 @@ cask "cyberduck"
 cask "daisydisk"
 cask "docker"
 cask "dropbox"
+cask "eloston-chromium" # chromium minus google
 cask "firefox"
 cask "google-chrome"
 cask "istat-menus"
@@ -82,4 +83,5 @@ cask "wavebox"
 #
 mas "Amphetamine", id: 937984704
 mas "CopyClip", id: 595191960
+mas "Drafts", id: 1435957248
 mas "Hidden Bar", id: 1452453066
