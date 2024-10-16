@@ -54,7 +54,6 @@ brew "xz"
 #
 cask "1password"
 cask "1password-cli"
-cask "aldente"
 cask "appcleaner"
 cask "arc"
 cask "cyberduck"
