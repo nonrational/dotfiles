@@ -1,4 +1,5 @@
 tap "homebrew/bundle"
+tap "homebrew/cask-versions"
 tap "homebrew/services"
 
 tap "1password/tap"
@@ -9,8 +10,10 @@ tap "1password/tap"
 # |  _| (_) | |  | | | | | | |_| | | (_| |
 # |_|  \___/|_|  |_| |_| |_|\__,_|_|\__,_|
 #
-brew "autojump"
 brew "asdf"
+brew "ast-grep"
+brew "autojump"
+brew "awscli"
 brew "bash"
 brew "bash-completion"
 brew "coreutils"
@@ -26,15 +29,21 @@ brew "gnu-sed"
 brew "gnu-tar"
 brew "gnupg"
 brew "hub"
+brew "jq"
 brew "just"
+brew "libass"
+brew "libyaml"
 brew "mas"
-brew "openssl"
+brew "openssl@3"
 brew "rclone"
 brew "readline"
 brew "rename"
 brew "tmux"
+brew "tmuxinator"
 brew "watch"
+brew "watchman"
 brew "wget"
+brew "wxwidgets"
 brew "xz"
 
 #                _
@@ -48,20 +57,19 @@ cask "1password-cli"
 cask "aldente"
 cask "appcleaner"
 cask "arc"
-# cask "bartender"
-# cask "charles"
 cask "cyberduck"
 cask "daisydisk"
 cask "docker"
 cask "dropbox"
-cask "eloston-chromium" # chromium minus google
+cask "eloston-chromium" # ungoogled chromium
 cask "firefox"
 cask "google-chrome"
 cask "istat-menus"
 cask "iterm2"
 cask "karabiner-elements"
-# cask "little-snitch"
-cask "moom"
+cask "moom" # moom3. maybe moom4 eventually?
+cask "ngrok"
+cask "postico"
 cask "shottr"
 cask "signal"
 cask "spotify"
@@ -81,7 +89,12 @@ cask "wavebox"
 #  \__,_| .__/| .__/|___/\__\___/|_|  \___|
 #       |_|   |_|
 #
+mas "1Password for Safari", id: 1569813296
 mas "Amphetamine", id: 937984704
+mas "Bear", id: 1091189122
 mas "CopyClip", id: 595191960
 mas "Drafts", id: 1435957248
 mas "Hidden Bar", id: 1452453066
+mas "iMovie", id: 408981434
+mas "Pages", id: 409201541
+mas "Xcode", id: 497799835
