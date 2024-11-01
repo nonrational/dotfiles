@@ -33,6 +33,9 @@
   # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
   precomposeunicode = false
 [alias]
+  opb = "!. ~/.githelpers && remote_origin_primary_branch"
+  pb = "!. ~/.githelpers && remote_origin_primary_branch | sed 's|origin/||g'"
+
   pp = push
   pro = "!hub pr show || hub browse"
 
@@ -46,13 +49,16 @@
   ci = commit -v
   co = checkout
 
+  wip = commit -v -m'wip'
+
   df = "diff --name-only"
-  dfo = "df origin/master"
+  dfo = "!git df $(git opb)"
   dc = diff --cached
 
   f = "fetch --tags --force --prune"
   ri = "rebase -i"
-  rio = "!git f && git rebase -i origin/master"
+  # use "primary branch" to play nice with origin/main and origin/master
+  rio = "!git f && git rebase -i $(git opb)"
   mov = "branch -m"
 
   head = !git r -1
@@ -67,9 +73,7 @@
   bs = "!. ~/.githelpers && pretty_git_branch_sorted"
   brr = branch --sort=-committerdate
 
-
   lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
-  stag = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 
   amend = commit --amend
   aa = add --all .
@@ -94,7 +98,6 @@
   broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
   spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
 
-  wtf = "!. ~/.githelpers && what_the_hell_just_happened"
   nuke = "!git reset --hard HEAD && git clean -fd"
 
   aww = "!. ~/.githelpers && add_wildcard"
