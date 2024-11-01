@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Based on Gary Bernhardt's .githelpers
-# https://github.com/garybernhardt/dotfiles/blob/master/.githelpers
+# https://github.com/garybernhardt/dotfiles/blob/main/.githelpers
 
 # Log output:
 #
@@ -37,6 +37,12 @@ BRANCH_CONTENTS="%(contents:subject)"
 
 BRANCH_FORMAT="$BRANCH_PREFIX^$BRANCH_REF^$BRANCH_HASH^$BRANCH_DATE^$BRANCH_AUTHOR^$BRANCH_CONTENTS"
 
+# Print the name of the "primary" branch, be it main or master.
+remote_origin_primary_branch() {
+  git branch -a | grep 'remotes.origin.\(main\|master\)' | sed 's|.*remotes/||g'
+}
+
+# Show a diff of the most recent commit.
 show_git_head() {
   pretty_git_log -1
   git show -p --pretty="tformat:"
@@ -73,18 +79,21 @@ git_page_maybe() {
   fi
 }
 
+# Accepts a pattern and attempts to stage all files that match it.
 add_wildcard(){
   git ls-files --modified | grep -i $1 | xargs -I{} git add {}
   git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git add {}
   git ls-files --deleted | grep -i $1 | xargs -I{} git rm {}
 }
 
+# Accepts a pattern and attempts to unstage all files that match it.
 reset_wildcard(){
   git ls-files --modified | grep -i $1 | xargs -I{} git checkout {}
   git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git checkout {}
   git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
 }
 
+# Accepts a pattern and switches to the first branch that matches it.
 switch_wildcard() {
   if [ -z "$1" ]; then
     echo "No pattern provided"
@@ -93,10 +102,12 @@ switch_wildcard() {
   fi
 }
 
+# Delete local-only branches with confirmation.
 delete_remoteless_branches_interactive(){
-  python3 $HOME/bin/git-broom.py
+  /usr/bin/python3 $HOME/bin/git-broom.py
 }
 
+# Delete all personally-prefixed non-primary branches with confirmation.
 delete_all_my_branches_interactive(){
   for branch in $(git branch | egrep '^\W*(aln|anorton|alan)/'); do
     printf "Delete $branch, both local and origin? ";
@@ -105,6 +116,7 @@ delete_all_my_branches_interactive(){
   done
 }
 
+# Accepts a sed substituion (e.g., s/foo/bar/) and applies it to the current branch, also unsetting the upstream branch.
 rename_branch_regex(){
   if [ -z "$1" ]; then
     echo "No pattern provided"
