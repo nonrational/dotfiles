@@ -97,6 +97,7 @@
 
   broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
   spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
+  everybody-out = "!. ~/.githelpers && delete_all_others_local_branches"
 
   nuke = "!git reset --hard HEAD && git clean -fd"
 

@@ -116,6 +116,15 @@ delete_all_my_branches_interactive(){
   done
 }
 
+# Delete all non-personally-prefixed non-primary branches.
+delete_all_others_local_branches(){
+  for branch in $(git branch | grep '/' | grep -v 'aln\|anorton\/'); do
+    printf "Delete $branch? ";
+    read ans;
+    [[ "$ans" == "y" ]] && git branch -D $branch
+  done
+}
+
 # Accepts a sed substituion (e.g., s/foo/bar/) and applies it to the current branch, also unsetting the upstream branch.
 rename_branch_regex(){
   if [ -z "$1" ]; then
