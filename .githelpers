@@ -103,8 +103,21 @@ switch_wildcard() {
 }
 
 # Delete local-only branches with confirmation.
-delete_remoteless_branches_interactive(){
-  /usr/bin/python3 $HOME/bin/git-broom.py
+delete_remoteless_branches_interactive() {
+  git fetch origin --prune --tags -f
+
+  main_branch=$(remote_origin_primary_branch)
+  remote_branches=$(git branch --remote | grep "origin" | grep -v "HEAD" | cut -c10- | egrep -v "^${main_branch}$")
+  local_branches=$(git branch | grep -v "HEAD" | cut -c3- | egrep -v "^${main_branch}$")
+
+  for local_branch in $local_branches; do
+    if ! echo "$remote_branches" | grep -q "$local_branch"; then
+      read -p "Delete $local_branch? (y/n): " response
+      if [[ $response =~ ^[Yy] ]]; then
+        git branch -D "$local_branch"
+      fi
+    fi
+  done
 }
 
 # Delete all personally-prefixed non-primary branches with confirmation.
