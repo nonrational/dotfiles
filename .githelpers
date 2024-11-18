@@ -122,16 +122,16 @@ delete_remoteless_branches_interactive() {
 
 # Delete all personally-prefixed non-primary branches with confirmation.
 delete_all_my_branches_interactive(){
-  for branch in $(git branch | egrep '^\W*(aln|anorton|alan)/'); do
+  for branch in $(git branch | egrep '^\W*(aln|anorton)/'); do
     printf "Delete $branch, both local and origin? ";
     read ans;
     [[ "$ans" == "y" ]] && git branch -D $branch && git push origin :$branch
   done
 }
 
-# Delete all non-personally-prefixed non-primary branches.
+# Delete all non-personally-prefixed, non-primary branches.
 delete_all_others_local_branches(){
-  for branch in $(git branch | grep '/' | grep -v 'aln\|anorton\/'); do
+  for branch in $(git branch | grep '/' | egrep -v '^\W*(aln|anorton)/'); do
     printf "Delete $branch? ";
     read ans;
     [[ "$ans" == "y" ]] && git branch -D $branch
