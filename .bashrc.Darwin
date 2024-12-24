@@ -12,6 +12,11 @@ export TERM=xterm-color
 alias ls="/bin/ls -F"
 alias git='hub'
 
+# Workaround for Homebrew tmuxinator issue
+# https://github.com/Homebrew/homebrew-core/issues/59484
+# https://discourse.brew.sh/t/why-does-tmuxinator-sets-gem-home/7296
+unset -v GEM_HOME
+
 parse_git_branch() {
   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
