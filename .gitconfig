@@ -82,10 +82,11 @@
 
   up = "!git f && hub sync"
 
-  modified = "!git ls-files --modified"
-  deleted = "!git ls-files --deleted"
-  untracked = "!git ls-files --others --exclude-standard"
-  new = untracked
+  # list specific sets of files
+  mod = "!git ls-files --modified ."
+  del = "!git ls-files --deleted ."
+  new = "!git ls-files --others --exclude-standard"
+  # ignored = "!git ls-files --others --ignored --exclude-standard * **/*"
 
   # ignore untracked files in this specific repo
   is-it-just-me = "!$EDITOR .git/info/exclude"
