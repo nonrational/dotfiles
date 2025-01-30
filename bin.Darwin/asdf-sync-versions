@@ -27,7 +27,7 @@ def get_in_use_versions_by_tool_name():
     with open(path, 'r') as file:
       lines = file.readlines()
       for line in lines:
-        tool_name, tool_version = line.strip().split()
+        tool_name, tool_version = line.strip().split(maxsplit=1)
         tool_version = strip_stars(tool_version)
         versions_in_use = in_use_map.get(tool_name, [])
         versions_in_use.append(tool_version)
