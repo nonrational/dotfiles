@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+import sys
 
 def strip_stars(version):
   return version.replace('*', '').strip()
@@ -24,14 +25,17 @@ def get_in_use_versions_by_tool_name():
   in_use_map = {}
 
   for path in tool_version_paths:
-    with open(path, 'r') as file:
-      lines = file.readlines()
-      for line in lines:
-        tool_name, tool_version = line.strip().split(maxsplit=1)
-        tool_version = strip_stars(tool_version)
-        versions_in_use = in_use_map.get(tool_name, [])
-        versions_in_use.append(tool_version)
-        in_use_map[tool_name] = list(set(versions_in_use))
+    try:
+      with open(path, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+          tool_name, tool_version = line.strip().split(maxsplit=1)
+          tool_version = strip_stars(tool_version)
+          versions_in_use = in_use_map.get(tool_name, [])
+          versions_in_use.append(tool_version)
+          in_use_map[tool_name] = list(set(versions_in_use))
+    except FileNotFoundError:
+      print(f"Skipped {path}", file=sys.stderr)
 
   return in_use_map
 
