@@ -1,5 +1,0 @@
-#!/bin/bash
-MYDIR="/Users/norton/Betterment/Dropbox/Development/database_changes/`date +%Y`/`date +%Y%m%d`";
-mkdir -p $MYDIR
-cd $MYDIR
-pwd

@@ -1,7 +1,0 @@
-#!/bin/sh
-
-killall Dropbox
-sleep 1;
-open -a ~/Applications/DropboxAlt.app &
-sleep 5;
-open -n -a Dropbox &
