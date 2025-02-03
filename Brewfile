@@ -1,5 +1,4 @@
 tap "homebrew/bundle"
-tap "homebrew/cask-versions"
 tap "homebrew/services"
 
 tap "1password/tap"
@@ -52,34 +51,34 @@ brew "xz"
 # | (_| (_| \__ \   <
 #  \___\__,_|___/_|\_\
 #
-cask "1password"
-cask "1password-cli"
-cask "appcleaner"
-cask "arc"
-cask "cyberduck"
-cask "daisydisk"
+# cask "1password"
+# cask "1password-cli"
+# cask "appcleaner"
+# cask "arc"
+# cask "cyberduck"
+# cask "daisydisk"
 cask "docker"
-cask "dropbox"
-cask "eloston-chromium" # ungoogled chromium
-cask "firefox"
-cask "google-chrome"
-cask "istat-menus"
+# cask "dropbox"
+# cask "eloston-chromium" # ungoogled chromium
+# cask "firefox"
+# cask "google-chrome"
+# cask "istat-menus"
 cask "iterm2"
 cask "karabiner-elements"
 cask "moom" # moom3. maybe moom4 eventually?
-cask "ngrok"
+# cask "ngrok"
 cask "postico"
 cask "shottr"
-cask "signal"
+# cask "signal"
 cask "spotify"
 # cask "steermouse"
 cask "sublime-merge"
 cask "sublime-text"
-cask "utm" # gui for qemu
-cask "veracrypt"
-cask "visual-studio-code"
-cask "vlc"
-cask "wavebox"
+# cask "utm" # gui for qemu
+# cask "veracrypt"
+# cask "visual-studio-code"
+# cask "vlc"
+# cask "wavebox"
 
 #                        _
 #   __ _ _ __  _ __  ___| |_ ___  _ __ ___
@@ -88,12 +87,12 @@ cask "wavebox"
 #  \__,_| .__/| .__/|___/\__\___/|_|  \___|
 #       |_|   |_|
 #
-mas "1Password for Safari", id: 1569813296
-mas "Amphetamine", id: 937984704
-mas "Bear", id: 1091189122
-mas "CopyClip", id: 595191960
-mas "Drafts", id: 1435957248
-mas "Hidden Bar", id: 1452453066
-mas "iMovie", id: 408981434
-mas "Pages", id: 409201541
-mas "Xcode", id: 497799835
+# mas "1Password for Safari", id: 1569813296
+# mas "Amphetamine", id: 937984704
+# mas "Bear", id: 1091189122
+# mas "CopyClip", id: 595191960
+# mas "Drafts", id: 1435957248
+# mas "Hidden Bar", id: 1452453066
+# mas "iMovie", id: 408981434
+# mas "Pages", id: 409201541
+# mas "Xcode", id: 497799835
