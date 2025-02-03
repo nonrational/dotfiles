@@ -1,4 +1,0 @@
-#!/bin/sh
-line_number=$1
-echo gsed --in-place "'${line_number}d'" /Users/norton/.ssh/known_hosts
-gsed --in-place "'${line_number}d'" /Users/norton/.ssh/known_hosts

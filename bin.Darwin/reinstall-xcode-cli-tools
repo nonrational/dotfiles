@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-# https://github.com/pyenv/pyenv/issues/1066#issuecomment-538201389
-
-sudo rm -rf /Library/Developer/CommandLineTools
-
-xcode-select --install
-
-pkgutil --pkg-info=com.apple.pkg.CLTools_Executables
