@@ -1,7 +1,7 @@
 # on macos, iterm and tmux will source this for every new window or pane.
 # screen will *not* source this on new screen creation (ctrl+a,c)
 
-BASH_REPORT_MISSING_SOURCES=true
+BASH_REPORT_MISSING=true
 
 prepend_new_path_if_exists() {
   if [ -d "$1" ]; then
@@ -10,7 +10,7 @@ prepend_new_path_if_exists() {
     # don't take precedence in tmux or screen-like environments.
     local CLEAN_PATH=$(echo "${PATH}:" | sed -e "s|$1:||" -e 's|:$||')
     export PATH="$1:$CLEAN_PATH"
-  elif $BASH_REPORT_MISSING_SOURCES; then
+  elif $BASH_REPORT_MISSING; then
     echo "$1 not added to PATH"
   fi
 }
@@ -26,7 +26,7 @@ prepend_new_path_if_exists "$HOME/.asdf/shims"
 source_if_exists() {
   if [[ -s "$1" ]]; then
     source "$1"
-  elif $BASH_REPORT_MISSING_SOURCES; then
+  elif $BASH_REPORT_MISSING; then
     echo "$1 not sourced"
   fi
 }
