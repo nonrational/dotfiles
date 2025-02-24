@@ -69,6 +69,4 @@ source_if_exists() {
 source_if_exists "$HOME/.fzf.bash"
 source_if_exists "$HOME/.homesick/repos/homeshick/homeshick.sh"
 source_if_exists "$HOME/.homesick/repos/homeshick/completions/homeshick-completion.bash"
-source_if_exists "$HOME/.asdf/asdf.sh"
-source_if_exists "$HOME/.asdf/completions/asdf.bash"
 source_if_exists "/usr/share/autojump/autojump.sh"

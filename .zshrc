@@ -68,11 +68,6 @@ brewery=$(brew --prefix)
 # autojump
 . "$brewery/etc/profile.d/autojump.sh"
 
-# asdf
-brew_prefix_asdf="$brewery/opt/asdf"
-export ASDF_DIR="$brew_prefix_asdf"
-. "$brew_prefix_asdf/asdf.sh"
-
 # To make Homebrew’s completions available in zsh, you must get the Homebrew-managed zsh site-functions on your FPATH
 # before initialising zsh’s completion facility.
 # Add the following to your ~/.zshrc file:
