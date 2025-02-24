@@ -27,17 +27,11 @@ alias du='du -h'
 alias grep="grep --color"
 alias hist="history|tail"
 alias psa="ps auxwww"
-
-alias pry-watch='while clear && sleep 1; do pry-remote -w; done'
-
 alias cdate="date '+%Y%m%d%H%M%S'"
 
+# random password generator
 rpg(){
-  size=${1:-12}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
-}
-
-git-rm-banch(){
-  git branch -D $1 && git push origin :$1
+  size=${1:-16}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
 }
 
 reset_known_host() {

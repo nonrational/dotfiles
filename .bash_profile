@@ -10,6 +10,8 @@ prepend_new_path_if_exists() {
     # don't take precedence in tmux or screen-like environments.
     local CLEAN_PATH=$(echo "${PATH}:" | sed -e "s|$1:||" -e 's|:$||')
     export PATH="$1:$CLEAN_PATH"
+  elif $BASH_REPORT_MISSING_SOURCES; then
+    echo "$1 not added to PATH"
   fi
 }
 
@@ -19,22 +21,23 @@ prepend_new_path_if_exists "/opt/homebrew/bin"  # apple silicon homebrew bin
 prepend_new_path_if_exists "/opt/homebrew/sbin" # apple silicon homebrew static bin
 prepend_new_path_if_exists "$HOME/.local/bin"
 prepend_new_path_if_exists "$HOME/bin"
+prepend_new_path_if_exists "$HOME/.asdf"
 
 source_if_exists() {
   if [[ -s "$1" ]]; then
     source "$1"
   elif $BASH_REPORT_MISSING_SOURCES; then
-    echo "Skipping $1"
+    echo "$1 not sourced"
   fi
 }
 
 # TODO: move this to darwin, perhaps including the homebrew path addition above
 if command -v brew &> /dev/null; then
   export HOMEBREW_ROOT="$(brew --prefix)"
-  source_if_exists "${HOMEBREW_ROOT}/opt/asdf/libexec/asdf.sh"
   source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/autojump.sh"
   source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/bash_completion.sh"
 fi
+
 
 source_if_exists "$HOME/.fzf.bash" # fzf --bash > ~/.fzf.bash
 source_if_exists "$HOME/.bashrc"
