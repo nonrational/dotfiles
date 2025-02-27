@@ -95,10 +95,20 @@ reset_wildcard(){
 
 # Accepts a pattern and switches to the first branch that matches it.
 switch_wildcard() {
+  local all_branches=false
+  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
+    -a | --all )
+      all_branches=true
+      ;;
+  esac; shift; done
+  if [[ "$1" == '--' ]]; then shift; fi
+
   if [ -z "$1" ]; then
     echo "No pattern provided"
+  elif [ "$all_branches" = true ]; then
+    git branch --all --sort=-committerdate | sed 's|remotes/origin/||' | egrep "$1" | head -1 | xargs git switch
   else
-    git branch -a | egrep "$1" | head -1 | xargs git switch
+    git branch --sort=-committerdate | egrep "$1" | head -1 | xargs git switch
   fi
 }
 
