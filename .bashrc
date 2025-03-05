@@ -29,9 +29,9 @@ alias hist="history|tail"
 alias psa="ps auxwww"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
-# random password generator
-rpg(){
-  size=${1:-16}; ruby -e "require 'securerandom'; puts SecureRandom.urlsafe_base64($size);"
+# psuedo-random, insecure password generator
+prpg() {
+  echo -n $RANDOM | openssl sha1 -binary | base64 | tr -d '/+=' | | cut -c-16
 }
 
 reset_known_host() {

@@ -94,6 +94,7 @@ reset_wildcard(){
 }
 
 # Accepts a pattern and switches to the first branch that matches it.
+# Provide the `--all` flag to include remote branches as well.
 switch_wildcard() {
   local all_branches=false
   while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
