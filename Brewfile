@@ -62,18 +62,19 @@ cask "docker"
 # cask "eloston-chromium" # ungoogled chromium
 # cask "firefox"
 # cask "google-chrome"
-# cask "istat-menus"
+# cask "istat-menus" # ($)
 cask "iterm2"
 cask "karabiner-elements"
-cask "moom" # moom3. maybe moom4 eventually?
+# cask "moom" # window manager ($)
+cask "maccy" # clipboard history manager
 # cask "ngrok"
-cask "postico"
-cask "shottr"
+cask "postico" # ($)
+cask "shottr" # ($)
 # cask "signal"
 cask "spotify"
-# cask "steermouse"
-cask "sublime-merge"
-cask "sublime-text"
+# cask "steermouse" # mouse acceleration curve customizer ($)
+cask "sublime-merge" # ($)
+cask "sublime-text" # ($)
 # cask "utm" # gui for qemu
 # cask "veracrypt"
 # cask "visual-studio-code"
@@ -90,7 +91,6 @@ cask "sublime-text"
 # mas "1Password for Safari", id: 1569813296
 # mas "Amphetamine", id: 937984704
 # mas "Bear", id: 1091189122
-# mas "CopyClip", id: 595191960
 # mas "Drafts", id: 1435957248
 # mas "Hidden Bar", id: 1452453066
 # mas "iMovie", id: 408981434
