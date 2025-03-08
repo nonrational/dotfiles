@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+
+# Live Reload Server
+
+import argparse
+import os
+import http.server
+import socket
+import socketserver
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Run a live reload HTTP server for static files.')
+    parser.add_argument('--port', type=int, default=8000, help='Specify the port number (default: 8000).')
+    parser.add_argument('--dir', default=os.getcwd(), help='Specify the directory to serve (default: current directory).')
+    parser.add_argument('--mode', default="", help='Specify the mode to monitor changes (options are html, js, css, or a combination such as html,css. Default: empty, to monitor all changes).')
+    parser.add_argument('--verbose', action='store_true', help='Output verbose message.')
+    return parser.parse_args()
+
+class RequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, mode=None, **kwargs):
+        self.mode = mode
+        super().__init__(*args, **kwargs)
+
+    def translate_path(self, path):
+        path = http.server.SimpleHTTPRequestHandler.translate_path(self, path)
+        if os.path.isdir(path):
+            for ext in "html", "htm":
+                index = f'{path}index.{ext}'
+                if os.path.exists(index):
+                    return index
+        return path
+
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
+    def do_GET(self):
+        file_path = self.translate_path(self.path)
+        if file_path.endswith((".html", ".htm")):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            reload_mode = '#' + self.mode if self.mode else '';
+            # Not valid HTML here, but works, acceptable for development only
+            content += f'<script src="//livejs.com/live.js{reload_mode}"></script>';
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(content.encode('utf-8'))
+        else:
+            super().do_GET()
+
+if __name__ == "__main__":
+    cmd_args = parse_arguments()
+    class Handler(RequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, mode=cmd_args.mode, directory=cmd_args.dir, **kwargs)
+
+        def log_message(self, format, *args):
+            if cmd_args.verbose:
+                super().log_message(format, *args)
+            else:
+                pass
+
+    socketserver.TCPServer.allow_reuse_address = True
+    with socketserver.TCPServer(("", cmd_args.port), Handler) as httpd:
+        print(f"Serving on http://127.0.0.1:{cmd_args.port}")
+        httpd.serve_forever()
