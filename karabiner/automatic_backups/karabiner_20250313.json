@@ -116,48 +116,6 @@
                             "to": [{ "key_code": "left_control" }]
                         }
                     ]
-                },
-                {
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "product_id": 36,
-                        "vendor_id": 1241
-                    },
-                    "simple_modifications": [
-                        {
-                            "from": { "key_code": "left_command" },
-                            "to": [{ "key_code": "left_option" }]
-                        },
-                        {
-                            "from": { "key_code": "left_option" },
-                            "to": [{ "key_code": "left_command" }]
-                        }
-                    ]
-                },
-                {
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "product_id": 270,
-                        "vendor_id": 2131
-                    },
-                    "simple_modifications": [
-                        {
-                            "from": { "key_code": "left_command" },
-                            "to": [{ "key_code": "left_option" }]
-                        },
-                        {
-                            "from": { "key_code": "left_option" },
-                            "to": [{ "key_code": "left_command" }]
-                        },
-                        {
-                            "from": { "key_code": "right_option" },
-                            "to": [{ "key_code": "right_command" }]
-                        },
-                        {
-                            "from": { "key_code": "application" },
-                            "to": [{ "key_code": "right_option" }]
-                        }
-                    ]
                 }
             ],
             "fn_function_keys": [
