@@ -37,7 +37,8 @@
   pb = "!. ~/.githelpers && remote_origin_primary_branch | sed 's|origin/||g'"
 
   pp = push
-  pro = "!hub pr show || hub browse"
+  bro = '!gh browse'
+  pro = "!gh pr view --web || gh browse"
 
   bump = "commit --allow-empty -m'ci-bump'"
   buu = "branch --unset-upstream"

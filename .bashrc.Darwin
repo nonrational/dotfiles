@@ -10,7 +10,6 @@ export CLICOLOR=1
 export TERM=xterm-color
 
 alias ls="/bin/ls -F"
-alias git='hub'
 
 # Workaround for Homebrew tmuxinator issue
 # https://github.com/Homebrew/homebrew-core/issues/59484
