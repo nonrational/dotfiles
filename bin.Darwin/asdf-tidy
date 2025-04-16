@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+# Use the system installed python3 rather than requiring a version potentially installed via asdf
+
+# asdf-tidy - A script to tidy up asdf versions
+# This script checks for unused and missing versions of tools managed by asdf.
+# It will prompt the user to uninstall unused versions and install missing versions.
 
 import subprocess
 import os

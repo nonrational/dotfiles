@@ -46,6 +46,7 @@
   bc = "branch --show-current"
   bmx = "!. ~/.githelpers && rename_branch_regex"
   bcp = "!git branch --show-current | pbcopy"
+  bmv = "branch -m"
 
   ci = commit -v
   co = checkout
@@ -60,7 +61,7 @@
   ri = "rebase -i"
   # use "primary branch" to play nice with origin/main and origin/master
   rio = "!git f && git rebase -i $(git opb)"
-  mov = "branch -m"
+
 
   head = !git r -1
   hp = "!. ~/.githelpers && show_git_head"
