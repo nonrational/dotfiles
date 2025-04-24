@@ -42,6 +42,27 @@ remote_origin_primary_branch() {
   git branch -a | grep 'remotes.origin.\(main\|master\)' | sed 's|.*remotes/||g'
 }
 
+# Get the host of the remote origin
+remote_origin_host() {
+  git remote get-url origin | sed -E -e 's|.*://([^/]+)/.*|\1|' -e 's|.*@([^:]+):.*|\1|'
+}
+
+git_browse_web() {
+  if [ "github.com" == "$(remote_origin_host)" ]; then
+    gh browse
+  else
+    echo "Hey! Implement this for $(remote_origin_host)" >&2
+  fi
+}
+
+git_browse_pull_request() {
+  if [ "github.com" == "$(remote_origin_host)" ]; then
+    gh pr view --web || gh browse --branch $(git branch --show-current)
+  else
+    echo "Hey! Implement this for $(remote_origin_host)" >&2
+  fi
+}
+
 # Show a diff of the most recent commit.
 show_git_head() {
   pretty_git_log -1

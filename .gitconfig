@@ -32,83 +32,82 @@
   # Prevent showing files whose names contain non-ASCII symbols as unversioned.
   # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
   precomposeunicode = false
+
 [alias]
-  opb = "!. ~/.githelpers && remote_origin_primary_branch"
-  pb = "!. ~/.githelpers && remote_origin_primary_branch | sed 's|origin/||g'"
-
+  # Short Core Commands
+  st = status
   pp = push
-  bro = "!gh browse"
-  pro = "!gh pr view --web || gh browse"
-
-  bump = "commit --allow-empty -m'ci-bump'"
-  buu = "branch --unset-upstream"
-
-  bc = "branch --show-current"
-  bmx = "!. ~/.githelpers && rename_branch_regex"
-  bcp = "!git branch --show-current | pbcopy"
-  bmv = "branch -m"
 
   ci = commit -v
   co = checkout
-
-  wip = commit -v -m'wip'
-
-  df = "diff --name-only"
-  dfo = "!git df $(git opb)"
   dc = diff --cached
+  df = "diff --name-only"
+  ri = rebase -i
 
-  f = "fetch --tags --force --prune"
-  ri = "rebase -i"
-  # use "primary branch" to play nice with origin/main and origin/master
-  rio = "!git f && git rebase -i $(git opb)"
-
-
-  head = !git r -1
-  hp = "!. ~/.githelpers && show_git_head"
-  r = !GIT_NO_PAGER=1 git l -10
-  ra = !git r --all
-  l = "!. ~/.githelpers && pretty_git_log"
-  la = !git l --all
-
-  lb = !git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", substr($2, 1, length($2)-1), $1)}'
-  b = "!. ~/.githelpers && pretty_git_branch"
-  bs = "!. ~/.githelpers && pretty_git_branch_sorted"
-  brr = branch --sort=-committerdate
-
-  lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3"
 
   amend = commit --amend
   aa = add --all .
-  st = status
-  stp = status --porcelain
+  buu = "branch --unset-upstream"
+  bc = "branch --show-current"
 
+  # Fetching from Remotes
+  opb = "!. ~/.githelpers && remote_origin_primary_branch"
+  pb = "!. ~/.githelpers && remote_origin_primary_branch | sed 's|origin/||g'"
+  f = "fetch --tags --force --prune"
   up = "!git f && hub sync"
 
-  # list specific sets of files
+  # Branch Management
+  mov = "branch -m"
+  bmx = "!. ~/.githelpers && rename_branch_regex"
+  bcp = "!git branch --show-current | pbcopy"
+  rio = "!git f && git rebase -i $(git opb)"
+
+  # Wildcard Support
+  aww = "!. ~/.githelpers && add_wildcard"
+  uww = "!. ~/.githelpers && reset_wildcard"
+  sww = "!. ~/.githelpers && switch_wildcard"
+
+  # List subcategories of unstaged files
   mod = "!git ls-files --modified ."
   del = "!git ls-files --deleted ."
   new = "!git ls-files --others --exclude-standard"
   # ignored = "!git ls-files --others --ignored --exclude-standard * **/*"
 
-  # ignore untracked files in this specific repo
-  is-it-just-me = "!$EDITOR .git/info/exclude"
+  # Move fast and commit things
+  bump = "commit --allow-empty -m'ci-bump'"
+  wip = commit -v -m'wip'
+  yolo = !git commit --allow-empty -m \"$(curl -s https://whatthecommit.com/index.txt)\"
 
-  # ignore changes to files that are never going to be committed
+  # Manage changes that aren't destined to be committed
   regard = update-index --no-assume-unchanged
   disregard = update-index --assume-unchanged
   dissed = !git ls-files -v | grep ^[a-z] || echo "None"
+  is-it-just-me = "!$EDITOR .git/info/exclude" # ignore untracked files in this specific repo
 
+  # Browse code in a browser
+  bro = "!. ~/.githelpers && git_browse_web"
+  pro = "!. ~/.githelpers && git_browse_pull_request"
+
+  # Inspect current or recent changes
+  head = !git r -1
+  hp = "!. ~/.githelpers && show_git_head"
+  lt = "!git tag | sort -n -t. -k1,1 -k2,2 -k3,3" # Sort by semantically versioned tags
+  l = "!. ~/.githelpers && pretty_git_log"
+  la = !git l --all
+  r = !GIT_NO_PAGER=1 git l -10
+  ra = !git r --all
+  b = "!. ~/.githelpers && pretty_git_branch"
+  bs = "!. ~/.githelpers && pretty_git_branch_sorted"
+
+  # List local branches, most recent first
+  lb = !git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", substr($2, 1, length($2)-1), $1)}'
+  brr = branch --sort=-committerdate
+
+  # Keep things tidy
   broom = "!. ~/.githelpers && delete_remoteless_branches_interactive"
   spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
   everybody-out = "!. ~/.githelpers && delete_all_others_local_branches"
-
   nuke = "!git reset --hard HEAD && git clean -fd"
-
-  aww = "!. ~/.githelpers && add_wildcard"
-  uww = "!. ~/.githelpers && reset_wildcard"
-  sww = "!. ~/.githelpers && switch_wildcard"
-
-  yolo = !git commit --allow-empty -m \"$(curl -s https://whatthecommit.com/index.txt)\"
 [status]
   relativePaths = true
 [color]
