@@ -48,18 +48,25 @@ remote_origin_host() {
 }
 
 git_browse_web() {
-  if [ "github.com" == "$(remote_origin_host)" ]; then
+  if [ "github.com" == "$(remote_origin_host)" ] && command -v gh > /dev/null; then
     gh browse
   else
-    echo "Hey! Implement this for $(remote_origin_host)" >&2
+    local url=$(git remote get-url origin)
+    url="${url%.git}"
+    if [[ "$url" =~ ^git@ ]]; then
+      url="${url/://}"
+      url="https://${url#git@}"
+    fi
+    echo "Opening $url"
+    open "$url"
   fi
 }
 
 git_browse_pull_request() {
-  if [ "github.com" == "$(remote_origin_host)" ]; then
+  if [ "github.com" == "$(remote_origin_host)" ] && command -v gh > /dev/null; then
     gh pr view --web || gh browse --branch $(git branch --show-current)
   else
-    echo "Hey! Implement this for $(remote_origin_host)" >&2
+    git_browse_web
   fi
 }
 
