@@ -116,42 +116,6 @@
                             "to": [{ "key_code": "left_control" }]
                         }
                     ]
-                },
-                {
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "product_id": 49299,
-                        "vendor_id": 1133
-                    },
-                    "ignore": true
-                },
-                {
-                    "identifiers": {
-                        "is_pointing_device": true,
-                        "product_id": 49299,
-                        "vendor_id": 1133
-                    },
-                    "ignore": false,
-                    "simple_modifications": [
-                        {
-                            "from": { "pointing_button": "button4" },
-                            "to": [
-                                {
-                                    "software_function": {
-                                        "set_mouse_cursor_position": {
-                                            "screen": 0,
-                                            "x": "50%",
-                                            "y": "50%"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "from": { "pointing_button": "button5" },
-                            "to": [{ "key_code": "mission_control" }]
-                        }
-                    ]
                 }
             ],
             "fn_function_keys": [
