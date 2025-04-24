@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+import subprocess
+import json
+from datetime import datetime
+import argparse
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Manage GitHub repositories.")
+parser.add_argument("--fork", action="store_true", help="Show only forks.")
+parser.add_argument("-l", "--language", type=str, help="Filter by primary coding language.")
+parser.add_argument("-L", "--limit", type=int, default=30, help="Maximum number of repositories to list (default 30).")
+parser.add_argument("--no-archived", action="store_true", help="Omit archived repositories.")
+parser.add_argument("--topic", type=str, help="Filter by topic.")
+parser.add_argument("--visibility", type=str, choices=["public", "private", "internal"], help="Filter by repository visibility.")
+parser.add_argument("--public", action="store_true", help="Alias for --visibility=public")
+args = parser.parse_args()
+
+# Build the GitHub CLI command
+command = [
+  "gh", "repo", "list",
+  "--limit", str(args.limit),
+  "--json", "name,createdAt,visibility,isFork,isArchived,stargazerCount",
+]
+
+if args.fork:
+  command.append("--fork")
+if args.language:
+  command.extend(["-l", args.language])
+if args.no_archived:
+  command.append("--no-archived")
+if args.topic:
+  command.extend(["--topic", args.topic])
+
+if args.visibility:
+  command.extend(["--visibility", args.visibility])
+elif args.public:
+  command.extend(["--visibility=public"])
+
+# Run the GitHub CLI command to get the repository list
+result = subprocess.run(command, capture_output=True, text=True)
+
+# print ("Command stdout:", result.stdout)
+# print ("Command stderr:", result.stderr)
+
+if result.returncode != 0:
+  print("Error fetching repository list:", result.stderr)
+  exit(1)
+
+# Parse the JSON output
+repos = json.loads(result.stdout)
+
+# Filter out repositories with stargazerCount > 0
+repos = [r for r in repos if r["stargazerCount"] == 0]
+
+# Sort repositories by createdAt in ascending order
+repos.sort(key=lambda repo: datetime.fromisoformat(repo["createdAt"].replace("Z", "+00:00")))
+
+# Iterate over each repository and prompt the user for action
+for repo in repos:
+  print(f"Repository: {repo['name']}")
+  print(f"  Stars: {repo['stargazerCount']}")
+  print(f"  Created At: {repo['createdAt']}")
+  print(f"  Visibility: {repo['visibility']}")
+  print(f"  Is Fork: {'Yes' if repo['isFork'] else 'No'}")
+  print(f"  Is Archived: {'Yes' if repo['isArchived'] else 'No'}")
+  action = input("What would you like to do? ([a]rchive/[d]elete/[c]ontinue): ").strip().lower()
+
+  if "archive".startswith(action):
+    subprocess.run(["gh", "repo", "archive", repo["name"], "--yes"])
+  elif "delete".startswith(action):
+    subprocess.run(["gh", "repo", "delete", repo["name"], "--yes"])
+  elif "continue".startswith(action):
+    continue
+  else:
+    print("Invalid action. Skipping...")
