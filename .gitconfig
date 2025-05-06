@@ -42,8 +42,8 @@
   co = checkout
   dc = diff --cached
   df = "diff --name-only"
+  dfo = "!git df $(git opb)"
   ri = rebase -i
-
 
   amend = commit --amend
   aa = add --all .
@@ -71,7 +71,7 @@
   mod = "!git ls-files --modified ."
   del = "!git ls-files --deleted ."
   new = "!git ls-files --others --exclude-standard"
-  # ignored = "!git ls-files --others --ignored --exclude-standard * **/*"
+  ignored = "!git ls-files --others --ignored --exclude-standard * **/*"
 
   # Move fast and commit things
   bump = "commit --allow-empty -m'ci-bump'"

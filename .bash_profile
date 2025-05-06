@@ -31,13 +31,12 @@ source_if_exists() {
   fi
 }
 
-# TODO: move this to darwin, perhaps including the homebrew path addition above
+# TODO: Make this Darwin specific, perhaps including the homebrew path addition above
 if command -v brew &> /dev/null; then
   export HOMEBREW_ROOT="$(brew --prefix)"
   source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/autojump.sh"
   source_if_exists "${HOMEBREW_ROOT}/etc/profile.d/bash_completion.sh"
 fi
-
 
 source_if_exists "$HOME/.fzf.bash" # fzf --bash > ~/.fzf.bash
 source_if_exists "$HOME/.bashrc"
