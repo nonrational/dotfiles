@@ -52,8 +52,6 @@
   f = "fetch --tags --force --prune"
   up = "!git f && hub sync"
 
-  dfo = "!git df $(git opb)"
-
   # Branch Management
   mov = "branch -m"
   bmx = "!. ~/.githelpers && rename_branch_regex"
