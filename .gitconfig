@@ -52,6 +52,8 @@
   f = "fetch --tags --force --prune"
   up = "!git f && hub sync"
 
+  dfo = "!git df $(git opb)"
+
   # Branch Management
   mov = "branch -m"
   bmx = "!. ~/.githelpers && rename_branch_regex"
@@ -96,7 +98,8 @@
   bs = "!. ~/.githelpers && pretty_git_branch_sorted"
 
   # List local branches, most recent first
-  lb = !git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", substr($2, 1, length($2)-1), $1)}'
+  lba = !git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", substr($2, 1, length($2)-1), $1)}'
+  lb = !git for-each-ref refs/heads/ --format='%(refname:short) ~ %(committerdate:relative)' | grep -v $(git pb) | awk -F~ '!seen[$1]++' | head -n 10 | awk -F' ~ ' '{printf(\"  \\033[33m%s: \\033[37m %s\\033[0m\\n\", $2, $1)}'
   brr = branch --sort=-committerdate
 
   # Keep things tidy

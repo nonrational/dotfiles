@@ -31,7 +31,7 @@ alias cdate="date '+%Y%m%d%H%M%S'"
 
 # psuedo-random, insecure password generator
 prpg() {
-  echo -n $RANDOM | openssl sha1 -binary | base64 | tr -d '/+=' | cut -c-16
+  echo -n $RANDOM | openssl sha1 -binary | base64 | tr -d '/+='
 }
 
 reset_known_host() {
