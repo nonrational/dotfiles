@@ -108,14 +108,14 @@ git_page_maybe() {
 }
 
 # Accepts a pattern and attempts to stage all files that match it.
-add_wildcard(){
+add_wildcard() {
   git ls-files --modified | grep -i $1 | xargs -I{} git add {}
   git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git add {}
   git ls-files --deleted | grep -i $1 | xargs -I{} git rm {}
 }
 
 # Accepts a pattern and attempts to unstage all files that match it.
-reset_wildcard(){
+reset_wildcard() {
   git ls-files --modified | grep -i $1 | xargs -I{} git checkout {}
   git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git checkout {}
   git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
@@ -160,7 +160,7 @@ delete_remoteless_branches_interactive() {
 }
 
 # Delete all personally-prefixed non-primary branches with confirmation.
-delete_all_my_branches_interactive(){
+delete_all_my_branches_interactive() {
   for branch in $(git branch | egrep '^\W*(aln|anorton)/'); do
     printf "Delete $branch, both local and origin? ";
     read ans;
@@ -169,7 +169,7 @@ delete_all_my_branches_interactive(){
 }
 
 # Delete all non-personally-prefixed, non-primary branches.
-delete_all_others_local_branches(){
+delete_all_others_local_branches() {
   for branch in $(git branch | grep '/' | egrep -v '^\W*(aln|anorton)/'); do
     printf "Delete $branch? ";
     read ans;
@@ -178,7 +178,7 @@ delete_all_others_local_branches(){
 }
 
 # Accepts a sed substituion (e.g., s/foo/bar/) and applies it to the current branch, also unsetting the upstream branch.
-rename_branch_regex(){
+rename_branch_regex() {
   if [ -z "$1" ]; then
     echo "No pattern provided"
   else
@@ -189,17 +189,28 @@ rename_branch_regex(){
   fi
 }
 
-TIMESINCE="function timeSince(date) {\
-  var seconds = Math.floor((new Date() - date) / 1000);\
-  var interval = Math.floor(seconds / 31536000);\
-  if (interval > 1) return interval + \" years\";\
-  interval = Math.floor(seconds / 2592000);\
-  if (interval > 1) return interval + \" months\";\
-  interval = Math.floor(seconds / 86400);\
-  if (interval > 1) return interval + \" days\";\
-  interval = Math.floor(seconds / 3600);\
-  if (interval > 1) return interval + \" hours\";\
-  interval = Math.floor(seconds / 60);\
-  if (interval > 1) return interval + \" minutes\";\
-  return Math.floor(seconds) + \" seconds\";\
-}";
+list_branches_by_relative_commit() {
+  current_branch=$(git branch --show-current)
+  git for-each-ref refs/heads/ --sort=-committerdate --format='%(refname:short) ~ %(committerdate:relative)' \
+    | awk -F~ '!seen[$1]++' \
+    | head -n 10 \
+    | awk -F' ~ ' '{
+      split($2, time_parts, " ");
+      relative_time = time_parts[1];
+      unit = substr(time_parts[2], 1, 1);
+      prefix = ($1 == "'$current_branch'") ? "*" : " ";
+      printf("%s%-2s %-5s %-s\n", prefix, NR, "-"relative_time unit, $1);
+    }'
+}
+
+switch_recent_branches_by_index() {
+  local branches=($(list_branches_by_relative_commit | awk '{print $NF}'))
+  list_branches_by_relative_commit
+  read -p "Select a branch by index: " index
+
+  if [[ $index -lt 0 || $index -ge ${#branches[@]} ]]; then
+    echo "Invalid index ${index}" >&2
+  fi
+
+  git switch "${branches[$((index - 1))]}"
+}
