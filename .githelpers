@@ -189,6 +189,9 @@ rename_branch_regex() {
   fi
 }
 
+
+# Lists the 10 most recently committed branches, sorted by relative commit time.
+# Highlights the current branch with an asterisk (*) and displays relative time in a concise format.
 list_branches_by_relative_commit() {
   current_branch=$(git branch --show-current)
   git for-each-ref refs/heads/ --sort=-committerdate --format='%(refname:short) ~ %(committerdate:relative)' \
@@ -203,14 +206,22 @@ list_branches_by_relative_commit() {
     }'
 }
 
+# Interactively switch to a recent branch using a selection menu with j/k or arrow keys, and Enter to confirm.
 switch_recent_branches_by_index() {
   local branches=($(list_branches_by_relative_commit | awk '{print $NF}'))
-  list_branches_by_relative_commit
-  read -p "Select a branch by index: " index
+  local current_branch=$(git branch --show-current)
 
-  if [[ $index -lt 0 || $index -ge ${#branches[@]} ]]; then
-    echo "Invalid index ${index}" >&2
+  # Use fzf for interactive selection
+  local selected_branch=$(list_branches_by_relative_commit | \
+    fzf --ansi --height=10 --reverse --header="Select a branch to switch to:" \
+        --bind="enter:accept" \
+        --bind="j:down,k:up" \
+        --color=hl:green --color=fg+:green --color=bg+:black)
+
+  if [ -n "$selected_branch" ]; then
+    local branch_name=$(echo "$selected_branch" | awk '{print $NF}')
+    git switch "$branch_name"
+  else
+    echo "No branch selected."
   fi
-
-  git switch "${branches[$((index - 1))]}"
 }
