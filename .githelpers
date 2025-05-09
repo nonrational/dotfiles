@@ -189,7 +189,6 @@ rename_branch_regex() {
   fi
 }
 
-
 # Lists the 10 most recently committed branches, sorted by relative commit time.
 # Highlights the current branch with an asterisk (*) and displays relative time in a concise format.
 list_branches_by_relative_commit() {
