@@ -224,3 +224,37 @@ switch_recent_branches_by_index() {
     echo "No branch selected."
   fi
 }
+
+switch_all_branches_by_index() {
+  local current_branch=$(git branch --show-current)
+
+  local selected_branch=$(git for-each-ref --sort=-committerdate --format='%(refname:short) ~ %(committerdate:relative)' refs/heads/ refs/remotes/ \
+    | awk -F' ~ ' '{print $1 " ~ " $2}' \
+    | grep -vE '^origin[^/]' \
+    | awk -F~ '!seen[$1]++' \
+    | head -n 20 \
+    | awk -F' ~ ' '{
+        split($2, time_parts, " ");
+        relative_time = time_parts[1];
+        unit = substr(time_parts[2], 1, 1);
+        prefix = ($1 == "'$current_branch'") ? "*" : " ";
+        printf("%s%-2s %-5s %-s\n", prefix, NR, "-"relative_time unit, $1);
+      }' \
+    | fzf --ansi --height=20 --reverse --header="Select a branch to switch to (local & remote):" \
+          --bind="enter:accept" \
+          --bind="j:down,k:up" \
+          --color=hl:green --color=fg+:green --color=bg+:black)
+
+  if [ -n "$selected_branch" ]; then
+    local branch_name=$(echo "$selected_branch" | awk '{print $NF}' | sed 's/origin\///g')
+    if git show-ref --verify --quiet "refs/heads/$branch_name"; then
+      git switch "$branch_name"
+    elif git show-ref --verify --quiet "refs/remotes/origin/$branch_name"; then
+      git switch --track "origin/$branch_name"
+    else
+      echo "Branch not found: $branch_name"
+    fi
+  else
+    echo "No branch selected."
+  fi
+}

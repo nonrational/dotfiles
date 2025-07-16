@@ -98,6 +98,7 @@
   # List local branches, most recent first
   lb = "!. ~/.githelpers && list_branches_by_relative_commit"
   lbs = "!. ~/.githelpers && switch_recent_branches_by_index"
+  lba = "!. ~/.githelpers && switch_all_branches_by_index"
   brr = branch --sort=-committerdate
 
   # Keep things tidy
