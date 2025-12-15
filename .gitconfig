@@ -69,11 +69,6 @@
   new = "!git ls-files --others --exclude-standard"
   ignored = "!git ls-files --others --ignored --exclude-standard * **/*"
 
-  # Move fast and commit things
-  bump = "commit --allow-empty -m'ci-bump'"
-  wip = commit -v -m'wip'
-  yolo = !git commit --allow-empty -m \"$(curl -s https://whatthecommit.com/index.txt)\"
-
   # Manage changes that aren't destined to be committed
   regard = update-index --no-assume-unchanged
   disregard = update-index --assume-unchanged
@@ -106,6 +101,12 @@
   spring-cleaning = "!. ~/.githelpers && delete_all_my_branches_interactive"
   everybody-out = "!. ~/.githelpers && delete_all_others_local_branches"
   nuke = "!git reset --hard HEAD && git clean -fd"
+
+  # Move fast and commit things
+  bump = "commit --allow-empty -m'ci-bump'"
+  wip = commit -v -m'wip'
+  yolo = !git mod | xargs git add && git commit --allow-empty -m \"$(curl -s https://whatthecommit.com/index.txt)\"
+
 [status]
   relativePaths = true
 [color]
