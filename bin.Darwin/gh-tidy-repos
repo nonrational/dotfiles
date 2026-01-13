@@ -1,4 +1,58 @@
 #!/usr/bin/env python
+"""
+Manage GitHub repositories interactively via the GitHub CLI.
+
+Too many repos got you down? This script helps you tidy up your GitHub
+repositories by allowing you to archive or delete *starless* repositories
+that you no longer need.
+
+This script retrieves a list of repositories for the authenticated user
+using `gh repo list`, filters out those with non-zero stars, and then
+prompts the user to either archive, delete, or skip each repository.
+
+Usage:
+  gh-tidy-repos [options]
+
+Options:
+  --fork
+    Show only repositories that are forks.
+  -l, --language <LANG>
+    Filter repositories by primary language (e.g., python, javascript).
+  -L, --limit <N>
+    Maximum number of repositories to list (default: 30).
+  --no-archived
+    Exclude repositories that are already archived.
+  --topic <TOPIC>
+    Filter repositories by a specific topic.
+  --visibility <public|private|internal>
+    Filter by repository visibility.
+  --public
+    Alias for `--visibility=public`.
+  -h, --help
+    Show this help message and exit.
+
+Behavior:
+  1. Builds a `gh repo list` command with the specified filters.
+  2. Runs the command and parses its JSON output.
+  3. Removes any repositories that have one or more stars.
+  4. Sorts remaining repositories by creation date (oldest first).
+  5. For each repository, prints metadata and asks:
+     [a]rchive, [d]elete, or [c]ontinue (skip).
+  6. Executes `gh repo archive` or `gh repo delete` with `--yes`
+     based on the user's choice.
+
+Requirements:
+  - Python 3.6+
+  - GitHub CLI (`gh`) installed and authenticated.
+
+Examples:
+  # List up to 50 unstarred Python repos and allow cleanup
+  gh-tidy-repos --language python --limit 50
+
+  # Only consider public, non-archived repositories
+  gh-tidy-repos --public --no-archived
+"""
+
 import subprocess
 import json
 from datetime import datetime

@@ -25,7 +25,14 @@ def get_installed_versions(tool_name):
 
 def get_in_use_versions_by_tool_name():
   global_paths = [os.path.expanduser('~/.tool-versions')]
-  tool_version_paths = global_paths + find_tool_version_paths_in('~/wrk') + find_tool_version_paths_in('~/src')
+  search_dirs = ['~/wrk', '~/src']
+
+  print('Looking for .tool-versions in:')
+  for d in search_dirs:
+    print(f'  {os.path.expanduser(d)}/**')
+  tool_version_paths = global_paths
+  for d in search_dirs:
+    tool_version_paths += find_tool_version_paths_in(d)
 
   in_use_map = {}
 
@@ -51,7 +58,7 @@ if __name__ == "__main__":
   install_missing_commands = []
 
   for tool_name, versions in in_use_map.items():
-    print(f'Checking {tool_name}...')
+    print(f'\nChecking {tool_name}...')
     installed_versions = get_installed_versions(tool_name)
 
     versions.sort()
