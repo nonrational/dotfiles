@@ -15,3 +15,5 @@
 
 bin.Darwin/local
 bin.Linux/local
+
+/tools/karabiner/automatic_backups/*.json

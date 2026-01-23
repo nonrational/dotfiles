@@ -25,12 +25,13 @@ link-dotfiles:
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
 	mkdir -p $$HOME/.config
-	ln -s $$PWD/karabiner $$HOME/.config/karabiner
+	rm -rf $$HOME/.config/karabiner
+	ln -sf $$PWD/tools/karabiner $$HOME/.config/karabiner
 
 link-sublime:
 	git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
 	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text
-	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text
+	ln -sf $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text
 
 backup-preferences:
 	cp $$HOME/Library/Preferences/com.googlecode.iterm2.plist $$PWD/etc/com.googlecode.iterm2.plist
@@ -51,5 +52,6 @@ macos-disable-restore-apps-on-login:
 	# set the user immutable flag
 	find ~/Library/Preferences/ByHost/ -name 'com.apple.loginwindow*' -exec chflags uimmutable {} \;
 
-# grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos link-dotfiles link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login
+# echo ".PHONY: $(grep '^\w' Makefile | sed 's/:.*//g' | grep -v SHELL | tr '\n' ' ')" | pbcopy
+.PHONY: default brew-install brew-bundle macos macos-reset-dock link-dotfiles link-karabiner link-sublime backup-preferences restore-preferences macos-disable-restore-apps-on-login
+
