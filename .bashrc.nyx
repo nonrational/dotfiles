@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Copied from https://github.com/scop/bash-completion/bash_completion
+# Fixes https://github.com/Backblaze/B2_Command_Line_Tool/issues/500
+_have()
+{
+    # Completions for system administrator commands are installed as well in
+    # case completion is attempted via `sudo command ...'.
+    PATH=$PATH:/usr/sbin:/sbin:/usr/local/sbin type $1 &>/dev/null
+}
+
+# enable the 1password ssh agent
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
+# enable 1password cli plugin command wrappers
+source ~/.config/op/plugins.sh
+
+# allow PUMA_DEV_BIN="./puma-dev" for installing dev versions
+export PUMA_DEV_BIN='puma-dev'
+alias puma-dev-setup="sudo $PUMA_DEV_BIN -d test:localhost:loc.al -setup"
+alias puma-dev-install="$PUMA_DEV_BIN -d test:localhost:loc.al -install"
+alias puma-dev-uninstall="$PUMA_DEV_BIN -uninstall -d test:localhost:loc.al"
+
+puma-dev-ln () {
+  echo ln -sf $1 "~/.puma-dev/$(basename $1)"
+  echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
+}
