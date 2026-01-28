@@ -26,6 +26,9 @@ fi
 # Better get a new terminal at this point.
 make link-dotfiles
 make link-karabiner
+
+# Authenticate with `gh` to clone private repo(s)
+gh auth login
 make link-sublime
 make restore-preferences
 

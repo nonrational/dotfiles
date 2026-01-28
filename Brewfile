@@ -1,6 +1,3 @@
-tap "homebrew/bundle"
-tap "homebrew/services"
-
 tap "1password/tap"
 
 #   __                            _
@@ -51,21 +48,21 @@ brew "xz"
 # | (_| (_| \__ \   <
 #  \___\__,_|___/_|\_\
 #
-# cask "1password"
-# cask "1password-cli"
+cask "1password"
+cask "1password-cli"
 # cask "appcleaner"
 # cask "arc"
 # cask "cyberduck"
 # cask "daisydisk"
 cask "docker"
-# cask "dropbox"
+cask "dropbox"
 # cask "eloston-chromium" # ungoogled chromium
-# cask "firefox"
-# cask "google-chrome"
-# cask "istat-menus" # ($)
+cask "firefox"
+cask "google-chrome"
+cask "istat-menus" # ($)
 cask "iterm2"
 cask "karabiner-elements"
-# cask "moom" # window manager ($)
+cask "moom" # window manager ($)
 cask "maccy" # clipboard history manager
 # cask "ngrok"
 cask "postico" # ($)
