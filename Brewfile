@@ -10,6 +10,7 @@ brew "asdf"
 brew "ast-grep"
 brew "autojump"
 brew "awscli"
+brew "beads"
 brew "bash"
 brew "bash-completion"
 brew "coreutils"
@@ -54,7 +55,8 @@ cask "1password-cli"
 # cask "arc"
 # cask "cyberduck"
 # cask "daisydisk"
-cask "docker"
+cask "claude-code"
+cask "docker-desktop"
 cask "dropbox"
 # cask "eloston-chromium" # ungoogled chromium
 cask "firefox"
@@ -72,8 +74,8 @@ cask "spotify"
 # cask "steermouse" # mouse acceleration curve customizer ($)
 cask "sublime-merge" # ($)
 cask "sublime-text" # ($)
-# cask "utm" # gui for qemu
-# cask "veracrypt"
+cask "utm" # gui for qemu
+cask "veracrypt"
 # cask "visual-studio-code"
 # cask "vlc"
 # cask "wavebox"
