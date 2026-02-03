@@ -60,7 +60,9 @@
 
   # Wildcard Support
   aww = "!. ~/.githelpers && add_wildcard"
-  uww = "!. ~/.githelpers && reset_wildcard"
+  rww = "!. ~/.githelpers && reset_wildcard"
+  xww = "!. ~/.githelpers && discard_wildcard"
+
   sww = "!. ~/.githelpers && switch_wildcard"
 
   # List subcategories of unstaged files
