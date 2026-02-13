@@ -29,9 +29,10 @@ alias hist="history|tail"
 alias psa="ps auxwww"
 alias cdate="date '+%Y%m%d%H%M%S'"
 
-# psuedo-random, insecure password generator
+# psudo-random password generator
 prpg() {
-  echo -n $RANDOM | openssl sha1 -binary | base64 | tr -d '/+='
+  local len=${1:-16}
+  openssl rand -base64 ${len} | tr -d '/+=\n'
 }
 
 reset_known_host() {
