@@ -78,7 +78,7 @@ cask "utm" # gui for qemu
 cask "veracrypt"
 # cask "visual-studio-code"
 # cask "vlc"
-# cask "wavebox"
+cask "wavebox"
 
 #                        _
 #   __ _ _ __  _ __  ___| |_ ___  _ __ ___
