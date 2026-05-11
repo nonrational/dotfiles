@@ -2,6 +2,7 @@
 *.swo
 *.swp
 ._*
+~$*.*
 .DS_Store
 .DS_Store?
 .elixir_ls
