@@ -1,0 +1,42 @@
+# Allowlist approach: ignore everything, then explicitly allow tracked files.
+#
+# Claude Code creates runtime/private state in this directory (transcripts,
+# history, caches, telemetry, tokens), so a default-deny is safer.
+
+*
+
+# Re-include the config directory entries themselves. Per gitignore rules, a
+# file cannot be re-included if its parent directory is excluded — so without
+# these, none of the `!...` re-includes below would take effect on files
+# inside these dirs. Listing each dir explicitly (rather than `!*/`) keeps
+# runtime dirs like cache/, projects/, sessions/, telemetry/ excluded.
+!agents/
+!commands/
+!hooks/
+!skills/
+!output-styles/
+!plugins/
+!plugins/marketplaces/
+
+# Tracked top-level config files.
+!.gitignore
+!settings.json
+!*.md
+
+# .keep markers so otherwise-empty config directories get committed. `**`
+# matches at any depth, covering both e.g. agents/.keep and the nested
+# plugins/marketplaces/.keep.
+!**/.keep
+
+# Re-include arbitrary file contents inside the config directories. The
+# directory un-ignores above only re-include the directory entries — files
+# inside still match `*` on line 6 and stay ignored without these patterns.
+# Together with the dir un-ignores, this means: drop a file into any of these
+# dirs and it'll be tracked; drop one into cache/ or sessions/ and it won't.
+!agents/*
+!commands/*
+!hooks/*
+!skills/*
+!output-styles/*
+!plugins/*
+!plugins/marketplaces/*
