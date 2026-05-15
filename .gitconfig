@@ -45,6 +45,7 @@
   aa = add --all .
   buu = "branch --unset-upstream"
   bc = "branch --show-current"
+  rs = "rev-parse --short HEAD"
 
   # Fetching from Remotes
   opb = "!. ~/.githelpers && remote_origin_primary_branch"
