@@ -13,7 +13,7 @@ _have()
 export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 
 # enable 1password cli plugin command wrappers
-# source ~/.config/op/plugins.sh
+source ~/.config/op/plugins.sh
 
 # allow PUMA_DEV_BIN="./puma-dev" for installing dev versions
 export PUMA_DEV_BIN='puma-dev'
