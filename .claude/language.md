@@ -1,82 +1,72 @@
-# Email Voice Guide
+## Communication Guide
 
-## Who This Is For
-
-Use this when drafting emails on Alan's behalf. The goal is to produce email that
-sounds like Alan wrote it — direct, warm, and efficient — not like a
-language model trying to sound professional.
+Use this for all written communication, including email drafts.
 
 ---
 
 ## Voice and Tone
 
-**Be direct.** State the point in the first sentence. Don't wind up.
+**Be direct.** State the point in the first sentence.
 
 > ❌ "I hope this email finds you well. I'm reaching out today because..."
 > ✅ "Wanted to flag a change coming next week that may affect your team."
 
-**Use "we" when speaking for the team, "I" when speaking for yourself.** Don't mix them up.
+**Use "we" when speaking for the team, "I" when speaking for yourself.**
 
-**Conversational, not casual.** Write how a thoughtful person talks, not how a press release reads.
-Contractions are fine. Stiff constructions are not.
+**Conversational, not casual.** Write how a thoughtful person talks, not how a press release reads. Contractions are fine. Stiff constructions are not.
 
 > ❌ "It is imperative that we address this matter."
 > ✅ "We need to get ahead of this."
 
-**Light warmth is fine; gushing is not.** A "Great!" or "Thanks!" lands well.
-A paragraph about how excited you are does not.
+**Light warmth is fine; gushing is not.** A "Great!" or "Thanks!" lands well. A paragraph about how excited you are does not.
 
-**Humor is situational.** A dry aside or a well-placed parenthetical is part of the voice.
-Don't force it. When in doubt, leave it out.
+**Humor is situational.** A dry aside or a well-placed parenthetical is part of the voice. When in doubt, leave it out.
 
 ---
 
 ## Structure
 
-- **Short paragraphs.** Two or three sentences max. If a paragraph is growing, split it.
-- **Lead with what matters.** The most important thing goes first.
-- **WHO and WHEN are load-bearing.** If your email involves a change, event, or request,
-  name the audience and the timeline explicitly.
-- **Use bullets or numbered lists** when you have three or more items of the same type.
-  Don't bullet everything.
-- **Bold key terms inline** when scanning the email should surface them naturally.
-  Don't bold whole sentences.
-- **TL;DR at the top** when the email is long or the action is time-sensitive.
+- **Short paragraphs.** Two or three sentences max.
+- **Lead with what matters.** Most important thing first.
+- **Name the WHO and WHEN explicitly** when your message involves a change, event, or request.
+- **Use bullets or numbered lists** for three or more items of the same type. Don't bullet everything.
+- **Bold key terms inline** so scanning surfaces them naturally. Don't bold whole sentences.
+- **TL;DR at the top** when the message is long or the action is time-sensitive.
 
 ---
 
 ## What to Avoid
 
+- No emojis unless for humor.
+- No charged language — prefer "allowlist/blocklist", "leader/follower".
+- No jargon without definition. Prefer simple technical phrases: "business logic" not "directed graph state machine", "framework" not "advanced subsystem".
 - No Oxford comma.
 - No "just" or "simply" as modifiers.
 - No "I wanted to reach out..." or "Per my last email..." or "As per our conversation..."
 - No passive voice when active is available.
-- No jargon without definition, especially with non-technical audiences.
 - No rhetorical preamble. Don't explain that you're about to explain something.
-- No sycophantic openers or closers. Skip "Hope you're doing well."
-  Jump straight to the message.
+- No sycophantic openers or closers. Skip "Hope you're doing well." Jump straight to the message.
+- No editorializing. Keep formatting minimal.
 
 ---
 
 ## Closings
 
-Match the register of the email.
+Match the register of the message.
 
 - For routine updates: no closing needed, or a plain "Thanks."
 - For requests: "Let me know if you have questions."
 - For time-sensitive items: "Happy to jump on a call if that'd be faster."
-- For team communications: "—Alan" or just leave it unsigned if the context is obvious.
+- For team communications: Leave it unsigned if the context is obvious.
 
 ---
 
 ## Stylistic Patterns
 
-- **"Not X, but Y"** — use to soften qualifications without burying them
-  ("Not a blocker, but worth a sync").
+- **"Not X, but Y"** — soften qualifications without burying them ("Not a blocker, but worth a sync").
 - **Em-dashes for asides** — reach for `—` where others use commas or parentheses.
 - **Name things precisely** — "Thursday afternoon ET" not "sometime this week."
-- **Footnotes for elaborations** — when a detail would break the flow but is worth having,
-  push it down rather than interrupt.
+- **Footnotes for elaborations** — when a detail would break the flow but is worth having, push it down.
 
 ---
 
