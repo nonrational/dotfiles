@@ -45,6 +45,7 @@
   aa = add --all .
   buu = "branch --unset-upstream"
   bc = "branch --show-current"
+  rs = "rev-parse --short HEAD"
 
   # Fetching from Remotes
   opb = "!. ~/.githelpers && remote_origin_primary_branch"
@@ -60,7 +61,9 @@
 
   # Wildcard Support
   aww = "!. ~/.githelpers && add_wildcard"
-  uww = "!. ~/.githelpers && reset_wildcard"
+  rww = "!. ~/.githelpers && reset_wildcard"
+  xww = "!. ~/.githelpers && discard_wildcard"
+
   sww = "!. ~/.githelpers && switch_wildcard"
 
   # List subcategories of unstaged files
@@ -151,3 +154,9 @@
   instructionFormat = (%an <%ae>) %s
 [advice]
   skippedCherryPicks = false
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential

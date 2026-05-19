@@ -19,9 +19,9 @@ prepend_new_path_if_exists() {
 # this is to make cross-platform support cleaner.
 prepend_new_path_if_exists "/opt/homebrew/bin"  # apple silicon homebrew bin
 prepend_new_path_if_exists "/opt/homebrew/sbin" # apple silicon homebrew static bin
+prepend_new_path_if_exists "$HOME/.asdf/shims"
 prepend_new_path_if_exists "$HOME/.local/bin"
 prepend_new_path_if_exists "$HOME/bin"
-prepend_new_path_if_exists "$HOME/.asdf/shims"
 
 source_if_exists() {
   if [[ -s "$1" ]]; then

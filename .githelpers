@@ -114,11 +114,16 @@ add_wildcard() {
   git ls-files --deleted | grep -i $1 | xargs -I{} git rm {}
 }
 
-# Accepts a pattern and attempts to unstage all files that match it.
+# Accepts a pattern and discards all changes to files that match it.
+discard_wildcard() {
+  git ls-files --modified | grep -i $1 | xargs -I{} git restore {}
+  git ls-files --deleted | grep -i $1 | xargs -I{} git restore {}
+  git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} rm {}
+}
+
+# Accepts a pattern and removes staged files back to unstaged/untracked.
 reset_wildcard() {
-  git ls-files --modified | grep -i $1 | xargs -I{} git checkout {}
-  git ls-files --others --exclude-standard | grep -i $1 | xargs -I{} git checkout {}
-  git ls-files --deleted | grep -i $1 | xargs -I{} git checkout HEAD {}
+  git diff --cached --name-only | grep -i $1 | xargs -I{} git restore --staged {}
 }
 
 # Accepts a pattern and switches to the first branch that matches it.

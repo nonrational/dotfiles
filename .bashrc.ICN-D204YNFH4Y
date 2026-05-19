@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# enable 1password cli plugin command wrappers
+source ~/.config/op/plugins.sh
+
+export AWS_PROFILE=parallel
+export AWS_DEFAULT_REGION=us-east-1
+
 export ERL_AFLAGS="-kernel shell_history enabled"
 export KERL_BUILD_DOCS="yes"
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
