@@ -29,8 +29,24 @@ symlink(){
         if [ $force_delete == 1 ]; then
             rm -rf "$trg"
             ln -sv "$src" "$trg"
+        elif [ -L "$trg" ]; then
+            rm -f "$trg"
+            ln -sv "$src" "$trg"
         else
-            echo "[error] unable to symlink $src; $trg exists."
+            echo "[warn] $trg exists and is not a symlink"
+            if [ -t 0 ]; then
+                printf "  (b)ackup, (o)verwrite, (s)kip, (q)uit? "
+                read -r choice
+            else
+                choice=s
+                echo "  non-interactive: skipping"
+            fi
+            case "$choice" in
+                b|B) mv "$trg" "$trg.bak"; echo "[backup] $trg.bak"; ln -sv "$src" "$trg" ;;
+                o|O) rm -rf "$trg"; ln -sv "$src" "$trg" ;;
+                q|Q) echo "Aborted."; exit 0 ;;
+                *)   echo "[skip] $trg" ;;
+            esac
         fi
     else
         mkdir -p "$(dirname "$trg")"
