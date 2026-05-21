@@ -24,6 +24,7 @@ else
 fi
 
 # Better get a new terminal at this point.
+make init-submodules
 make link-dotfiles
 make link-karabiner
 
@@ -47,6 +48,7 @@ make macos
 git clone git@github.com:nonrational/dotfiles .dotfiles
 cd .dotfiles
 
+make init-submodules
 make link-dotfiles
 ```
 
