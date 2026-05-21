@@ -17,6 +17,7 @@
 !output-styles/
 !plugins/
 !plugins/marketplaces/
+!ext/
 
 # Tracked top-level config files.
 !.gitignore
@@ -38,3 +39,4 @@
 !hooks/*
 !skills/*
 !output-styles/*
+!ext/*
