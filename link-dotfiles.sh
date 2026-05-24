@@ -15,6 +15,37 @@ do
     shift
 done
 
+_show_diff(){
+    local a="$1" b="$2"
+    if command -v git >/dev/null 2>&1; then
+        git diff --no-index -- "$a" "$b" 2>/dev/null || return 1
+    else
+        diff -u "$a" "$b" || return 1
+    fi
+}
+
+_merge(){
+    local src="$1" trg="$2"
+    echo "  left=$trg (current)  right=$src (dotfiles)"
+    if [ -n "${MERGE_TOOL:-}" ]; then
+        $MERGE_TOOL "$trg" "$src"
+    elif command -v nvim >/dev/null 2>&1; then
+        nvim -d "$trg" "$src"
+    elif command -v vimdiff >/dev/null 2>&1; then
+        vimdiff "$trg" "$src"
+    else
+        echo "[error] no merge tool found; set MERGE_TOOL"
+        echo "[skip] $trg"
+        return
+    fi
+    printf "  symlink now? (y/n) "
+    read -r yn
+    case "$yn" in
+        y|Y) mv "$trg" "$trg.bak"; echo "[backup] $trg.bak"; ln -sv "$src" "$trg" ;;
+        *)   echo "[skip] $trg" ;;
+    esac
+}
+
 symlink(){
     file="$1"
     src="$DOTS/$file"
@@ -34,8 +65,14 @@ symlink(){
             ln -sv "$src" "$trg"
         else
             echo "[warn] $trg exists and is not a symlink"
+            if _show_diff "$trg" "$src"; then
+                echo "  files are identical — symlinking"
+                rm -f "$trg"
+                ln -sv "$src" "$trg"
+                return
+            fi
             if [ -t 0 ]; then
-                printf "  (b)ackup, (o)verwrite, (s)kip, (q)uit? "
+                printf "  (b)ackup, (m)erge, (o)verwrite, (s)kip, (q)uit? "
                 read -r choice
             else
                 choice=s
@@ -43,6 +80,7 @@ symlink(){
             fi
             case "$choice" in
                 b|B) mv "$trg" "$trg.bak"; echo "[backup] $trg.bak"; ln -sv "$src" "$trg" ;;
+                m|M) _merge "$src" "$trg" ;;
                 o|O) rm -rf "$trg"; ln -sv "$src" "$trg" ;;
                 q|Q) echo "Aborted."; exit 0 ;;
                 *)   echo "[skip] $trg" ;;
