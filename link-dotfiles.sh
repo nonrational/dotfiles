@@ -26,24 +26,71 @@ _show_diff(){
 
 _merge(){
     local src="$1" trg="$2"
-    echo "  left=$trg (current)  right=$src (dotfiles)"
-    if [ -n "${MERGE_TOOL:-}" ]; then
-        $MERGE_TOOL "$trg" "$src"
-    elif command -v nvim >/dev/null 2>&1; then
-        nvim -d "$trg" "$src"
-    elif command -v vimdiff >/dev/null 2>&1; then
-        vimdiff "$trg" "$src"
-    else
-        echo "[error] no merge tool found; set MERGE_TOOL"
-        echo "[skip] $trg"
-        return
+    echo "  Merging $trg (current) and $src (dotfiles)..."
+
+    # Determine editor
+    local editor="${EDITOR:-}"
+    if [ -z "$editor" ]; then
+        if command -v nvim >/dev/null 2>&1; then
+            editor="nvim"
+        elif command -v vim >/dev/null 2>&1; then
+            editor="vim"
+        elif command -v vi >/dev/null 2>&1; then
+            editor="vi"
+        elif command -v nano >/dev/null 2>&1; then
+            editor="nano"
+        else
+            echo "  [error] no EDITOR set and no standard editor (nvim/vim/vi/nano) found."
+            echo "  [skip] $trg"
+            return
+        fi
     fi
-    printf "  symlink now? (y/n) "
+
+    # Create temporary file for editing
+    local tmp_merge
+    tmp_merge=$(mktemp "${TMPDIR:-/tmp}/link-dotfiles-merge.XXXXXX")
+
+    # Generate conflict markers
+    if command -v git >/dev/null 2>&1; then
+        git merge-file -p -L "CURRENT ($trg)" -L "BASE" -L "DOTFILES ($src)" "$trg" /dev/null "$src" > "$tmp_merge" || true
+    else
+        # Fallback if git is not available
+        if command -v diff3 >/dev/null 2>&1; then
+            diff3 -m -L "CURRENT ($trg)" -L "BASE" -L "DOTFILES ($src)" "$trg" /dev/null "$src" > "$tmp_merge" || true
+        else
+            # Simple fallback: concatenate them with markers
+            {
+                echo "<<<<<<< CURRENT ($trg)"
+                cat "$trg"
+                echo "======="
+                cat "$src"
+                echo ">>>>>>> DOTFILES ($src)"
+            } > "$tmp_merge"
+        fi
+    fi
+
+    # Open in EDITOR
+    eval "$editor \"\$tmp_merge\""
+
+    if grep -qE "^(<<<<<<<|=======|>>>>>>>)" "$tmp_merge"; then
+        echo "  [warn] Merge markers still found in the file!"
+    fi
+
+    printf "  Apply merge changes? (y/n) "
     read -r yn
     case "$yn" in
-        y|Y) mv "$trg" "$trg.bak"; echo "[backup] $trg.bak"; ln -sv "$src" "$trg" ;;
-        *)   echo "[skip] $trg" ;;
+        y|Y)
+            cp "$tmp_merge" "$src"
+            mv "$trg" "$trg.bak"
+            echo "  [backup] $trg.bak"
+            ln -sv "$src" "$trg"
+            ;;
+        *)
+            echo "  [skip] $trg"
+            ;;
     esac
+
+    rm -f "$tmp_merge"
 }
 
 symlink(){
