@@ -110,6 +110,8 @@
   wip = commit -v -m'wip'
   yolo = !git mod | xargs git add && git commit --allow-empty -m \"$(curl -s https://whatthecommit.com/index.txt)\"
 
+  subup = "submodule update --remote --recursive"
+
 [status]
   relativePaths = true
 [color]
