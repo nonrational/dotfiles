@@ -15,3 +15,6 @@
 
 bin.Darwin/local
 bin.Linux/local
+
+.claude/plugins
+!.claude/plugins/.keep
