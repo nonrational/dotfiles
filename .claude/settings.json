@@ -1,1 +1,8 @@
-{}
+{
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "effortLevel": "xhigh",
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
+}
