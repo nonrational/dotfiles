@@ -149,6 +149,7 @@ switch_wildcard() {
 # Delete local-only branches with confirmation.
 delete_remoteless_branches_interactive() {
   git fetch origin --prune --tags -f
+  git worktree prune
 
   main_branch=$(remote_origin_primary_branch)
   remote_branches=$(git branch --remote | grep "origin" | grep -v "HEAD" | cut -c10- | egrep -v "^${main_branch}$")
@@ -158,7 +159,19 @@ delete_remoteless_branches_interactive() {
     if ! echo "$remote_branches" | grep -q "$local_branch"; then
       read -p "Delete $local_branch? (y/n): " response
       if [[ $response =~ ^[Yy] ]]; then
-        git branch -D "$local_branch"
+        local err
+        err=$(git branch -D "$local_branch" 2>&1 >/dev/tty)
+        if [[ -n "$err" ]]; then
+          echo "$err"
+          local wt_path
+          wt_path=$(echo "$err" | sed -n "s/.*used by worktree at '\(.*\)'.*/\1/p")
+          if [[ -n "$wt_path" ]]; then
+            echo "  Removing worktree at $wt_path"
+            git worktree remove --force "$wt_path" 2>/dev/null
+            git worktree prune
+            git branch -D "$local_branch"
+          fi
+        fi
       fi
     fi
   done
