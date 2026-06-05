@@ -27,7 +27,7 @@ brew "git"                 # Distributed revision control system
 brew "gnu-sed"             # GNU implementation of the famous stream editor
 brew "gnu-tar"             # GNU version of the tar archiving utility
 brew "gnupg"               # GNU Privacy Guard (OpenPGP)
-brew "hub"                 # Add GitHub support to git on the command-line
+brew "hub"                 # Add GitHub support to git on the command-line (`git up` -> `hub sync`)
 brew "jq"                  # Lightweight and flexible command-line JSON processor
 brew "just"                # Handy way to save and run project-specific commands
 brew "libass"              # Subtitle renderer for the ASS/SSA subtitle format
@@ -71,7 +71,7 @@ cask "iterm2"              # Terminal emulator as alternative to Apple's Termina
 cask "karabiner-elements"  # Keyboard customiser
 cask "maccy"               # clipboard history manager | Clipboard manager
 cask "macfuse"             # File system integration
-cask "moom"                # window manager ($) | Utility to move and zoom windows—on one display
+cask "moom"                # ($) | Utility to move and zoom windows—on one display
 cask "postico"             # ($) | GUI client for PostgreSQL databases
 cask "shottr"              # ($) | Screenshot measurement and annotation tool
 cask "signal"              # Instant messaging application focusing on security
