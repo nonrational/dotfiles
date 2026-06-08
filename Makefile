@@ -54,5 +54,8 @@ macos-disable-restore-apps-on-login:
 set-file-associations:
 	./scripts/set-file-associations.sh
 
+init-submodules:
+	git submodule update --init --recursive
+
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
 .PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos link-dotfiles link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

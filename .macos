@@ -4,9 +4,10 @@
 
 # https://macos-defaults.com/
 
-# Close any open System Preferences panes, to prevent them from overriding
-# settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+# Close any open System Preferences/Settings panes, to prevent them from overriding
+# settings we're about to change
+osascript -e 'tell application "System Preferences" to quit' 2> /dev/null
+osascript -e 'tell application "System Settings" to quit' 2> /dev/null
 
 # Ask for the administrator password upfront
 sudo -v
@@ -79,9 +80,6 @@ defaults write com.apple.helpviewer DevMode -bool true
 # in the login window
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 
-# Disable Notification Center and remove the menu bar icon
-launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
-
 # Disable automatic capitalization as it’s annoying when typing code
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 
@@ -118,10 +116,10 @@ defaults write com.apple.AppleMultitouchTrackpad AppleEnableSwipeNavigateWithScr
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.AppleMultitouchTrackpad DragLock -bool false
 defaults write com.apple.AppleMultitouchTrackpad Dragging -bool false
-defaults write com.apple.AppleMultitouchTrackpad FirstClickThreshold -bool true
+defaults write com.apple.AppleMultitouchTrackpad FirstClickThreshold -int 1
 defaults write com.apple.AppleMultitouchTrackpad ForceSuppressed -bool true
 defaults write com.apple.AppleMultitouchTrackpad HIDScrollZoomModifierMask -bool false
-defaults write com.apple.AppleMultitouchTrackpad SecondClickThreshold -bool true
+defaults write com.apple.AppleMultitouchTrackpad SecondClickThreshold -int 1
 defaults write com.apple.AppleMultitouchTrackpad TrackpadCornerSecondaryClick -bool false
 defaults write com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture -int 2
 defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int 2
@@ -169,7 +167,7 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bo
 # Set the timezone; see `sudo systemsetup -listtimezones` for other values
 sudo systemsetup -settimezone "America/New_York" > /dev/null
 
-# Stop iTunes from responding to the keyboard media keys
+# Stop Music/TV from responding to the keyboard media keys
 #launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
 
 ###############################################################################
@@ -347,7 +345,7 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 	Privileges -bool true
 
 ###############################################################################
-# Dock, Dashboard, and hot corners                                            #
+# Dock and hot corners                                                        #
 ###############################################################################
 
 # Enable highlight hover effect for the grid view of a stack (Dock)
@@ -382,17 +380,11 @@ defaults write com.apple.dock launchanim -bool false
 # Speed up Mission Control animations
 defaults write com.apple.dock expose-animation-duration -float 0.1
 
-# Don’t group windows by application in Mission Control
+# Don't group windows by application in Mission Control
 # (i.e. use the old Exposé behavior instead)
 defaults write com.apple.dock expose-group-by-app -bool false
 
-# Disable Dashboard
-defaults write com.apple.dashboard mcx-disabled -bool true
-
-# Don’t show Dashboard as a Space
-defaults write com.apple.dock dashboard-in-overlay -bool true
-
-# Don’t automatically rearrange Spaces based on most recent use
+# Don't automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
 
 # Remove the auto-hiding Dock delay
@@ -432,7 +424,6 @@ find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -dele
 #  4: Desktop
 #  5: Start screen saver
 #  6: Disable screen saver
-#  7: Dashboard
 # 10: Put display to sleep
 # 11: Launchpad
 # 12: Notification Center
@@ -663,16 +654,13 @@ defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
 defaults write com.apple.ActivityMonitor SortDirection -int 0
 
 ###############################################################################
-# Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
+# Address Book, Calendar, TextEdit, and Disk Utility                          #
 ###############################################################################
 
 # Enable the debug menu in Address Book
 defaults write com.apple.addressbook ABShowDebugMenu -bool true
 
-# Enable Dashboard dev mode (allows keeping widgets on the desktop)
-defaults write com.apple.dashboard devmode -bool true
-
-# Enable the debug menu in iCal (pre-10.8)
+# Enable the debug menu in Calendar (pre-10.8)
 defaults write com.apple.iCal IncludeDebugMenu -bool true
 
 # Use plain text mode for new TextEdit documents
@@ -768,9 +756,6 @@ defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool t
 #           |_|   |_|                                nonrational
 ################################################################
 
-# Use analog clock in menubar
-defaults write com.apple.menuextra.clock IsAnalog -bool true
-
 # Use all F1, F2 as standard keys
 defaults write -g com.apple.keyboard.fnState -bool true
 
@@ -800,11 +785,6 @@ defaults write com.apple.dock showLaunchpadGestureEnabled -int 0
 defaults write com.apple.dock showMissionControlGestureEnabled -int 1
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerFromRightEdgeSwipeGesture -int 0
 
-# Map Caps Lock key to Left Control key
-# https://developer.apple.com/library/content/technotes/tn2450/_index.html
-# https://github.com/mathiasbynens/dotfiles/pull/774/files
-hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}]}'
-
 # Indirect GLX was disabled by default in Xorg 1.17, starting from XQuartz version 2.7.9,
 # to enable indirect GLX and to allow remote visualization on the cluster you will have to issue at the terminal command prompt of your mac:
 defaults write org.macosforge.xquartz.X11 enable_iglx -bool true
@@ -812,6 +792,21 @@ defaults write org.x.X11 enable_test_extensions -boolean true
 
 # disable mouse acceleration
 defaults write .GlobalPreferences com.apple.mouse.scaling -1
+
+###############################################################################
+# Siri                                                                        #
+###############################################################################
+
+# Disable Siri
+defaults write com.apple.Siri StatusMenuVisible -bool false
+defaults write com.apple.Siri UserHasDeclinedEnable -bool true
+
+###############################################################################
+# Game Center                                                                 #
+###############################################################################
+
+# Disable Game Center notifications
+defaults write com.apple.GameCenter GKInviteAlertEnabled -bool false
 
 ###############################################################################
 # Kill affected applications                                                  #
