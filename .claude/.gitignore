@@ -23,6 +23,7 @@
 !.gitignore
 !settings.json
 !*.md
+!sync-plugins.sh
 
 # .keep markers so otherwise-empty config directories get committed. `**`
 # matches at any depth, covering both e.g. agents/.keep and the nested
