@@ -15,4 +15,4 @@ export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agen
 # enable 1password cli plugin command wrappers
 source ~/.config/op/plugins.sh
 
-export PATH="/opt/homebrew/opt/postgresql@18/bin:$PATH"
+export PATH="$HOME/.cargo/bin:/opt/homebrew/opt/postgresql@18/bin:$PATH"
