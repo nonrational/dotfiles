@@ -225,7 +225,6 @@ list_branches_by_relative_commit() {
 
 # Interactively switch to a recent branch using a selection menu with j/k or arrow keys, and Enter to confirm.
 switch_recent_branches_by_index() {
-  local branches=($(list_branches_by_relative_commit | awk '{print $NF}'))
   local current_branch=$(git branch --show-current)
 
   # Use fzf for interactive selection
