@@ -1,0 +1,6 @@
+*
+!.gitignore
+!settings.json
+!*.md
+!instructions/
+!instructions/*.instructions.md
