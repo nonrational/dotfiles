@@ -1,5 +1,5 @@
 {
-  "model": "claude-opus-4.7",
-  "effortLevel": "high",
-  "contextTier": "long_context"
+  "effortLevel": "max",
+  "contextTier": "long_context",
+  "model": "claude-opus-4.7"
 }
