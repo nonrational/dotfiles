@@ -11,6 +11,7 @@
 # inside these dirs. Listing each dir explicitly (rather than `!*/`) keeps
 # runtime dirs like cache/, projects/, sessions/, telemetry/ excluded.
 !agents/
+!rules/
 !commands/
 !hooks/
 !skills/
