@@ -39,6 +39,9 @@
 !agents/*
 !commands/*
 !hooks/*
-!skills/*
 !output-styles/*
 !ext/*
+
+# Skills may nest content (bin/, runs/, references/), so re-include every
+# depth — the one-level `!skills/*` form would leave nested files ignored.
+!skills/**
