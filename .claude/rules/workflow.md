@@ -4,6 +4,7 @@
 - Simplicity is paramount. Minimum code that solves the problem. Nothing speculative.
 - Touch only what you must. Leave the codebase cleaner than how you found it.
 - Focus on the goal. Outside-in design. Define success criteria. Loop until verified.
+- Liberally dispatch cheap adversarial sub-agents to self-review.
 
 For multi-step tasks, state a brief plan:
 ```
@@ -11,6 +12,10 @@ For multi-step tasks, state a brief plan:
 2. [Step] → verify: [check]
 3. [Step] → verify: [check]
 ```
+
+## UX/UI Iteration
+
+- For interaction/animation tweaks, start with the smallest, most subtle effect (tight area-of-effect, sparse randomness) and let the user dial it up.
 
 ## Code Conventions
 

@@ -1,0 +1,42 @@
+{
+  "allowNonWorkspaceAccess": true,
+  "colorScheme": "tokyo night",
+  "enableTelemetry": false,
+  "model": "Gemini 3.1 Pro (High)",
+  "permissions": {
+    "allow": [
+      "command(git branch)",
+      "command(ls)",
+      "command(find)",
+      "command(mktemp)",
+      "command(cat)",
+      "command(printf)",
+      "command(./test-link.sh)",
+      "command(uv)",
+      "command(asdf)",
+      "command(mkdir)",
+      "command(cd)",
+      "command(bun init)",
+      "command(bun add)",
+      "command(bun pm)",
+      "command(bun install)",
+      "command(pwd)",
+      "command(brew list)",
+      "command(mas)",
+      "command(git diff)",
+      "command(git status)",
+      "command(git log)",
+      "command(gh)",
+      "command(which)",
+      "command(pandoc)",
+      "command(mv)",
+      "command(git add)"
+    ]
+  },
+  "trustedWorkspaces": [
+    "/Users/norton/src/katandalan.club",
+    "/Users/norton/.dotfiles",
+    "/Users/norton/src/lizzy",
+    "/Users/norton/src/kycli"
+  ]
+}

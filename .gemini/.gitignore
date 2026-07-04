@@ -1,0 +1,37 @@
+# Allowlist approach: ignore everything, then explicitly allow tracked files.
+#
+# Gemini creates runtime/private state in this directory (history, tmp,
+# oauth credentials, auth state, cache, logs), so a default-deny is safer.
+
+*
+
+# Re-include the top-level config directories themselves.
+# Per gitignore rules, a file cannot be re-included if its parent directory is
+# excluded — so without these, none of the `!...` re-includes below would
+# take effect on files inside these dirs.
+!config/
+!antigravity-cli/
+!antigravity-cli/skills
+!antigravity-cli/rules
+!antigravity-cli/sidecars
+!antigravity-cli/mcp
+
+# Tracked top-level config files.
+!.gitignore
+!settings.json
+!trustedFolders.json
+!*.md
+
+# Tracked antigravity-cli config files.
+!antigravity-cli/settings.json
+!antigravity-cli/keybindings.json
+
+# .keep markers so otherwise-empty config directories get committed.
+!**/.keep
+
+# Re-include arbitrary file contents inside the config directories.
+!config/*
+!antigravity-cli/skills/*
+!antigravity-cli/rules/*
+!antigravity-cli/sidecars/*
+!antigravity-cli/mcp/*
