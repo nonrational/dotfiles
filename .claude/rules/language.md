@@ -38,9 +38,8 @@ Use this for all written communication, including email drafts.
 ## What to Avoid
 
 - No emojis unless for humor.
-- No charged language — prefer "allowlist/blocklist", "leader/follower".
+- No charged language; prefer "allowlist/blocklist", "leader/follower".
 - No jargon without definition. Prefer simple technical phrases: "business logic" not "directed graph state machine", "framework" not "advanced subsystem".
-- No Oxford comma.
 - No "just" or "simply" as modifiers.
 - No "I wanted to reach out..." or "Per my last email..." or "As per our conversation..."
 - No passive voice when active is available.
@@ -63,10 +62,10 @@ Match the register of the message.
 
 ## Stylistic Patterns
 
-- **"Not X, but Y"** — soften qualifications without burying them ("Not a blocker, but worth a sync").
-- **Em-dashes for asides** — reach for `—` where others use commas or parentheses.
-- **Name things precisely** — "Thursday afternoon ET" not "sometime this week."
-- **Footnotes for elaborations** — when a detail would break the flow but is worth having, push it down.
+- **"Not X, but Y"** – soften qualifications without burying them ("Not a blocker, but worth a sync").
+- **Avoid em-dashes for asides** – Use full stops, semicolons, parenthesis.
+- **Name things precisely** – "Thursday afternoon ET" not "sometime this week."
+- **Footnotes for elaborations** – when a detail would break the flow but is worth having, push it down.
 
 ---
 
