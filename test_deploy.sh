@@ -5,6 +5,7 @@ set -euf -o pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 BASE="$(mktemp -d "${TMPDIR:-/tmp}/test-deploy.XXXXXX")"
+BASE="$(cd "$BASE" && pwd)"
 trap 'rm -rf "$BASE"' EXIT
 
 pass=0
@@ -113,6 +114,123 @@ test_rejects_empty_manifest() {
     fi
 }
 
+test_apply_creates_missing_link() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    deploy apply
+    if [ "$status" = 0 ] && [ "$(readlink "$FAKEHOME/.rc")" = "$REPO/rc" ] \
+        && grep -q "^link: " <<<"$out"; then
+        ok "apply creates missing link"
+    else
+        bad "apply creates missing link (status=$status, out=$out)"
+    fi
+}
+
+test_apply_is_idempotent() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    deploy apply
+    deploy apply
+    if [ "$status" = 0 ] && grep -q "^ok: " <<<"$out"; then
+        ok "second apply is a no-op reported as ok"
+    else
+        bad "second apply is a no-op reported as ok (status=$status, out=$out)"
+    fi
+}
+
+test_apply_creates_parent_dirs() {
+    sandbox
+    printf 'rc\t~/.config/deep/rc\n' > "$REPO/manifest"
+    deploy apply
+    if [ "$status" = 0 ] && [ "$(readlink "$FAKEHOME/.config/deep/rc")" = "$REPO/rc" ]; then
+        ok "apply mkdir -p's missing parent dirs"
+    else
+        bad "apply mkdir -p's missing parent dirs (status=$status, out=$out)"
+    fi
+}
+
+test_apply_relinks_wrong_symlink() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    ln -s /somewhere/else "$FAKEHOME/.rc"
+    deploy apply
+    if [ "$status" = 0 ] && [ "$(readlink "$FAKEHOME/.rc")" = "$REPO/rc" ] \
+        && grep -q "^relink: " <<<"$out"; then
+        ok "apply replaces a wrong symlink"
+    else
+        bad "apply replaces a wrong symlink (status=$status, out=$out)"
+    fi
+}
+
+test_apply_skips_unmatched_condition() {
+    sandbox
+    printf 'rc\t~/.rc\tos=NoSuchOS\n' > "$REPO/manifest"
+    deploy apply
+    if [ "$status" = 0 ] && grep -q "^skip: " <<<"$out" \
+        && [ ! -e "$FAKEHOME/.rc" ] && [ ! -L "$FAKEHOME/.rc" ]; then
+        ok "unmatched condition is skipped, target untouched"
+    else
+        bad "unmatched condition is skipped, target untouched (status=$status, out=$out)"
+    fi
+}
+
+test_apply_matches_os_and_host() {
+    sandbox
+    os_now="$(uname)"
+    host_now="$(uname -n | sed -e 's/\.lan$//g' -e 's/\.local$//g')"
+    printf 'rc\t~/.rc\tos=%s\nbin.any\t~/bin\thost=%s\n' "$os_now" "$host_now" > "$REPO/manifest"
+    deploy apply
+    if [ "$status" = 0 ] && [ "$(readlink "$FAKEHOME/.rc")" = "$REPO/rc" ] \
+        && [ "$(readlink "$FAKEHOME/bin")" = "$REPO/bin.any" ]; then
+        ok "matching os= and host= conditions are applied"
+    else
+        bad "matching os= and host= conditions are applied (status=$status, out=$out)"
+    fi
+}
+
+test_apply_backs_up_regular_file() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    echo "precious" > "$FAKEHOME/.rc"
+    deploy apply
+    if [ "$status" = 0 ] && [ "$(cat "$FAKEHOME/.rc.bak")" = "precious" ] \
+        && [ "$(readlink "$FAKEHOME/.rc")" = "$REPO/rc" ] \
+        && grep -q "^backup: " <<<"$out"; then
+        ok "regular file is backed up then linked"
+    else
+        bad "regular file is backed up then linked (status=$status, out=$out)"
+    fi
+}
+
+test_apply_backs_up_directory() {
+    sandbox
+    printf 'bin.any\t~/bin\n' > "$REPO/manifest"
+    mkdir "$FAKEHOME/bin"
+    echo "old-tool" > "$FAKEHOME/bin/tool"
+    deploy apply
+    if [ "$status" = 0 ] && [ "$(cat "$FAKEHOME/bin.bak/tool")" = "old-tool" ] \
+        && [ "$(readlink "$FAKEHOME/bin")" = "$REPO/bin.any" ]; then
+        ok "conflicting directory is backed up then linked"
+    else
+        bad "conflicting directory is backed up then linked (status=$status, out=$out)"
+    fi
+}
+
+test_apply_refuses_second_backup() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    echo "precious" > "$FAKEHOME/.rc"
+    echo "older" > "$FAKEHOME/.rc.bak"
+    deploy apply
+    if [ "$status" = 1 ] && [ "$(cat "$FAKEHOME/.rc")" = "precious" ] \
+        && [ "$(cat "$FAKEHOME/.rc.bak")" = "older" ] \
+        && grep -q "already exists" <<<"$out"; then
+        ok "existing .bak refused; target and backup untouched; exit 1"
+    else
+        bad "existing .bak refused; target and backup untouched; exit 1 (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_manifest
@@ -121,6 +239,15 @@ test_rejects_extra_columns
 test_rejects_unknown_condition
 test_rejects_missing_source
 test_rejects_empty_manifest
+test_apply_creates_missing_link
+test_apply_is_idempotent
+test_apply_creates_parent_dirs
+test_apply_relinks_wrong_symlink
+test_apply_skips_unmatched_condition
+test_apply_matches_os_and_host
+test_apply_backs_up_regular_file
+test_apply_backs_up_directory
+test_apply_refuses_second_backup
 
 echo
 echo "$pass passed, $fail failed"

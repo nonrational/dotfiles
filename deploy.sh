@@ -63,4 +63,69 @@ parse_manifest() {
     fi
 }
 
-parse_manifest
+os="$(uname)"
+host="$(uname -n | sed -e 's/\.lan$//g' -e 's/\.local$//g')"
+failures=0
+
+condition_matches() {
+    case "$1" in
+        "") return 0 ;;
+        os=*) [ "${1#os=}" = "$os" ] ;;
+        host=*) [ "${1#host=}" = "$host" ] ;;
+    esac
+}
+
+expand_target() {
+    case "$1" in
+        "~/"*) printf '%s\n' "$HOME/${1#\~/}" ;;
+        *) printf '%s\n' "$1" ;;
+    esac
+}
+
+apply_entry() {
+    local src="$1" trg="$2"
+    if [ -L "$trg" ] && [ "$(readlink "$trg")" = "$src" ]; then
+        echo "ok: $trg -> $src"
+    elif [ -L "$trg" ]; then
+        echo "relink: $trg -> $src (was $(readlink "$trg"))"
+        rm "$trg"
+        ln -s "$src" "$trg"
+    elif [ -e "$trg" ]; then
+        if [ -e "$trg.bak" ] || [ -L "$trg.bak" ]; then
+            echo "error: $trg.bak already exists; skipping $trg" >&2
+            failures=$((failures + 1))
+        else
+            echo "backup: $trg -> $trg.bak, link $trg -> $src"
+            mv "$trg" "$trg.bak"
+            ln -s "$src" "$trg"
+        fi
+    else
+        echo "link: $trg -> $src"
+        mkdir -p "$(dirname "$trg")"
+        ln -s "$src" "$trg"
+    fi
+}
+
+main() {
+    local i src trg cond
+    parse_manifest
+    i=0
+    while [ "$i" -lt "${#sources[@]}" ]; do
+        src="$DOTS/${sources[$i]}"
+        trg="$(expand_target "${targets[$i]}")"
+        cond="${conditions[$i]}"
+        if condition_matches "$cond"; then
+            case "$mode" in
+                apply) apply_entry "$src" "$trg" ;;
+            esac
+        else
+            echo "skip: ${targets[$i]} ($cond)"
+        fi
+        i=$((i + 1))
+    done
+    if [ "$failures" -gt 0 ]; then
+        exit 1
+    fi
+}
+
+main
