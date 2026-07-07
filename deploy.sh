@@ -83,26 +83,35 @@ expand_target() {
 }
 
 apply_entry() {
-    local src="$1" trg="$2"
+    local src="$1" trg="$2" prefix=""
+    if [ "$dry_run" = 1 ]; then
+        prefix="would: "
+    fi
     if [ -L "$trg" ] && [ "$(readlink "$trg")" = "$src" ]; then
         echo "ok: $trg -> $src"
     elif [ -L "$trg" ]; then
-        echo "relink: $trg -> $src (was $(readlink "$trg"))"
-        rm "$trg"
-        ln -s "$src" "$trg"
+        echo "${prefix}relink: $trg -> $src (was $(readlink "$trg"))"
+        if [ "$dry_run" = 0 ]; then
+            rm "$trg"
+            ln -s "$src" "$trg"
+        fi
     elif [ -e "$trg" ]; then
         if [ -e "$trg.bak" ] || [ -L "$trg.bak" ]; then
             echo "error: $trg.bak already exists; skipping $trg" >&2
             failures=$((failures + 1))
         else
-            echo "backup: $trg -> $trg.bak, link $trg -> $src"
-            mv "$trg" "$trg.bak"
-            ln -s "$src" "$trg"
+            echo "${prefix}backup: $trg -> $trg.bak, link $trg -> $src"
+            if [ "$dry_run" = 0 ]; then
+                mv "$trg" "$trg.bak"
+                ln -s "$src" "$trg"
+            fi
         fi
     else
-        echo "link: $trg -> $src"
-        mkdir -p "$(dirname "$trg")"
-        ln -s "$src" "$trg"
+        echo "${prefix}link: $trg -> $src"
+        if [ "$dry_run" = 0 ]; then
+            mkdir -p "$(dirname "$trg")"
+            ln -s "$src" "$trg"
+        fi
     fi
 }
 

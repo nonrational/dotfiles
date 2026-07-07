@@ -37,6 +37,20 @@ deploy() {
     set -e
 }
 
+# Stable fingerprint of a tree: paths, symlink destinations, file checksums.
+snapshot() {
+    (
+        cd "$1"
+        find . | sort
+        find . -type l | sort | while read -r link; do
+            printf '%s -> %s\n' "$link" "$(readlink "$link")"
+        done
+        find . -type f | sort | while read -r f; do
+            printf '%s %s\n' "$f" "$(cksum <"$f")"
+        done
+    )
+}
+
 test_rejects_unknown_flag() {
     sandbox
     printf 'rc\t~/.rc\n' > "$REPO/manifest"
@@ -231,6 +245,36 @@ test_apply_refuses_second_backup() {
     fi
 }
 
+test_dry_run_reports_would_link() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    deploy --dry-run apply
+    if [ "$status" = 0 ] && grep -q "^would: link: " <<<"$out" \
+        && [ ! -e "$FAKEHOME/.rc" ] && [ ! -L "$FAKEHOME/.rc" ]; then
+        ok "dry-run prints would: link and creates nothing"
+    else
+        bad "dry-run prints would: link and creates nothing (status=$status, out=$out)"
+    fi
+}
+
+test_dry_run_changes_nothing() {
+    sandbox
+    printf 'rc\t~/.rc\nbin.any\t~/bin\n' > "$REPO/manifest"
+    ln -s /somewhere/else "$FAKEHOME/.rc"
+    mkdir "$FAKEHOME/bin"
+    echo "old-tool" > "$FAKEHOME/bin/tool"
+    before="$(snapshot "$FAKEHOME")"
+    deploy --dry-run apply
+    after="$(snapshot "$FAKEHOME")"
+    if [ "$status" = 0 ] && [ "$before" = "$after" ] \
+        && grep -q "^would: relink: " <<<"$out" \
+        && grep -q "^would: backup: " <<<"$out"; then
+        ok "dry-run leaves a dirty tree byte-identical"
+    else
+        bad "dry-run leaves a dirty tree byte-identical (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_manifest
@@ -248,6 +292,8 @@ test_apply_matches_os_and_host
 test_apply_backs_up_regular_file
 test_apply_backs_up_directory
 test_apply_refuses_second_backup
+test_dry_run_reports_would_link
+test_dry_run_changes_nothing
 
 echo
 echo "$pass passed, $fail failed"
