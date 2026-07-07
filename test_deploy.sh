@@ -275,6 +275,53 @@ test_dry_run_changes_nothing() {
     fi
 }
 
+test_audit_ok_after_apply() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    deploy apply
+    deploy audit
+    if [ "$status" = 0 ] && grep -q "^ok: " <<<"$out"; then
+        ok "audit reports ok and exits 0 when converged"
+    else
+        bad "audit reports ok and exits 0 when converged (status=$status, out=$out)"
+    fi
+}
+
+test_audit_reports_missing() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    deploy audit
+    if [ "$status" = 1 ] && grep -q "^missing: " <<<"$out"; then
+        ok "audit reports missing and exits 1"
+    else
+        bad "audit reports missing and exits 1 (status=$status, out=$out)"
+    fi
+}
+
+test_audit_reports_drift() {
+    sandbox
+    printf 'rc\t~/.rc\n' > "$REPO/manifest"
+    echo "real-file" > "$FAKEHOME/.rc"
+    deploy audit
+    if [ "$status" = 1 ] && grep -q "^drift: " <<<"$out" \
+        && [ "$(cat "$FAKEHOME/.rc")" = "real-file" ]; then
+        ok "audit reports drift, exits 1, touches nothing"
+    else
+        bad "audit reports drift, exits 1, touches nothing (status=$status, out=$out)"
+    fi
+}
+
+test_audit_skips_unmatched_condition() {
+    sandbox
+    printf 'rc\t~/.rc\tos=NoSuchOS\n' > "$REPO/manifest"
+    deploy audit
+    if [ "$status" = 0 ] && grep -q "^skip: " <<<"$out"; then
+        ok "audit lists unmatched entries as skip and exits 0"
+    else
+        bad "audit lists unmatched entries as skip and exits 0 (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_manifest
@@ -294,6 +341,10 @@ test_apply_backs_up_directory
 test_apply_refuses_second_backup
 test_dry_run_reports_would_link
 test_dry_run_changes_nothing
+test_audit_ok_after_apply
+test_audit_reports_missing
+test_audit_reports_drift
+test_audit_skips_unmatched_condition
 
 echo
 echo "$pass passed, $fail failed"

@@ -115,6 +115,19 @@ apply_entry() {
     fi
 }
 
+audit_entry() {
+    local src="$1" trg="$2"
+    if [ -L "$trg" ] && [ "$(readlink "$trg")" = "$src" ]; then
+        echo "ok: $trg"
+    elif [ -e "$trg" ] || [ -L "$trg" ]; then
+        echo "drift: $trg is not a symlink to $src"
+        failures=$((failures + 1))
+    else
+        echo "missing: $trg"
+        failures=$((failures + 1))
+    fi
+}
+
 main() {
     local i src trg cond
     parse_manifest
@@ -126,6 +139,7 @@ main() {
         if condition_matches "$cond"; then
             case "$mode" in
                 apply) apply_entry "$src" "$trg" ;;
+                audit) audit_entry "$src" "$trg" ;;
             esac
         else
             echo "skip: ${targets[$i]} ($cond)"
