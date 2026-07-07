@@ -49,6 +49,13 @@ parse_manifest() {
                 exit 1
                 ;;
         esac
+        case "$trg" in
+            "~/"* | /*) ;;
+            *)
+                echo "error: manifest line $lineno: target must be absolute or start with ~/" >&2
+                exit 1
+                ;;
+        esac
         if [ ! -e "$DOTS/$src" ]; then
             echo "error: manifest line $lineno: source $DOTS/$src does not exist" >&2
             exit 1
@@ -72,6 +79,7 @@ condition_matches() {
         "") return 0 ;;
         os=*) [ "${1#os=}" = "$os" ] ;;
         host=*) [ "${1#host=}" = "$host" ] ;;
+        *) return 1 ;;
     esac
 }
 

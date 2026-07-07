@@ -105,6 +105,18 @@ test_rejects_unknown_condition() {
     fi
 }
 
+test_rejects_relative_target() {
+    sandbox
+    printf 'rc\trelative-target\n' > "$REPO/manifest"
+    deploy apply
+    if [ "$status" = 1 ] && grep -q "must be absolute" <<<"$out" \
+        && [ ! -e "$REPO/relative-target" ] && [ ! -L "$REPO/relative-target" ]; then
+        ok "relative target exits 1 and creates nothing"
+    else
+        bad "relative target exits 1 and creates nothing (status=$status, out=$out)"
+    fi
+}
+
 test_rejects_missing_source() {
     sandbox
     printf 'rc\t~/.rc\nnope\t~/.nope\n' > "$REPO/manifest"
@@ -330,6 +342,7 @@ test_rejects_extra_columns
 test_rejects_unknown_condition
 test_rejects_missing_source
 test_rejects_empty_manifest
+test_rejects_relative_target
 test_apply_creates_missing_link
 test_apply_is_idempotent
 test_apply_creates_parent_dirs
