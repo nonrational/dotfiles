@@ -25,7 +25,7 @@ fi
 
 # Better get a new terminal at this point.
 make init-submodules
-make link-dotfiles
+make deploy
 make link-karabiner
 
 # Authenticate with `gh` to clone private repo(s)
@@ -49,7 +49,7 @@ git clone git@github.com:nonrational/dotfiles .dotfiles
 cd .dotfiles
 
 make init-submodules
-make link-dotfiles
+make deploy
 ```
 
 # Development

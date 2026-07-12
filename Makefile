@@ -18,9 +18,8 @@ macos-reset-dock:
 	defaults write com.apple.dock persistent-apps -array
 	killall Dock
 
-link-dotfiles:
-	mkdir -p $$HOME/.local
-	./link-dotfiles.sh
+deploy:
+	./deploy.sh apply
 
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
@@ -58,4 +57,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos link-dotfiles link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
