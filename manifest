@@ -1,4 +1,27 @@
-# source        target          condition
-bin.Darwin      ~/bin           os=Darwin
-bin.Linux       ~/bin           os=Linux
-.bashrc.nyx     ~/.bashrc.nyx   host=nyx
+# source            target                condition
+.bash_completion    ~/.bash_completion
+.bash_completion.d  ~/.bash_completion.d
+.bash_profile       ~/.bash_profile
+.bashrc             ~/.bashrc
+.bashrc.Darwin      ~/.bashrc.Darwin      os=Darwin
+.bashrc.Linux       ~/.bashrc.Linux       os=Linux
+.bashrc.nyx         ~/.bashrc.nyx         host=nyx
+.claude             ~/.claude
+.copilot            ~/.copilot
+.gemini             ~/.gemini
+.gitconfig          ~/.gitconfig
+.githelpers         ~/.githelpers
+.gitignore_global   ~/.gitignore_global
+.inputrc            ~/.inputrc
+.irbrc              ~/.irbrc
+.nethackrc          ~/.nethackrc
+.profile            ~/.profile
+.railsrc            ~/.railsrc
+.screenrc           ~/.screenrc
+.tmux.conf          ~/.tmux.conf
+.vim                ~/.vim
+.vimrc              ~/.vimrc
+.zprofile           ~/.zprofile
+.zshrc              ~/.zshrc
+bin.Darwin          ~/bin                 os=Darwin
+bin.Linux           ~/bin                 os=Linux
