@@ -4,13 +4,11 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
-  link:
+  test:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
-      - run: make link-dotfiles
+      - run: /bin/bash ./test_deploy.sh
       - run: make check-copilot-instructions
-
