@@ -32,9 +32,8 @@ check-symlinks:
 	fi
 	@echo "all tracked symlinks resolve"
 
-link-dotfiles:
-	mkdir -p $$HOME/.local
-	./link-dotfiles.sh
+deploy:
+	./deploy.sh apply
 
 # Ensures .copilot/instructions/*.instructions.md (per-file symlinks required by
 # the Copilot CLI's *.instructions.md filename suffix) mirror
@@ -110,4 +109,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-copilot-instructions link-dotfiles link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-copilot-instructions deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

@@ -4,13 +4,19 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
-  link:
-    runs-on: macos-latest
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
-      - run: make link-dotfiles
+      - run: /bin/bash ./test_deploy.sh
+      - run: |
+          export HOME="$(mktemp -d)"
+          ./deploy.sh apply
+          ./deploy.sh audit
       - run: make check-copilot-instructions
-
