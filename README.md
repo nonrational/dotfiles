@@ -56,4 +56,4 @@ make deploy
 
 Since live-copies are symlinked out, commit and push changes as necessary.
 
-For big refactors, don't try to do it live. Clone a separate copy.
+For big refactors, don't try to do it live; use a separate clone or worktrees.
