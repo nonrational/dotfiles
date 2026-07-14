@@ -41,5 +41,5 @@
       "command(node ace test)",
       "command(git commit)"
     ]
-  },
+  }
 }
