@@ -10,6 +10,7 @@
 .copilot            ~/.copilot
 .gemini             ~/.gemini
 .gitconfig          ~/.gitconfig
+.gitconfig.Darwin   ~/.gitconfig.Darwin   os=Darwin
 .githelpers         ~/.githelpers
 .gitignore_global   ~/.gitignore_global
 .inputrc            ~/.inputrc

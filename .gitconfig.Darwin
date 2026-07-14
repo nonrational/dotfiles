@@ -1,0 +1,30 @@
+# macOS-only git config. Included from ~/.gitconfig; the manifest deploys this
+# file only on Darwin, and git silently skips missing include paths elsewhere.
+
+[alias]
+  # Copy the current branch name
+  bcp = "!git branch --show-current | pbcopy"
+
+  # Fetch and fast-forward local branches (hub is brew-installed)
+  up = "!git f && hub sync"
+
+  # Browse code in a browser (falls back to `open` for non-GitHub remotes)
+  bro = "!. ~/.githelpers && git_browse_web"
+  pro = "!. ~/.githelpers && git_browse_pull_request"
+
+[merge]
+  tool = smerge
+  prompt = false
+[mergetool "smerge"]
+  cmd = smerge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+  keepTemporaries = false
+  trustExitCode = false
+  keepBackup = false
+  prompt = false
+
+[credential "https://github.com"]
+  helper =
+  helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+  helper =
+  helper = !/opt/homebrew/bin/gh auth git-credential

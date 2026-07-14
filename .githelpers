@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/bin/sh
+
+# Sourced by git "!" aliases, which run under /bin/sh (dash on Debian, not
+# bash). Keep everything here POSIX-compatible: no [[ ]], ==, =~, read -p,
+# or ${var/pat/rep}.
 
 # Based on Gary Bernhardt's .githelpers
 # https://github.com/garybernhardt/dotfiles/blob/main/.githelpers
@@ -16,8 +20,8 @@
 # author name, ensuring that we don't destroy anything in the commit message
 # that looks like time.
 #
-# The log format uses } characters between each field, and `column` is later
-# used to split on them. A } in the commit subject or any other field will
+# The log format uses ^ characters between each field, and `column` is later
+# used to split on them. A ^ in the commit subject or any other field will
 # break this.
 
 LOG_AUTHOR="%C(always,bold blue)<%aN>%C(always,reset)"
@@ -48,22 +52,24 @@ remote_origin_host() {
 }
 
 git_browse_web() {
-  if [ "github.com" == "$(remote_origin_host)" ] && command -v gh > /dev/null; then
+  if [ "github.com" = "$(remote_origin_host)" ] && command -v gh > /dev/null; then
     gh browse
   else
-    local url=$(git remote get-url origin)
+    local url="$(git remote get-url origin)"
     url="${url%.git}"
-    if [[ "$url" =~ ^git@ ]]; then
-      url="${url/://}"
-      url="https://${url#git@}"
-    fi
+    case "$url" in
+      git@*)
+        url="${url%%:*}/${url#*:}"
+        url="https://${url#git@}"
+        ;;
+    esac
     echo "Opening $url"
     open "$url"
   fi
 }
 
 git_browse_pull_request() {
-  if [ "github.com" == "$(remote_origin_host)" ] && command -v gh > /dev/null; then
+  if [ "github.com" = "$(remote_origin_host)" ] && command -v gh > /dev/null; then
     gh pr view --web || gh browse --branch $(git branch --show-current)
   else
     git_browse_web
@@ -130,12 +136,14 @@ reset_wildcard() {
 # Provide the `--all` flag to include remote branches as well.
 switch_wildcard() {
   local all_branches=false
-  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
-    -a | --all )
-      all_branches=true
-      ;;
-  esac; shift; done
-  if [[ "$1" == '--' ]]; then shift; fi
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --) shift; break ;;
+      -a | --all) all_branches=true; shift ;;
+      -*) shift ;;
+      *) break ;;
+    esac
+  done
 
   if [ -z "$1" ]; then
     echo "No pattern provided"
@@ -157,22 +165,25 @@ delete_remoteless_branches_interactive() {
 
   for local_branch in $local_branches; do
     if ! echo "$remote_branches" | grep -q "$local_branch"; then
-      read -p "Delete $local_branch? (y/n): " response
-      if [[ $response =~ ^[Yy] ]]; then
-        local err
-        err=$(git branch -D "$local_branch" 2>&1 >/dev/tty)
-        if [[ -n "$err" ]]; then
-          echo "$err"
-          local wt_path
-          wt_path=$(echo "$err" | sed -n "s/.*used by worktree at '\(.*\)'.*/\1/p")
-          if [[ -n "$wt_path" ]]; then
-            echo "  Removing worktree at $wt_path"
-            git worktree remove --force "$wt_path" 2>/dev/null
-            git worktree prune
-            git branch -D "$local_branch"
+      printf "Delete %s? (y/n): " "$local_branch"
+      read -r response
+      case "$response" in
+        [Yy]*)
+          local err
+          err=$(git branch -D "$local_branch" 2>&1 >/dev/tty)
+          if [ -n "$err" ]; then
+            echo "$err"
+            local wt_path
+            wt_path=$(echo "$err" | sed -n "s/.*used by worktree at '\(.*\)'.*/\1/p")
+            if [ -n "$wt_path" ]; then
+              echo "  Removing worktree at $wt_path"
+              git worktree remove --force "$wt_path" 2>/dev/null
+              git worktree prune
+              git branch -D "$local_branch"
+            fi
           fi
-        fi
-      fi
+          ;;
+      esac
     fi
   done
 }
@@ -182,7 +193,7 @@ delete_all_my_branches_interactive() {
   for branch in $(git branch | egrep '^\W*(aln|anorton)/'); do
     printf "Delete $branch, both local and origin? (y/[n])";
     read ans;
-    [[ "$ans" == "y" ]] && git branch -D $branch && git push origin :$branch
+    [ "$ans" = "y" ] && git branch -D $branch && git push origin :$branch
   done
 }
 
@@ -191,7 +202,7 @@ delete_all_others_local_branches() {
   for branch in $(git branch | grep '/' | egrep -v '^\W*(aln|anorton)/'); do
     printf "Delete $branch? ";
     read ans;
-    [[ "$ans" == "y" ]] && git branch -D $branch
+    [ "$ans" = "y" ] && git branch -D $branch
   done
 }
 

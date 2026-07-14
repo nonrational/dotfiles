@@ -9,6 +9,8 @@
 
 [include]
   path = ~/.local/.gitconfig
+  # OS-specific config; git silently skips missing include paths.
+  path = ~/.gitconfig.Darwin
 
 [includeIf "gitdir:~/wrk/**"]
   path = ~/wrk/.gitconfig
@@ -50,12 +52,10 @@
   opb = "!. ~/.githelpers && remote_origin_primary_branch"
   pb = "!. ~/.githelpers && remote_origin_primary_branch | sed 's|origin/||g'"
   f = "fetch --tags --force --prune"
-  up = "!git f && hub sync"
 
   # Branch Management
   mov = "branch -m"
   bmx = "!. ~/.githelpers && rename_branch_regex"
-  bcp = "!git branch --show-current | pbcopy"
   rio = "!git f && git rebase -i $(git opb)"
 
   # Wildcard Support
@@ -76,10 +76,6 @@
   disregard = update-index --assume-unchanged
   dissed = !git ls-files -v | grep ^[a-z] || echo "None"
   is-it-just-me = "!$EDITOR .git/info/exclude" # ignore untracked files in this specific repo
-
-  # Browse code in a browser
-  bro = "!. ~/.githelpers && git_browse_web"
-  pro = "!. ~/.githelpers && git_browse_pull_request"
 
   # Inspect current or recent changes
   head = !git r -1
@@ -132,14 +128,6 @@
 [merge]
   log = true
   keepBackup = false;
-  tool = smerge
-  prompt = false
-[mergetool "smerge"]
-  cmd = smerge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
-  keepTemporaries = false
-  trustExitCode = false
-  keepBackup = false
-  prompt = false
 [gc]
   auto = 0
 [filter "lfs"]
@@ -153,9 +141,3 @@
   instructionFormat = (%an <%ae>) %s
 [advice]
   skippedCherryPicks = false
-[credential "https://github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
