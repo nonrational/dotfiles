@@ -15,4 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: /bin/bash ./test_deploy.sh
+      - run: |
+          export HOME="$(mktemp -d)"
+          ./deploy.sh apply
+          ./deploy.sh audit
       - run: make check-copilot-instructions
