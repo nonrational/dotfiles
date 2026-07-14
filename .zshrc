@@ -63,10 +63,11 @@ alias l='ls'
 
 host=$(uname -n | sed -e 's/\.local//g')
 
-brewery=$(brew --prefix)
-
-# autojump
-. "$brewery/etc/profile.d/autojump.sh"
+# autojump — only when brew and the script are present
+if command -v brew >/dev/null 2>&1; then
+  brewery=$(brew --prefix)
+  [ -f "$brewery/etc/profile.d/autojump.sh" ] && . "$brewery/etc/profile.d/autojump.sh"
+fi
 
 # To make Homebrew’s completions available in zsh, you must get the Homebrew-managed zsh site-functions on your FPATH
 # before initialising zsh’s completion facility.
@@ -80,4 +81,6 @@ fi
 
 export PATH="/usr/local/opt/sqlite/bin:$PATH"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f ~/.fzf.zsh ]; then
+  source ~/.fzf.zsh
+fi

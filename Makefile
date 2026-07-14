@@ -32,6 +32,11 @@ check-symlinks:
 	fi
 	@echo "all tracked symlinks resolve"
 
+# Run the full test suite: deploy.sh behavior + shell rc smoke tests.
+test:
+	./test/test_deploy.sh
+	./test/test_shell.sh
+
 deploy:
 	./deploy.sh apply
 
@@ -109,4 +114,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-copilot-instructions deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

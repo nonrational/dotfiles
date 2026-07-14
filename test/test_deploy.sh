@@ -3,7 +3,7 @@
 # fake $HOME under mktemp, so nothing here touches the real home directory.
 set -euf -o pipefail
 
-ROOT="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BASE="$(mktemp -d "${TMPDIR:-/tmp}/test-deploy.XXXXXX")"
 BASE="$(cd "$BASE" && pwd)"
 trap 'rm -rf "$BASE"' EXIT
