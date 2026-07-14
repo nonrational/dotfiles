@@ -5,6 +5,7 @@
 # This script checks for unused and missing versions of tools managed by asdf.
 # It will prompt the user to uninstall unused versions and install missing versions.
 
+import argparse
 import subprocess
 import os
 import sys
@@ -23,7 +24,7 @@ def get_installed_versions(tool_name):
   versions = [strip_stars(line) for line in result.stdout.splitlines()]
   return versions
 
-def get_in_use_versions_by_tool_name():
+def get_in_use_dirs_by_tool_and_version():
   global_paths = [os.path.expanduser('~/.tool-versions')]
   search_dirs = ['~/wrk', '~/src']
 
@@ -43,29 +44,37 @@ def get_in_use_versions_by_tool_name():
         for line in lines:
           tool_name, tool_version = line.strip().split(maxsplit=1)
           tool_version = strip_stars(tool_version)
-          versions_in_use = in_use_map.get(tool_name, [])
-          versions_in_use.append(tool_version)
-          in_use_map[tool_name] = list(set(versions_in_use))
+          dirs_by_version = in_use_map.setdefault(tool_name, {})
+          dirs_by_version.setdefault(tool_version, set()).add(os.path.dirname(path))
     except FileNotFoundError:
       print(f"Skipped {path}", file=sys.stderr)
 
   return in_use_map
 
 if __name__ == "__main__":
-  in_use_map = get_in_use_versions_by_tool_name()
+  parser = argparse.ArgumentParser(description='Tidy up asdf versions')
+  parser.add_argument('-r', '--report', action='store_true', help='show which directories use each in-use version, and skip the interactive prompts')
+  args = parser.parse_args()
+
+  in_use_map = get_in_use_dirs_by_tool_and_version()
 
   uninstall_commands = []
   install_missing_commands = []
 
-  for tool_name, versions in in_use_map.items():
+  for tool_name, dirs_by_version in in_use_map.items():
     print(f'\nChecking {tool_name}...')
     installed_versions = get_installed_versions(tool_name)
 
-    versions.sort()
+    versions = sorted(dirs_by_version.keys())
     installed_versions.sort()
 
     print(f'     In-Use: {", ".join(versions)}')
     print(f'  Installed: {", ".join(installed_versions)}')
+
+    if args.report:
+      for version in versions:
+        for d in sorted(dirs_by_version[version]):
+          print(f'    {version} -> {d}')
 
     unused = set(installed_versions) - set(versions)
     print(f'  Unused: {", ".join(unused)}')
@@ -78,6 +87,9 @@ if __name__ == "__main__":
 
     for v in missing:
       install_missing_commands.append(f'asdf install {tool_name} {v}')
+
+  if args.report:
+    sys.exit(0)
 
   if uninstall_commands:
     response = input("🧹 Do you want to uninstall unused versions? (y/n): ").strip().lower()
