@@ -30,7 +30,16 @@
       "command(which)",
       "command(pandoc)",
       "command(mv)",
-      "command(git add)"
+      "command(git add)",
+      "command(git fetch)",
+      "command(git merge)",
+      "command(git show)",
+      "command(head)",
+      "command(just lint)",
+      "command(just format-check)",
+      "command(npm run)",
+      "command(node ace test)",
+      "command(git commit)"
     ]
   },
   "trustedWorkspaces": [
