@@ -1,1 +1,1 @@
-../../.claude/improvement.md
+../../.claude/rules/improvement.md

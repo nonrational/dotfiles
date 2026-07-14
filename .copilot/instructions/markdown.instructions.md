@@ -1,1 +1,1 @@
-../../.claude/markdown.md
+../../.claude/rules/markdown.md

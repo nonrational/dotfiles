@@ -1,1 +1,1 @@
-../../.claude/language.md
+../../.claude/rules/language.md

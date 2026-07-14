@@ -1,1 +1,0 @@
-../../.claude/macos_interactions.md

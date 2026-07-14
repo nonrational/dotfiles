@@ -18,9 +18,43 @@ macos-reset-dock:
 	defaults write com.apple.dock persistent-apps -array
 	killall Dock
 
+# .claude rules are mirrored by per-file symlinks in .copilot/instructions and
+# dir symlinks in .gemini/antigravity-cli — renames in .claude/rules break the
+# copilot links silently, so fail fast on any dangling tracked symlink.
+check-symlinks:
+	@broken=$$(git ls-files -z | while IFS= read -r -d '' f; do \
+		[ -L "$$f" ] && [ ! -e "$$f" ] && echo "$$f"; \
+	done; true); \
+	if [ -n "$$broken" ]; then \
+		echo "[error] broken symlinks:"; \
+		echo "$$broken" | sed 's/^/  /'; \
+		exit 1; \
+	fi
+	@echo "all tracked symlinks resolve"
+
 link-dotfiles:
 	mkdir -p $$HOME/.local
 	./link-dotfiles.sh
+
+# Fails if .copilot/instructions/*.instructions.md (per-file symlinks required by
+# the Copilot CLI's *.instructions.md filename suffix) don't mirror
+# .claude/rules/*.md 1:1 — both historical breaks (f820754, 0d4743e) were renames
+# in .claude/rules/ that silently dangled or orphaned these links.
+check-copilot-instructions:
+	@fail=0; \
+	for rule in .claude/rules/*.md; do \
+		name=$$(basename "$$rule" .md); \
+		link=".copilot/instructions/$$name.instructions.md"; \
+		if [ ! -L "$$link" ] || [ "$$(realpath "$$link" 2>/dev/null)" != "$$(realpath "$$rule")" ]; then \
+			echo "[error] $$link does not mirror $$rule"; \
+			fail=1; \
+		fi; \
+	done; \
+	for link in .copilot/instructions/*.instructions.md; do \
+		[ -L "$$link" ] && [ ! -e "$$link" ] && echo "[error] $$link is a dangling symlink" && fail=1; \
+	done; \
+	if [ $$fail -eq 0 ]; then echo "copilot instructions mirror .claude/rules"; fi; \
+	exit $$fail
 
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
@@ -58,4 +92,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos link-dotfiles link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-copilot-instructions link-dotfiles link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

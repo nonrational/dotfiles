@@ -1,1 +1,1 @@
-../../.claude/workflow.md
+../../.claude/rules/workflow.md

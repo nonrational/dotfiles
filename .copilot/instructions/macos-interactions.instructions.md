@@ -1,0 +1,1 @@
+../../.claude/rules/macos-interactions.md
