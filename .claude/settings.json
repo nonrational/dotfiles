@@ -2,6 +2,10 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "attribution": {
+    "pr": "",
+    "sessionUrl": false
+  },
   "model": "claude-fable-5[1m]",
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
