@@ -42,10 +42,4 @@
       "command(git commit)"
     ]
   },
-  "trustedWorkspaces": [
-    "/Users/norton/src/katandalan.club",
-    "/Users/norton/.dotfiles",
-    "/Users/norton/src/lizzy",
-    "/Users/norton/src/kycli"
-  ]
 }
