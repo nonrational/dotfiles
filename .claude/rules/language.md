@@ -41,10 +41,8 @@ Use this for all written communication, including email drafts.
 - No charged language; prefer "allowlist/blocklist", "leader/follower".
 - No jargon without definition. Prefer simple technical phrases: "business logic" not "directed graph state machine", "framework" not "advanced subsystem".
 - No "just" or "simply" as modifiers.
-- No "I wanted to reach out..." or "Per my last email..." or "As per our conversation..."
+- No throat-clearing. Skip "I wanted to reach out...", "Per my last email...", "Hope you're doing well," and any preamble explaining what you're about to say. Jump straight to the message.
 - No passive voice when active is available.
-- No rhetorical preamble. Don't explain that you're about to explain something.
-- No sycophantic openers or closers. Skip "Hope you're doing well." Jump straight to the message.
 - No editorializing. Keep formatting minimal.
 
 ---
@@ -70,21 +68,6 @@ Match the register of the message.
 ---
 
 ## Examples
-
-**Good — internal team update:**
-
-> Heads up: we're shipping the selfie-matching feature to beta partners next Tuesday.
-> CS will get a separate heads-up before it goes out. If you have questions before then,
-> drop them in #engineering.
-
-**Bad — same message, wrong voice:**
-
-> Hi team! I hope you're all doing well. I'm excited to share that we are making
-> great progress on our selfie-matching initiative. We anticipate a beta launch
-> next Tuesday and wanted to make sure everyone was informed. Please don't hesitate
-> to reach out if you have any questions or concerns!
-
----
 
 **Good — request to external stakeholder:**
 
