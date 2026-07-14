@@ -4,10 +4,7 @@ These instructions apply only on Darwin. On Linux, `pbcopy` does not exist — s
 
 ### Clipboard
 
-When you produce output the user is likely to paste elsewhere — GitHub (commit messages, PR/issue bodies, comments), email drafts, a browser, or any other external destination — also copy it to the clipboard with `pbcopy`. This covers:
-
-- Markdown-formatted text meant for a markdown editor (keep the raw `#`, `**`, backticks, etc.).
-- URLs the user will open or share.
+When you produce output the user is likely to paste elsewhere — GitHub (commit messages, PR/issue bodies, comments), email drafts, a browser, or any other external destination — also copy it to the clipboard with `pbcopy`. This covers markdown-formatted text (copied raw, per the markdown rules) and URLs the user will open or share.
 
 Pipe via a quoted heredoc to preserve formatting, e.g. `cat <<'EOF' | pbcopy … EOF`.
 
