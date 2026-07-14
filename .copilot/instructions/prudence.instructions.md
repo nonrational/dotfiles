@@ -1,0 +1,1 @@
+../../.claude/rules/prudence.md
