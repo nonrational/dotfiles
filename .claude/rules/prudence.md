@@ -4,7 +4,7 @@ Use this when picking a model and reasoning effort for a task — your own or a 
 
 ### Match the model to the work
 
-- **Brainstorming, ideation, divergent drafting** — Fable, medium. Breadth matters more than depth here; save the heavy tiers for when a decision is on the line.
+- **Brainstorming, ideation, divergent drafting** — Opus or Fable, medium. Breadth matters more than depth here; save the heavy tiers for when a decision is on the line.
 - **Planning, triage, architecture, hard root-cause debugging** — Opus, xhigh (max for the gnarliest calls). Choices that are expensive to reverse — or that many later steps lean on — earn the deepest reasoning.
 - **Implementation, refactors, delegated research, code review** — Sonnet. The workhorse. Scale effort to risk: mechanical edits run low, integration work runs high.
 - **Commit messages, PR summaries, short prose, mechanical transcription** — Haiku, low. Fast and cheap for low-stakes text where the answer is already known.

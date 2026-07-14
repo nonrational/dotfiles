@@ -36,25 +36,43 @@ link-dotfiles:
 	mkdir -p $$HOME/.local
 	./link-dotfiles.sh
 
-# Fails if .copilot/instructions/*.instructions.md (per-file symlinks required by
-# the Copilot CLI's *.instructions.md filename suffix) don't mirror
+# Ensures .copilot/instructions/*.instructions.md (per-file symlinks required by
+# the Copilot CLI's *.instructions.md filename suffix) mirror
 # .claude/rules/*.md 1:1 — both historical breaks (f820754, 0d4743e) were renames
 # in .claude/rules/ that silently dangled or orphaned these links.
 check-copilot-instructions:
-	@fail=0; \
+	@mkdir -p .copilot/instructions; \
+	changed=0; \
 	for rule in .claude/rules/*.md; do \
+		[ -f "$$rule" ] || continue; \
 		name=$$(basename "$$rule" .md); \
 		link=".copilot/instructions/$$name.instructions.md"; \
 		if [ ! -L "$$link" ] || [ "$$(realpath "$$link" 2>/dev/null)" != "$$(realpath "$$rule")" ]; then \
-			echo "[error] $$link does not mirror $$rule"; \
-			fail=1; \
+			echo "[fix] symlinking $$link -> $$rule"; \
+			rm -f "$$link"; \
+			ln -s "../../$$rule" "$$link"; \
+			changed=1; \
 		fi; \
 	done; \
 	for link in .copilot/instructions/*.instructions.md; do \
-		[ -L "$$link" ] && [ ! -e "$$link" ] && echo "[error] $$link is a dangling symlink" && fail=1; \
+		[ -L "$$link" ] || continue; \
+		rule=".claude/rules/$$(basename "$$link" .instructions.md).md"; \
+		if [ ! -f "$$rule" ]; then \
+			echo "[fix] removing orphaned symlink $$link"; \
+			rm -f "$$link"; \
+			changed=1; \
+		fi; \
 	done; \
-	if [ $$fail -eq 0 ]; then echo "copilot instructions mirror .claude/rules"; fi; \
-	exit $$fail
+	if [ "$$changed" -eq 1 ]; then \
+		if [ -n "$$CI" ]; then \
+			echo "[error] copilot instructions were out of sync. failing CI."; \
+			exit 1; \
+		else \
+			echo "copilot instructions were updated. please commit the changes."; \
+		fi; \
+	else \
+		echo "copilot instructions mirror .claude/rules"; \
+	fi
 
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
