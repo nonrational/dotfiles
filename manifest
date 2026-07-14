@@ -1,0 +1,4 @@
+# source        target          condition
+bin.Darwin      ~/bin           os=Darwin
+bin.Linux       ~/bin           os=Linux
+.bashrc.nyx     ~/.bashrc.nyx   host=nyx
