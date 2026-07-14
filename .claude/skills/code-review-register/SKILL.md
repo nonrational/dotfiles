@@ -1,3 +1,8 @@
+---
+name: code-review-register
+description: Voice and format register for PR/code review comments. Use when drafting, suggesting, or editing any pull-request or code review comment on the user's behalf — inline comments, top-level PR comments, review summaries, or replies to review threads.
+---
+
 # Code Review Comment Register
 
 Applies whenever drafting, suggesting, or editing a PR/code review comment on my behalf (inline comments, top-level PR comments, review summaries).
