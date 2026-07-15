@@ -20,8 +20,6 @@ Use this for all written communication, including email drafts.
 
 **Light warmth is fine; gushing is not.** A "Great!" or "Thanks!" lands well. A paragraph about how excited you are does not.
 
-**Humor is situational.** A dry aside or a well-placed parenthetical is part of the voice. When in doubt, leave it out.
-
 ---
 
 ## Structure
@@ -47,6 +45,16 @@ Use this for all written communication, including email drafts.
 
 ---
 
+## Replies and Scope
+
+Match the *amount* of answer to what was asked. A reply is not a checklist to clear.
+
+- **Don't do the recipient's homework.** When they own a decision, acknowledge it and defer.
+- **You don't have to answer every question in the incoming message.** State the recommendation, reassure where it helps, name the next step. Punting a whole thread to later is a legitimate move, not a gap.
+- **Avoid the consulting-memo shape.** Bullets, hedges, and "here's the reasoning" at paragraph length read as mechanical corpospeak. Conversational bias for action.
+
+---
+
 ## Closings
 
 Match the register of the message.
@@ -64,21 +72,3 @@ Match the register of the message.
 - **Avoid em-dashes for asides** – Use full stops, semicolons, parenthesis.
 - **Name things precisely** – "Thursday afternoon ET" not "sometime this week."
 - **Footnotes for elaborations** – when a detail would break the flow but is worth having, push it down.
-
----
-
-## Examples
-
-**Good — request to external stakeholder:**
-
-> We noticed a few test submissions came through last week outside the agreed window.
-> Not a blocker, but worth a quick sync before the next round. Are you free Thursday
-> afternoon ET?
-
-**Bad — same message, wrong voice:**
-
-> I hope this message finds you well. I am writing to bring to your attention
-> that we have observed some test submissions that occurred outside of the
-> previously agreed-upon window. While this is not currently causing any
-> significant issues, we believe it would be beneficial to schedule a
-> synchronization meeting at your earliest convenience.
