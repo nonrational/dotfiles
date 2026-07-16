@@ -338,7 +338,7 @@ test_manifest_covers_link_dotfiles() {
     # Mirror link-dotfiles.sh's find + exclude list, against the real repo
     # (not a sandbox fixture) so this proves coverage of the actual manifest.
     local linked
-    linked="$(cd "$ROOT" && find . -maxdepth 1 -name '.*' \
+    linked="$(cd "$ROOT/home" && find . -maxdepth 1 -name '.*' \
         ! -name '.' ! -name '.AppleDouble' ! -name '.DS_Store' \
         ! -name '.git' ! -name '.github' ! -name '.gitignore' \
         ! -name '.gitmodules' ! -name '.macos' -exec basename {} \; | sort)"
@@ -348,12 +348,12 @@ test_manifest_covers_link_dotfiles() {
     for f in $linked; do
         # Skip paths git considers wholly ignored (e.g. a local agent-scratch
         # dir) — those are never part of a real dotfiles checkout.
-        if git -C "$ROOT" status --porcelain --ignored -- "$f" 2>/dev/null | grep -q '^!!'; then
+        if git -C "$ROOT" status --porcelain --ignored -- "home/$f" 2>/dev/null | grep -q '^!!'; then
             continue
         fi
-        grep -qxF "$f" <<<"$sources" || missing="$missing $f"
+        grep -qxF "home/$f" <<<"$sources" || missing="$missing $f"
     done
-    grep -qxF "bin.$(uname)" <<<"$sources" || missing="$missing bin.$(uname)"
+    grep -qxF "home/bin.$(uname)" <<<"$sources" || missing="$missing bin.$(uname)"
     if [ -z "$missing" ]; then
         ok "manifest covers every link-dotfiles.sh-linked path"
     else

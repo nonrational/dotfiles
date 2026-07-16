@@ -2,5 +2,5 @@
 	path = etc/tomorrow-theme
 	url = https://github.com/chriskempson/tomorrow-theme
 [submodule ".claude/ext/mattpocock-skills"]
-	path = .claude/ext/mattpocock-skills
+	path = home/.claude/ext/mattpocock-skills
 	url = https://github.com/mattpocock/skills
