@@ -27,8 +27,8 @@ fake_home() {
     local h f
     h="$(mktemp -d "$BASE/home.XXXXXX")"
     for f in "${RC_FILES[@]}"; do
-        if [ -e "$ROOT/$f" ]; then
-            ln -s "$ROOT/$f" "$h/$f"
+        if [ -e "$ROOT/home/$f" ]; then
+            ln -s "$ROOT/home/$f" "$h/$f"
         fi
     done
     printf '%s' "$h"

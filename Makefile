@@ -18,9 +18,10 @@ macos-reset-dock:
 	defaults write com.apple.dock persistent-apps -array
 	killall Dock
 
-# .claude rules are mirrored by per-file symlinks in .copilot/instructions and
-# dir symlinks in .gemini/antigravity-cli — renames in .claude/rules break the
-# copilot links silently, so fail fast on any dangling tracked symlink.
+# home/.claude rules are mirrored by per-file symlinks in
+# home/.copilot/instructions and dir symlinks in home/.gemini/antigravity-cli
+# — renames in home/.claude/rules break the copilot links silently, so fail
+# fast on any dangling tracked symlink.
 check-symlinks:
 	@broken=$$(git ls-files -z | while IFS= read -r -d '' f; do \
 		[ -L "$$f" ] && [ ! -e "$$f" ] && echo "$$f"; \
@@ -32,14 +33,14 @@ check-symlinks:
 	fi
 	@echo "all tracked symlinks resolve"
 
-# .claude/skills symlinks point into the mattpocock-skills submodule; an
+# home/.claude/skills symlinks point into the mattpocock-skills submodule; an
 # upstream rename or removal (e.g. 968c3be) leaves them dangling silently
 # until someone happens to invoke that skill. Scoped separately from
 # check-symlinks so it's safe to run in CI: check-symlinks also covers
 # bin.Darwin/* app paths and every other submodule, which only resolve on a
 # machine with those apps installed and submodules fetched.
 check-skills:
-	@broken=$$(git ls-files -z -- .claude/skills | while IFS= read -r -d '' f; do \
+	@broken=$$(git ls-files -z -- home/.claude/skills | while IFS= read -r -d '' f; do \
 		[ -L "$$f" ] && [ ! -e "$$f" ] && echo "$$f"; \
 	done; true); \
 	if [ -n "$$broken" ]; then \
@@ -57,12 +58,14 @@ test:
 deploy:
 	./deploy.sh apply
 
-# Ensures .copilot/instructions/*.instructions.md (per-file symlinks required by
-# the Copilot CLI's *.instructions.md filename suffix) mirror
-# .claude/rules/*.md 1:1 — both historical breaks (f820754, 0d4743e) were renames
-# in .claude/rules/ that silently dangled or orphaned these links.
+# Ensures home/.copilot/instructions/*.instructions.md (per-file symlinks
+# required by the Copilot CLI's *.instructions.md filename suffix) mirror
+# home/.claude/rules/*.md 1:1 — both historical breaks (f820754, 0d4743e) were
+# renames in .claude/rules/ (pre-move) that silently dangled or orphaned
+# these links.
 check-copilot-instructions:
-	@mkdir -p .copilot/instructions; \
+	@cd home && \
+	mkdir -p .copilot/instructions; \
 	changed=0; \
 	for rule in .claude/rules/*.md; do \
 		[ -f "$$rule" ] || continue; \
@@ -92,7 +95,7 @@ check-copilot-instructions:
 			echo "copilot instructions were updated. please commit the changes."; \
 		fi; \
 	else \
-		echo "copilot instructions mirror .claude/rules"; \
+		echo "copilot instructions mirror home/.claude/rules"; \
 	fi
 
 link-karabiner:

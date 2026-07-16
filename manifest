@@ -1,28 +1,28 @@
-# source            target                condition
-.bash_completion    ~/.bash_completion
-.bash_completion.d  ~/.bash_completion.d
-.bash_profile       ~/.bash_profile
-.bashrc             ~/.bashrc
-.bashrc.Darwin      ~/.bashrc.Darwin      os=Darwin
-.bashrc.Linux       ~/.bashrc.Linux       os=Linux
-.bashrc.nyx         ~/.bashrc.nyx         host=nyx
-.claude             ~/.claude
-.copilot            ~/.copilot
-.gemini             ~/.gemini
-.gitconfig          ~/.gitconfig
-.gitconfig.Darwin   ~/.gitconfig.Darwin   os=Darwin
-.githelpers         ~/.githelpers
-.gitignore_global   ~/.gitignore_global
-.inputrc            ~/.inputrc
-.irbrc              ~/.irbrc
-.nethackrc          ~/.nethackrc
-.profile            ~/.profile
-.railsrc            ~/.railsrc
-.screenrc           ~/.screenrc
-.tmux.conf          ~/.tmux.conf
-.vim                ~/.vim
-.vimrc              ~/.vimrc
-.zprofile           ~/.zprofile
-.zshrc              ~/.zshrc
-bin.Darwin          ~/bin                 os=Darwin
-bin.Linux           ~/bin                 os=Linux
+# source                 target                condition
+home/.bash_completion    ~/.bash_completion
+home/.bash_completion.d  ~/.bash_completion.d
+home/.bash_profile       ~/.bash_profile
+home/.bashrc             ~/.bashrc
+home/.bashrc.Darwin      ~/.bashrc.Darwin      os=Darwin
+home/.bashrc.Linux       ~/.bashrc.Linux       os=Linux
+home/.bashrc.nyx         ~/.bashrc.nyx         host=nyx
+home/.claude             ~/.claude
+home/.copilot            ~/.copilot
+home/.gemini             ~/.gemini
+home/.gitconfig          ~/.gitconfig
+home/.gitconfig.Darwin   ~/.gitconfig.Darwin   os=Darwin
+home/.githelpers         ~/.githelpers
+home/.gitignore_global   ~/.gitignore_global
+home/.inputrc            ~/.inputrc
+home/.irbrc              ~/.irbrc
+home/.nethackrc          ~/.nethackrc
+home/.profile            ~/.profile
+home/.railsrc            ~/.railsrc
+home/.screenrc           ~/.screenrc
+home/.tmux.conf          ~/.tmux.conf
+home/.vim                ~/.vim
+home/.vimrc              ~/.vimrc
+home/.zprofile           ~/.zprofile
+home/.zshrc              ~/.zshrc
+home/bin.Darwin          ~/bin                 os=Darwin
+home/bin.Linux           ~/bin                 os=Linux
