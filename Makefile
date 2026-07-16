@@ -32,6 +32,23 @@ check-symlinks:
 	fi
 	@echo "all tracked symlinks resolve"
 
+# .claude/skills symlinks point into the mattpocock-skills submodule; an
+# upstream rename or removal (e.g. 968c3be) leaves them dangling silently
+# until someone happens to invoke that skill. Scoped separately from
+# check-symlinks so it's safe to run in CI: check-symlinks also covers
+# bin.Darwin/* app paths and every other submodule, which only resolve on a
+# machine with those apps installed and submodules fetched.
+check-skills:
+	@broken=$$(git ls-files -z -- .claude/skills | while IFS= read -r -d '' f; do \
+		[ -L "$$f" ] && [ ! -e "$$f" ] && echo "$$f"; \
+	done; true); \
+	if [ -n "$$broken" ]; then \
+		echo "[error] broken skill symlinks:"; \
+		echo "$$broken" | sed 's/^/  /'; \
+		exit 1; \
+	fi
+	@echo "all skill symlinks resolve"
+
 # Run the full test suite: deploy.sh behavior + shell rc smoke tests.
 test:
 	./test/test_deploy.sh
@@ -114,4 +131,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

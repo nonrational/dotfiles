@@ -14,9 +14,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: recursive
       - run: make test
       - run: |
           export HOME="$(mktemp -d)"
           ./deploy.sh apply
           ./deploy.sh audit
       - run: make check-copilot-instructions
+      - run: make check-skills
