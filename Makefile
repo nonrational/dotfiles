@@ -61,7 +61,8 @@ deploy:
 # Ensures home/.copilot/instructions/*.instructions.md (per-file symlinks
 # required by the Copilot CLI's *.instructions.md filename suffix) mirror
 # home/.claude/rules/*.md 1:1 — both historical breaks (f820754, 0d4743e) were
-# renames in .claude/rules/ that silently dangled or orphaned these links.
+# renames in .claude/rules/ (pre-move) that silently dangled or orphaned
+# these links.
 check-copilot-instructions:
 	@cd home && \
 	mkdir -p .copilot/instructions; \
@@ -94,7 +95,7 @@ check-copilot-instructions:
 			echo "copilot instructions were updated. please commit the changes."; \
 		fi; \
 	else \
-		echo "copilot instructions mirror .claude/rules"; \
+		echo "copilot instructions mirror home/.claude/rules"; \
 	fi
 
 link-karabiner:

@@ -7,11 +7,11 @@
 .DS_Store
 .AppleDouble
 .viminfo
-.vim/.netrwhist
+home/.vim/.netrwhist
 
 *.swp
 *.cache
 *.pyc
 
-bin.Darwin/local
-bin.Linux/local
+home/bin.Darwin/local
+home/bin.Linux/local
