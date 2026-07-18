@@ -40,7 +40,7 @@ check-symlinks:
 # bin.Darwin/* app paths and every other submodule, which only resolve on a
 # machine with those apps installed and submodules fetched.
 check-skills:
-	@broken=$$(git ls-files -z -- home/.claude/skills | while IFS= read -r -d '' f; do \
+	@broken=$$(git ls-files -z -- home/.agents/skills | while IFS= read -r -d '' f; do \
 		[ -L "$$f" ] && [ ! -e "$$f" ] && echo "$$f"; \
 	done; true); \
 	if [ -n "$$broken" ]; then \
@@ -60,14 +60,14 @@ deploy:
 
 # Ensures home/.copilot/instructions/*.instructions.md (per-file symlinks
 # required by the Copilot CLI's *.instructions.md filename suffix) mirror
-# home/.claude/rules/*.md 1:1 — both historical breaks (f820754, 0d4743e) were
-# renames in .claude/rules/ (pre-move) that silently dangled or orphaned
+# home/.agents/rules/*.md 1:1 — both historical breaks (f820754, 0d4743e) were
+# renames in .agents/rules/ (pre-move) that silently dangled or orphaned
 # these links.
 check-copilot-instructions:
 	@cd home && \
 	mkdir -p .copilot/instructions; \
 	changed=0; \
-	for rule in .claude/rules/*.md; do \
+	for rule in .agents/rules/*.md; do \
 		[ -f "$$rule" ] || continue; \
 		name=$$(basename "$$rule" .md); \
 		link=".copilot/instructions/$$name.instructions.md"; \
@@ -80,7 +80,7 @@ check-copilot-instructions:
 	done; \
 	for link in .copilot/instructions/*.instructions.md; do \
 		[ -L "$$link" ] || continue; \
-		rule=".claude/rules/$$(basename "$$link" .instructions.md).md"; \
+		rule=".agents/rules/$$(basename "$$link" .instructions.md).md"; \
 		if [ ! -f "$$rule" ]; then \
 			echo "[fix] removing orphaned symlink $$link"; \
 			rm -f "$$link"; \
@@ -95,7 +95,7 @@ check-copilot-instructions:
 			echo "copilot instructions were updated. please commit the changes."; \
 		fi; \
 	else \
-		echo "copilot instructions mirror home/.claude/rules"; \
+		echo "copilot instructions mirror home/.agents/rules"; \
 	fi
 
 link-karabiner:

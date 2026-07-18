@@ -11,14 +11,13 @@
 # inside these dirs. Listing each dir explicitly (rather than `!*/`) keeps
 # runtime dirs like cache/, projects/, sessions/, telemetry/ excluded.
 !agents/
-!rules/
+!rules
 !commands/
 !hooks/
-!skills/
+!skills
 !output-styles/
 !plugins/
 !plugins/marketplaces/
-!ext/
 
 # Tracked top-level config files.
 !.gitignore
@@ -40,8 +39,3 @@
 !commands/*
 !hooks/*
 !output-styles/*
-!ext/*
-
-# Skills may nest content (bin/, runs/, references/), so re-include every
-# depth — the one-level `!skills/*` form would leave nested files ignored.
-!skills/**

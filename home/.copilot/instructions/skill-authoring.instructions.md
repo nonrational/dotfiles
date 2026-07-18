@@ -1,1 +1,1 @@
-../../.claude/rules/skill-authoring.md
+../../.agents/rules/skill-authoring.md

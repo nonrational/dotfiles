@@ -1,1 +1,1 @@
-../../.claude/rules/macos-interactions.md
+../../.agents/rules/macos-interactions.md

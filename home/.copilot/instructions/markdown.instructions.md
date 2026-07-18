@@ -1,1 +1,1 @@
-../../.claude/rules/markdown.md
+../../.agents/rules/markdown.md
