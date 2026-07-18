@@ -80,13 +80,66 @@ lands in `test/test_deploy.sh`, and the exclusion needs a comment saying why.
 
 ## Link accounting
 
-27 agent-related symlinks (the repo tracks 29 in total; the other 2 are `home/bin.Darwin/{code,subl}`
-app links, untouched by this work). The distribution is the design:
+27 agent-related symlinks today (the repo tracks 29 in total; the other 2 are
+`home/bin.Darwin/{code,subl}` app links, untouched by this work). The distribution is the
+design:
 
 - **18 skill links: no edits.** Relative depth preserved by moving `ext/` alongside `skills/`.
 - **7 Copilot links:** retarget `../../.claude/rules/x.md` → `../../.agents/rules/x.md`.
-- **2 Gemini links:** same retarget at directory level.
+- **2 Gemini links, split by the liveness finding below:** the `skills` link is retargeted
+  `../../.claude/skills` → `../../.agents/skills`; the `rules` link is **deleted**, not
+  retargeted, because Antigravity never reads it.
 - **2 new:** the `.claude/rules` and `.claude/skills` shims.
+
+Net: 29 tracked symlinks − 1 deleted (`gemini …/rules`) + 2 shims = **30** after the move.
+
+## Antigravity liveness: skills live, rules dead (verified)
+
+The handoff asserted "Gemini follows those dir symlinks, has all along." Half true, and the
+false half was silently costing coverage. Verified empirically against the installed
+`agy` v1.1.3 with behavioral-suffix probes (a rule that forces an observable output token,
+which is a valid detector — recall probes are not, because Antigravity injects rules as
+constraints, not recallable facts):
+
+- **`~/.gemini/antigravity-cli/skills` → LIVE.** `agy` enumerated exactly the
+  `home/.claude/skills` contents (`code-review`, `tdd`, `research`, …), and no competing
+  `~/.gemini/config/skills` exists, so the symlink is the sole source. Retarget it.
+- **`~/.gemini/antigravity-cli/rules` → DEAD.** A behavioral rule planted there was
+  ignored; the same rule placed in `~/.gemini/GEMINI.md` fired. Antigravity reads global
+  rules only from `~/.gemini/GEMINI.md` (a single file), not a `rules/` directory. The
+  symlink points out from a location nothing reads, so the 7 rules never reach Antigravity.
+  Delete the link.
+
+**Scope note — global vs project.** These findings are about *global* config, which is
+what the dotfiles deploy. Antigravity separately supports a *project-local* `.agents/`
+convention (`.agents/rules`, `.agents/skills`, MCP) read from a repo/workspace root,
+defaulting to `.agents` with `.agent` as legacy fallback. That is a different mechanism and
+does not resurrect the dead global link. It is also not something these dotfiles deploy —
+project-local config lives per-repo. Worth noting only because it validates the `.agents`
+name choice, and because the global skills link being live while the global rules link is
+dead is a global-scope fact, not a contradiction of project-scope support. Caveat: the
+project-*skills* half is corroborated by our own testing (`agy` enumerated them); the
+project-*rules* half is not — a behavioral `.agents/rules` rule did not fire under
+`agy -p`, which may be a print-mode limitation. Verify interactively before relying on it.
+
+Consequence worth recording separately: the user's rules do not currently reach
+Antigravity at all. Making them reach it is a `GEMINI.md` task (single-file, so it needs
+concatenation or an import mechanism) and is **out of scope** for this migration.
+
+### Parked decisions (do not relitigate)
+
+- **Getting rules into Antigravity is parked.** The migration deletes the dead link and
+  stops. Accepted that rules do not reach Antigravity; skills still do.
+- **No native `GEMINI.md` import exists.** Tested against `agy` v1.1.3: both `@./file.md`
+  and `@file.md` in `~/.gemini/GEMINI.md` were ignored (a behavioral-suffix rule in the
+  imported file did not fire). So any future fix must materialize a single file.
+- **Concat will not go into the manifest.** `deploy.sh` is symlink-only by design: a
+  manifest line is `ln -s` and `audit` is `readlink target == source`. A concatenated
+  `GEMINI.md` is a materialized copy that goes stale on any rule edit, forcing `audit` to
+  re-concatenate-and-diff — a new verb that erodes the tool's simplicity and re-creates the
+  mirror-policing problem this work reduces. If the fix is ever built, it belongs as a
+  generated artifact plus a CI staleness check, mirroring `check-copilot-instructions`, not
+  as a manifest directive.
 
 ## The checks must be retargeted, and both rot silently if they are not
 
@@ -214,8 +267,12 @@ The module *name* stays `.claude/ext/mattpocock-skills`, so that is the path und
 `~/.dotfiles` already differ today: the live checkout has `core.worktree` set, this one
 has none at all.
 
-This fixup must be verified against a simulated clone during implementation, not asserted.
-It is a documented manual step, not a script — but "no migration needed" is retired.
+**Verified during planning, not asserted.** A pre-move consumer clone (submodule
+initialized, like `~/.dotfiles`) was made to pull the move: it reproduced the leading `-`,
+the stale `core.worktree`, 18 dangling links, and stranded content — then the fixup above
+recovered it to fully green (`git submodule status` clean, `core.worktree` repointed to
+`.agents`, `make check-skills` and `check-symlinks` pass). It is a documented manual step,
+not a script — but "no migration needed" is retired.
 
 ## Baseline hazard
 
@@ -280,7 +337,9 @@ before this change lands there, or migrated by hand afterward.
 - `check-copilot-instructions` run twice in a row is a no-op, and the 7 links still read `../../.agents/rules/*.md` afterward
 - `git submodule status` shows no leading `-`, in both this repo and a simulated fresh clone that pulled the move
 - `./deploy.sh audit` reports 25 ok, 0 drift, 0 missing
-- `git ls-files -s | awk '$1=="120000"' | wc -l` reports 31 (29 existing + 2 new shims)
+- `git ls-files -s | awk '$1=="120000"' | wc -l` reports **30** (29 existing − 1 deleted `gemini …/rules` + 2 new shims)
+- `home/.gemini/antigravity-cli/rules` is gone; `home/.gemini/antigravity-cli/skills` resolves to `../../.agents/skills`
 - no tracked path references `../../.claude/rules` or `../../.claude/skills` as a *symlink target*
   (documentation of runtime `~/.claude/...` paths is exempt; see above)
 - a fresh Claude Code session loads all 7 rules from `home/.agents/rules/`
+- `agy` still enumerates the skills (proving the retargeted skills link is live)
