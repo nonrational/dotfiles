@@ -13,5 +13,7 @@ home/.vim/.netrwhist
 *.cache
 *.pyc
 
+.worktrees/
+
 home/bin.Darwin/local
 home/bin.Linux/local
