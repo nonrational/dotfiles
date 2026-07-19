@@ -328,12 +328,17 @@ These describe *runtime* paths under `~/.claude`, which stay valid via the shims
 
 `scripts/migrate-to-home.sh:201,202,207,352,438,439,445,453,469` also hardcodes
 `.claude/ext/mattpocock-skills` and `home/.claude/skills/*`. It is a historical one-shot
-that migrates *from* the pre-`home/` layout, so it is deliberately left as-is. It would
-only matter for a machine still on the pre-`home/` layout, and none is known: `nyx` (this
-machine) is already on `home/`, and the handoff's belief that it wasn't came from
-misreading the `host=nyx` manifest entry — that entry only customizes nyx's bashrc, it
-does not imply an unmigrated machine. So `.agents` needs no `home/` migration anywhere;
-existing clones just need the submodule fixup above.
+that migrates *from* the pre-`home/` layout, and it is **retained** for any host still on
+that layout — it is deliberately left as-is by this change. `nyx` (this machine) is already
+on `home/`; the handoff's belief that it wasn't came from misreading the `host=nyx`
+manifest entry, which only customizes nyx's bashrc. How many hosts this repo is deployed to,
+and their layout state, is not knowable from here — so no blanket "nothing needs migration"
+claim is made. Two cases: a host already on `home/` (like nyx) needs only the submodule
+fixup above after pulling; a host still on the pre-`home/` layout runs
+`migrate-to-home.sh` first, then pulls `.agents` and applies the fixup. Because the script
+predates `.agents`, such a host lands on `home/` with `.claude/{skills,ext}` and the
+subsequent `.agents` pull completes the move; updating the script to be `.agents`-aware is
+possible future work, not required here.
 
 ## Success criteria
 

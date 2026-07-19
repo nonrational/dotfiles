@@ -311,9 +311,9 @@ make check-skills
 
 Then confirm this Claude session's rules and skills still resolve (`~/.claude -> ~/.dotfiles/home/.claude`, so `~/.claude/rules` follows the shim to `.agents/rules`).
 
-- [ ] **Step 3: Any other clones / machines**
+- [ ] **Step 3: Other clones / hosts**
 
-No `home/` migration is needed anywhere — `nyx` (this machine) is already on the `home/` layout, and no other machine is known to be on the pre-`home/` layout. The only other clone on nyx is `~/src/wip-dotfiles` (the working copy); apply the Step 2 fixup there too after it pulls. Any additional machine's clone is the same: pull, then run the Step 2 fixup. `scripts/migrate-to-home.sh` stays untouched; it would only be relevant if some machine were still pre-`home/`, which none is.
+`nyx` (this machine) is already on the `home/` layout, so it just needs the Step 2 fixup — on `~/.dotfiles` and on `~/src/wip-dotfiles` (the working copy) after each pulls. How many other hosts this repo runs on is not knowable from here, so make no blanket claim: a host already on `home/` needs only the fixup; a host still on the pre-`home/` layout runs `scripts/migrate-to-home.sh` first, then pulls `.agents` and applies the fixup. The script is **retained** for exactly that case; updating it to be `.agents`-aware is possible future work.
 
 ---
 
