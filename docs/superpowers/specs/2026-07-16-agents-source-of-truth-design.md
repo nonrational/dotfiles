@@ -250,8 +250,10 @@ make check-skills: all skill symlinks resolve                                   
 
 Stale content also strands at `home/.claude/ext/`. Because `~/.claude ->
 ~/.dotfiles/home/.claude`, the live skills break on `git pull` until fixed by hand. This
-hits `~/.dotfiles` and `nyx`. The spec's own submodule warning was aimed at the authoring
-repo; the actual trap is the consuming clones, which the handoff said needed nothing.
+hits every existing clone that pulls — on this machine (nyx) that is `~/.dotfiles` (the
+deployed clone) and `~/src/wip-dotfiles` (the working copy). The spec's own submodule
+warning was aimed at the authoring repo; the actual trap is the consuming clones, which
+the handoff said needed nothing.
 
 Fixup for each existing clone after pulling. Since `ext/` is only ~900K, discarding and
 re-cloning the module beats `core.worktree` surgery:
@@ -326,9 +328,12 @@ These describe *runtime* paths under `~/.claude`, which stay valid via the shims
 
 `scripts/migrate-to-home.sh:201,202,207,352,438,439,445,453,469` also hardcodes
 `.claude/ext/mattpocock-skills` and `home/.claude/skills/*`. It is a historical one-shot
-that migrates *from* the pre-`home/` layout, so it is deliberately left as-is. It will not
-work for a machine that has been through both moves; `nyx` must be migrated to `home/`
-before this change lands there, or migrated by hand afterward.
+that migrates *from* the pre-`home/` layout, so it is deliberately left as-is. It would
+only matter for a machine still on the pre-`home/` layout, and none is known: `nyx` (this
+machine) is already on `home/`, and the handoff's belief that it wasn't came from
+misreading the `host=nyx` manifest entry — that entry only customizes nyx's bashrc, it
+does not imply an unmigrated machine. So `.agents` needs no `home/` migration anywhere;
+existing clones just need the submodule fixup above.
 
 ## Success criteria
 

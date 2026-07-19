@@ -215,7 +215,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ### Task 2: Prove the clone-pull fixup on a simulated clone
 
-Existing clones (`~/.dotfiles`, `nyx`) break on pull because `core.worktree` lives in unversioned `.git/modules/<name>/config`. This task proves the fixup before anyone runs it for real, and produces the exact commands for the PR description. It creates no repo changes.
+Existing clones break on pull because `core.worktree` lives in unversioned `.git/modules/<name>/config`. On this machine (nyx) that means `~/.dotfiles` and `~/src/wip-dotfiles`; any other machine's clone is the same. This task proves the fixup before anyone runs it for real, and produces the exact commands for the PR description. It creates no repo changes.
 
 **Files:** none in the repo. Works entirely in a scratch clone.
 
@@ -294,7 +294,6 @@ repo. After pulling this, each clone (including ~/.dotfiles) must run:
 ## Notes
 - Deletes the home/.gemini/antigravity-cli/rules link: verified dead (Antigravity reads
   global rules only from ~/.gemini/GEMINI.md). Rules reaching Antigravity is parked.
-- nyx must be migrated to the home/ layout before this lands there.
 EOF
 )"
 ```
@@ -312,15 +311,15 @@ make check-skills
 
 Then confirm this Claude session's rules and skills still resolve (`~/.claude -> ~/.dotfiles/home/.claude`, so `~/.claude/rules` follows the shim to `.agents/rules`).
 
-- [ ] **Step 3: `nyx` — migrate to `home/` first, then apply the fixup**
+- [ ] **Step 3: Any other clones / machines**
 
-`scripts/migrate-to-home.sh` predates `.agents` and hardcodes `.claude/ext`/`home/.claude/skills`. Run it (or hand-migrate) to get nyx onto the `home/` layout before pulling this change, then apply the Step 2 fixup. Do not run the migration script against a repo already on `.agents`.
+No `home/` migration is needed anywhere — `nyx` (this machine) is already on the `home/` layout, and no other machine is known to be on the pre-`home/` layout. The only other clone on nyx is `~/src/wip-dotfiles` (the working copy); apply the Step 2 fixup there too after it pulls. Any additional machine's clone is the same: pull, then run the Step 2 fixup. `scripts/migrate-to-home.sh` stays untouched; it would only be relevant if some machine were still pre-`home/`, which none is.
 
 ---
 
 ## Self-Review
 
-**Spec coverage:** every spec section maps to a step — the move (Task 1 §2), submodule mechanics (§3), shims (§4), `.gitignore` (§5), copilot retarget (§6), gemini split delete+retarget (§7), the two check retargets (§8–9), test exclude (§10), the non-vacuous-check proof (§12), the Claude rules-load proof (§13), the clone fixup (Task 2), and the post-merge runbook incl. nyx (Task 3). Parked items (GEMINI.md, manifest-concat) are correctly absent.
+**Spec coverage:** every spec section maps to a step — the move (Task 1 §2), submodule mechanics (§3), shims (§4), `.gitignore` (§5), copilot retarget (§6), gemini split delete+retarget (§7), the two check retargets (§8–9), test exclude (§10), the non-vacuous-check proof (§12), the Claude rules-load proof (§13), the clone fixup (Task 2), and the post-merge runbook for existing clones (Task 3). Parked items (GEMINI.md, manifest-concat) are correctly absent.
 
 **Placeholder scan:** no TBD/TODO; every edit cites a concrete file, line, and before/after value.
 
