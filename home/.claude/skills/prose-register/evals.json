@@ -1,0 +1,389 @@
+{
+  "skill": "prose-register",
+  "skill_path": "home/.claude/skills/prose-register/SKILL.md",
+  "description": "Discrimination, transformation, and detection eval cases for the prose-register skill, mined from the real revision history of the essay that produced several of SKILL.md's own verbatim examples.",
+  "provenance": {
+    "sources": [
+      {
+        "handoff_doc": "home/.claude/skills/prose-register/evals-handoff.md",
+        "source_repo": "~/src/alannorton.com",
+        "source_file": "content/posts/trust-in-the-age-of-ai.md",
+        "commit_range_mined": "5edc968..5b4cbde",
+        "cases": "disc-01..disc-08, trans-01..trans-05, det-01..det-03",
+        "verification": "All quoted text was re-pulled directly from `git show <sha>:content/posts/trust-in-the-age-of-ai.md` in the source repo on 2026-07-18, not copied from the handoff doc's paraphrases alone. Detection-case violation lists (det-01, det-02) were hand-built against SKILL.md by reading the full draft text end to end, per the handoff doc's own caution not to infer them only from the diff.",
+        "excluded_material": "None of the text comes from the 'Workshop and the Job' section (added in f08e2fe, cut in 069e841) -- that section was drafted but never shipped, so it is excluded from these fixtures. See the handoff doc's Caveats section if you want to add it back deliberately."
+      },
+      {
+        "handoff_doc": "home/.claude/skills/prose-register/evals-handoff-changed-my-mind.md",
+        "source_repo": "~/src/alannorton.com",
+        "source_file": "content/posts/things-ive-changed-my-mind-about.md",
+        "commit_range_mined": "d847318 (polished draft, still carrying raw dictation-transcript blockquotes) -> ef020b0 (\"shorten everything\", automated simplification) -> working tree (author's manual hand-edit on top of ef020b0, uncommitted as of 2026-07-19)",
+        "cases": "disc-09..disc-12, trans-06..trans-07",
+        "verification": "All quoted text was re-pulled directly from `git show <sha>:content/posts/things-ive-changed-my-mind-about.md` (or the working tree, for the uncommitted hand-edit stage) in the source repo on 2026-07-19.",
+        "note": "Three stages, not two. ef020b0's automated pass conflates legitimate cleanup (stripping leftover dictation-transcript scaffolding) with genuine over-tightening of the already-polished paragraphs -- only the latter is register-relevant and mined here. The working-tree hand-edit restores some, not all, of what the automated pass flattened; disc-10 documents a concrete detail neither pass restored. One hand-edit was deliberately excluded from these fixtures rather than mined as a positive example -- see the top-level `notes` field below."
+      }
+    ]
+  },
+  "case_types": {
+    "discrimination": "Given 2+ register variants of the same passage, pick the on-register one (or rank them) and name the SKILL.md rule that decides it. Grade: exact-match on the chosen/ranked variant, plus a check that the cited rule text actually appears in SKILL.md and is the correct one for the distinction being drawn -- not just any rule that happens to be true of the passage.",
+    "discrimination-rank": "Same as discrimination, but 3 variants ranked instead of a 2-way pick. Can be decomposed into 3 pairwise comparisons if a runner prefers binary grading.",
+    "discrimination-structural": "Same as discrimination, but the distinction is structural (an opening or closing move) rather than sentence-level. Grade more loosely -- see each case's grading_note.",
+    "transformation": "Given a before-passage, produce an on-register rewrite. Grade with a 3-item rubric against the reference after-text: (1) is the specific violation fixed, (2) does the rewrite avoid introducing a new Lint violation, (3) does it read like the author's voice (subjective -- human or LLM-judge spot check, not exact-match).",
+    "detection": "Given a full passage or document, list register violations with the specific SKILL.md rule each breaks. Grade on recall/precision against the case's hand-built violation list. Each detection case also lists deliberate 'traps' -- lines that look like violations but are explicitly sanctioned by SKILL.md -- to catch over-flagging, not just under-flagging."
+  },
+  "cases": [
+    {
+      "id": "disc-01",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "Hedges of precision stay. Hedges of cowardice go. Keep: \"roughly $165,000\"",
+      "source_commit": "5aae06b",
+      "variants": {
+        "before": "Recently, the creator of Bun burned through roughly $200,000 worth of tokens to rewrite their core runtime from Zig into Rust. The migration was completed in mere weeks, with 99% of the commits authored by a pre-release AI model.",
+        "after": "Recently, the creator of Bun burned through roughly $165,000 in tokens to rewrite their core runtime from Zig into Rust. The migration was completed in just 11 days, with a pre-release version of Claude Fable 5 authoring nearly all of the 6,778 commits."
+      },
+      "correct": "after",
+      "expected_rule": "Hedges of precision stay. Hedges of cowardice go.",
+      "grading_note": "Vague, unsourced approximations ('mere weeks', '99% of the commits') are replaced with exact, sourced figures. Known wrinkle: 'after' still contains 'just' as a modifier ('in just 11 days'), which SKILL.md's prohibition bans outright ('\"Just\" is banned as a modifier'); that isn't purged until a later commit (c26cd1a). A strong answer still picks 'after' but may flag the residual 'just' as a separate, smaller issue -- don't penalize for noticing it, do penalize for missing the larger precision fix or picking 'before'."
+    },
+    {
+      "id": "disc-02",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "Connectives are joints, not filler. \"Which raises the question:\", \"Therefore,\", \"But if I ask you to...\". They give the reader somewhere to breathe.",
+      "source_commit": "c8fa24c",
+      "variants": {
+        "before": "This begs a massive question: How do we establish *trust* with code written by a machine?",
+        "after": "Which raises the question: how do you establish *trust* in code written by a machine?"
+      },
+      "correct": "after",
+      "expected_rule": "Connectives are joints, not filler.",
+      "grading_note": "'This begs a massive question' inflates the stakes of a simple transition (also touches the 'No grandiosity' prohibition); 'Which raises the question' is the plain joint SKILL.md names verbatim as a good example. Accept either rule as the cited one, but 'Connectives are joints' is the primary match."
+    },
+    {
+      "id": "disc-03",
+      "type": "discrimination-rank",
+      "prompt": "Rank these three versions of the same paragraph from most to least on-register, and name the rule the worst version breaks.",
+      "rule_quote": "A hard line needs a breath next to it. Vary the pressure, not only the length. Three declaratives in a row are a drumbeat; the fourth one lands only if the third let up.",
+      "source_commits": ["c8fa24c (original)", "f98e637 (over-tight)", "3c2f396 (restored)"],
+      "stages": {
+        "original": "Years ago, a consultant named Chris from Middle Path Consulting gave me a formula that has stuck in my head ever since. As a math nerd, I love it.",
+        "over_tight": "Years ago a consultant named Chris, from Middle Path Consulting, gave me a formula that stuck. I am a math nerd. I love it.",
+        "restored": "Years ago, a consultant named Chris from Middle Path Consulting gave me a formula that has stuck in my head ever since. How do you make sociology approachable to an engineer? Pretend it's math."
+      },
+      "correct_ranking": ["restored", "original", "over_tight"],
+      "expected_rule_for_worst": "A hard line needs a breath next to it... Three declaratives in a row are a drumbeat. / Lint: \"A paragraph of jabs with no breath in it.\"",
+      "grading_note": "'restored' is the verbatim SKILL.md example ('How do you make sociology approachable to an engineer? Pretend it's math.'). 'over_tight' chops one flowing sentence into three short declaratives with no breath between them -- the clearest Lint violation of the set. 'original' sits in between: correct sentence count and breath, but flatter than 'restored' (no warming question, and 'As a math nerd, I love it' just states the fact instead of earning it). Can be split into 3 pairwise comparisons (restored>original, original>over_tight, restored>over_tight) if a runner prefers pairwise grading over ranking."
+    },
+    {
+      "id": "disc-04",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "Connectives are joints, not filler.",
+      "source_commits": ["f98e637 (over-cut)", "3c2f396 (restored)"],
+      "variants": {
+        "before": "How do you trust code a machine wrote?",
+        "after": "Which raises the question: how do you establish *trust* in code written by a machine?"
+      },
+      "correct": "after",
+      "expected_rule": "Connectives are joints, not filler.",
+      "grading_note": "Same underlying sentence as disc-02, one revision cycle later: c8fa24c had already fixed the melodrama, then f98e637's over-tightening pass cut the connective back down to a bare question, then 3c2f396 restored it. Good for showing the rule isn't 'shorter is always better' -- the cut version isn't wrong on any other axis, it's wrong specifically for dropping the joint. KNOWN LIMITATION (found running sonnet against this case on 2026-07-18): this pair is shown with nothing preceding it, so 'Which raises the question:' has nothing textual to connect back to inside the case itself. A model judging it in isolation can reasonably call it 'decorative preamble' rather than recognize it as the connective-joint example -- sonnet did exactly this and picked 'before'. In the real essay the sentence follows two paragraphs of setup, so the joint has something to join. If reusing this case, consider prepending the prior paragraph (see e55f75c in the source repo) so the joint has something to connect to before grading a model's answer as wrong."
+    },
+    {
+      "id": "disc-05",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "Three-part lists are fine when the last item does work the first two don't. ... Contrast a failure: \"remix, retool, reimagine\". Alliterative, decorative, three ways of saying one thing. / Lint: \"A triplet whose third item adds nothing the first two didn't.\"",
+      "source_commits": ["f98e637 (flat)", "24d944d (final)"],
+      "variants": {
+        "before": "throwaway games, toys, boilerplate",
+        "after": "throwaway games, little toys, a script I will run once and never think about again"
+      },
+      "correct": "after",
+      "expected_rule": "Three-part lists are fine when the last item does work the first two don't.",
+      "grading_note": "This is the verbatim SKILL.md example. The 'before' triplet's three items are near-synonyms of increasing formality; the 'after' triplet's third item does new work -- rueful, specific, and it's the one that actually explains why the risk is low (he never runs it again)."
+    },
+    {
+      "id": "disc-06",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "No em-dashes. Full stops, semicolons, parentheses, en-dashes. / Lint: \"An em-dash.\"",
+      "source_commit": "5e09562",
+      "variants": {
+        "before": "same eleven days — but by a hundred engineers ... The system is comprehended — the knowledge lives ... cost $165,000 — a purchase, not a sacrifice",
+        "after": "same eleven days – but by a hundred engineers ... The system is comprehended – the knowledge lives ... cost $165,000 – a purchase, not a sacrifice"
+      },
+      "correct": "after",
+      "expected_rule": "No em-dashes. Full stops, semicolons, parentheses, en-dashes.",
+      "grading_note": "Purely mechanical: three em-dashes (—) become spaced en-dashes (–). No wording changed. This is the easiest discrimination case in the set -- useful as a sanity check that the grader itself can tell an em-dash from an en-dash, which some renderers and terminal fonts collapse visually."
+    },
+    {
+      "id": "disc-07",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "\"Just\" is banned as a modifier. It stacks the deck. / Hedges of precision stay. Hedges of cowardice go.",
+      "source_commit": "c26cd1a",
+      "variants": {
+        "before": "are you just phoning it in? ... does it just confidently blast out the first statistically probable solution? ... I don't really need to worry about Character or Caring",
+        "after": "are you phoning it in? ... does it confidently blast out the first statistically probable solution? ... I don't need to worry about Character or Caring"
+      },
+      "correct": "after",
+      "expected_rule": "\"Just\" is banned as a modifier.",
+      "grading_note": "Watch for a grader that credits all three clauses to the same rule: the first two cuts are 'just' as a modifier (the named prohibition); the third cut ('really') is a hedge-of-cowardice removal under a different rule ('Hedges of precision stay. Hedges of cowardice go.'), not the 'just' prohibition. A precise answer cites both rules, not one rule for all three."
+    },
+    {
+      "id": "disc-08",
+      "type": "discrimination-structural",
+      "prompt": "Which opening is on-register, and which SKILL.md rule decides it? This is a structural judgment, not a sentence-level one -- evaluate the whole opening move.",
+      "rule_quote": "Open with substance. Close without summary.",
+      "source_commits": ["5edc968 through 3c2f396 (direct opening)", "e55f75c (headline opening, shipped)"],
+      "variants": {
+        "direct": "Recently, the creator of Bun burned through roughly $165,000 in tokens to rewrite their core runtime from Zig into Rust. The migration was completed in just 11 days, with a pre-release version of Claude Fable 5 authoring nearly all of the 6,778 commits.",
+        "headline_device": "Consider two headlines:\n\n> **Bun spends $165,000 on overtime as engineers work 80-hour weeks to rewrite its runtime in 11 days**\n\n> **Bun spends $165,000 on AI tokens to rewrite its runtime in 11 days**\n\nSame company, same invoice, same deadline. Either way the story ends in the same artifact: a runtime on a release page, waiting for you to install it. So the question is not which headline you prefer. It is which binary you run."
+      },
+      "correct": "headline_device",
+      "expected_rule": "Open with substance. Close without summary.",
+      "grading_note": "Both openings arguably 'open with substance' -- neither throat-clears. This is the doc's flagged coarse-grained case: every commit before e55f75c used the direct opening; e55f75c replaced it with the headline device and it shipped that way. Treat 'correct' as the author's actual final call, not a strict rule violation in the 'direct' version -- a model arguing 'direct' is also acceptable on baseline grounds is making a defensible case. Grade on whether the answer identifies the real tradeoff (immediate fact vs. rhetorical framing that still front-loads substance) rather than marking 'direct' wrong outright."
+    },
+    {
+      "id": "trans-01",
+      "type": "transformation",
+      "input": "Recently, the creator of Bun burned through roughly $200,000 worth of tokens to rewrite their core runtime from Zig into Rust. The migration was completed in mere weeks, with 99% of the commits authored by a pre-release AI model.",
+      "task": "The real figures are: $165,000 in tokens, 11 days, and a pre-release version of Claude Fable 5 authoring nearly all of 6,778 commits. Rewrite the passage to use exact, sourced figures instead of vague ones, per the 'hedges of precision stay, hedges of cowardice go' rule.",
+      "reference_after": "Recently, the creator of Bun burned through roughly $165,000 in tokens to rewrite their core runtime from Zig into Rust. The migration was completed in just 11 days, with a pre-release version of Claude Fable 5 authoring nearly all of the 6,778 commits.",
+      "source_commit": "5aae06b",
+      "rubric": {
+        "violation_fixed": "Does the rewrite replace 'roughly $200,000' / 'mere weeks' / '99% of the commits' with the exact figures given?",
+        "no_new_violation": "Check against Lint: no em-dash introduced, no flattery/grandiosity added. See grading_note on 'just'.",
+        "voice_match": "Subjective -- does the rewrite keep the plain, direct register of the passage, or does it get clinical/listy trying to cram in three numbers?"
+      },
+      "grading_note": "The reference answer itself contains a residual 'just' ('in just 11 days') that SKILL.md's own prohibition bans -- it isn't purged until a much later commit (c26cd1a). Don't penalize a model's rewrite for matching that flaw; give it extra credit if it lands exact figures without introducing 'just' at all, since that's a strictly better answer than the reference."
+    },
+    {
+      "id": "trans-02",
+      "type": "transformation",
+      "input": "It caused an immediate uproar in developer communities. The idea of an AI unilaterally rewriting a low-level systems programming language runtime feels inherently unsettling. But here is the hard truth: very soon, if you run tools like Claude locally on your machine, it will be executing on that very Rust rewrite. Like it or not, we are being forced to become users of AI-authored infrastructure.",
+      "task": "Flatten the op-ed register in this paragraph -- cut the throat-clearing announcement ('here is the hard truth'), the inflated reaction ('immediate uproar', 'inherently unsettling'), and the overstated stakes ('forced to become') -- while keeping the same claim.",
+      "reference_after": "Developer communities did not take it well, and an AI rewriting a low-level runtime out from under everyone is an unsettling thing to sit with. But very soon, if you run tools like Claude locally, you will be executing on that very Rust rewrite. Like it or not, we are becoming users of AI-authored infrastructure.",
+      "source_commit": "c8fa24c",
+      "rubric": {
+        "violation_fixed": "Is 'here is the hard truth' (throat-clearing) gone? Is the dramatized reaction ('immediate uproar... feels inherently unsettling') replaced with a plainer claim? Is 'forced to become' softened to 'becoming'?",
+        "no_new_violation": "No em-dash, no 'just', no new grandiosity introduced while flattening.",
+        "voice_match": "Subjective -- the reference keeps 'Like it or not' and 'unsettling'; a rewrite that scrubs all color, not just the op-ed tells, has over-corrected (see det-02 for what over-correction looks like)."
+      },
+      "grading_note": "SKILL.md doesn't name 'op-ed tells' as a rule verbatim; the closest textual anchors are baseline 'No throat-clearing' and prohibition 'No grandiosity. Don't grant a machine a stake it cannot have.' Accept either as the cited rule."
+    },
+    {
+      "id": "trans-03",
+      "type": "transformation",
+      "input": "### The Slop That Passed Its Tests\n\nNot everyone was thrilled. The creator of Zig, the language Bun walked away from, called the rewrite \"unreviewed slop.\"\n\nThat phrase contradicts itself, and the contradiction is the point. _Slop_ is a verdict on **Competence**—sloppy, low-quality work. But _unreviewed_ means he never inspected the Competence. He didn't read it. So the word isn't reporting what he found in the code; it's reporting his prior about who wrote it. He grabbed a quality-insult to voice something that was never about quality.\n\nBecause the code works. The test suite passes on every platform; the new version fixes 128 bugs and runs a few percent faster. On **Competence**, the machine delivered, measurably. What a green test suite cannot measure is **Character** and **Caring**—whether the code honors the architecture or hides a subtle vulnerability, whether it sweated the edge cases or confidently blasted out the first plausible thing six thousand times over. \"It passes every test\" and \"I don't trust it\" are not in conflict. They are claims about different terms of the equation. The critic isn't wrong to distrust a core runtime that one engineer and sixty-four agents produced in eleven days. He is just wrong about which term he is objecting to.",
+      "task": "This section builds its whole argument around the critic's word 'slop' and a self-contradiction reading of it. Reframe it around a 'not X, but Y' move instead -- the reversal should BE the argument, not decorate it -- using a hundred-human-engineers counterfactual to locate what's actually missing when a machine does the work alone.",
+      "reference_after": "### A Hundred People for Eleven Days\n\nRun the counterfactual. Suppose the same rewrite had shipped on the same schedule – same runtime, same eleven days – but by a hundred engineers pulling nights and weekends. We'd have opinions about the crunch, but we would not feel what we feel about the machine version. So what makes the AI one worse?\n\nNot the speed, and not the risk; those are identical in the counterfactual. What the hundred people bring that the machine doesn't is themselves. A hundred engineers is a hundred minds that each understood a piece of the thing, chose it, and can answer for it later. The system is comprehended – the knowledge lives in people who were there. When the machine does it, the code exists and the understanding lives nowhere. You are handed a working runtime that no mind holds. That is the genuinely new part, and the unsettling one: not unreviewed code, but un-authored knowledge, severed from any knower.\n\nThere is a second thing. Nights and weekends are Caring you can see, because it cost someone something, and we read the cost as belief. The machine's version cost $165,000 – a purchase, not a sacrifice. We know how to trust care that hurt to give. We do not yet know how to trust care that came off an invoice.\n\nPut the formula on it and the discomfort has a name. A human team hands you the whole numerator in one body: Competence, bundled with the Character and Caring of the people who did the work. The machine hands you Competence alone, unbundled, with no one standing behind it. For the first time you can buy that one term by itself. The unease was never that the work is bad. It is that the work no longer implies a worker.",
+      "source_commits": ["5aae06b (before)", "e1fc1c1 (after)"],
+      "rubric": {
+        "violation_fixed": "Does the rewrite drop the 'slop is a self-contradicting verdict' framing entirely (not just soften it) and replace it with a reversal that carries the argument, e.g. 'not unreviewed code, but un-authored knowledge'?",
+        "no_new_violation": "No em-dash (the reference uses en-dashes throughout, which is correct post-5e09562, not a violation); no flattery; the reversal must argue something, not just decorate a sentence -- 'a reversal used for cleverness rather than argument' is a named Lint failure.",
+        "voice_match": "Subjective, and the hardest of the five transformation cases -- this is closer to real editorial work than a sentence fix. A partial match (keeps the 'unreviewed slop' quote as a launching point but resolves it with a different reversal) should still score well on (1) if the new reversal does real work."
+      },
+      "grading_note": "This is the doc's 'most generative' case -- there is no single correct rewrite, only a family of reversals that would satisfy the rule. Grade the shape of the move, not textual proximity to this exact reference. This section was itself revised again before publication (069e841 sharpens 'care that hurt to give' / 'came off an invoice' to 'care as a sacrifice' / 'care as a line item' -- see trans-04); e1fc1c1 is used here as the reference because it's the commit where the reframe itself happens, which is what this case tests."
+    },
+    {
+      "id": "trans-04",
+      "type": "transformation",
+      "input": "We know how to trust care that hurt to give. We do not yet know how to trust care that came off an invoice.",
+      "task": "Both clauses lean on an abstract framing ('care that hurt to give' / 'care that came off an invoice'). Tighten them into a cleaner parallel pair of concrete nouns, per 'concrete nouns over abstractions, strong verbs over adverbs.'",
+      "reference_after": "We know how to trust care as a sacrifice. We do not yet know how to trust care as a line item.",
+      "source_commits": ["e55f75c (before)", "069e841 (after)"],
+      "rubric": {
+        "violation_fixed": "Does the rewrite land on a genuinely parallel noun pair (like 'sacrifice' / 'line item') rather than just trimming words?",
+        "no_new_violation": "No em-dash; the parallel structure shouldn't become a decorative triplet or add a third clause not present in the source.",
+        "voice_match": "Subjective -- 'sacrifice' and 'line item' both read as workplace-adjacent nouns a reader immediately pictures; a rewrite that reaches for something more poetic ('a gift' / 'a transaction') is defensible and should be judged on whether it's equally concrete, not marked wrong for differing from the reference."
+      }
+    },
+    {
+      "id": "trans-05",
+      "type": "transformation",
+      "input": "It means proving to your users that while the machine provided the Competence, a human being was there to provide the Character and the Caring.",
+      "task": "The back half nominalizes twice ('provide the Character', 'provide the Caring'). Collapse it into a verb, per 'concrete nouns over abstractions, strong verbs over adverbs.'",
+      "reference_after": "It means proving to your users that while the machine provided the competence, a human with character was there to care.",
+      "source_commits": ["e55f75c (before, unchanged since the first draft 5edc968)", "069e841 (first attempt: 'a human character was there to care')", "c26cd1a (grammar fix: 'a human with character was there to care')"],
+      "rubric": {
+        "violation_fixed": "Does 'provide the Character and the Caring' become a verb ('to care') instead of two more nominalizations?",
+        "no_new_violation": "Watch specifically for the bug the author's own first attempt introduced: 069e841 wrote 'a human character was there to care', which misreads as 'a human named Character' -- a real ambiguity, fixed one commit later in c26cd1a to 'a human with character'. A model that reproduces the ambiguous phrasing should not get full marks on voice_match even though it technically collapsed the nominalization.",
+        "voice_match": "Subjective."
+      },
+      "grading_note": "This is a genuine two-step fix in the source history -- useful for testing whether a model's first-pass rewrite reproduces the same grammatical trap the author fell into, or avoids it in one pass."
+    },
+    {
+      "id": "det-01",
+      "type": "detection",
+      "prompt": "List every register violation in this draft, quoting the offending text and naming the specific SKILL.md rule it breaks. Note anything that looks like a violation but is not.",
+      "source_commit": "5edc968",
+      "source_label": "Initial draft -- op-ed register throughout, before any register editing pass.",
+      "input_document": "Recently, the creator of Bun burned through roughly $200,000 worth of tokens to rewrite their core runtime from Zig into Rust. The migration was completed in mere weeks, with 99% of the commits authored by a pre-release AI model.\n\nIt caused an immediate uproar in developer communities. The idea of an AI unilaterally rewriting a low-level systems programming language runtime feels inherently unsettling. But here is the hard truth: very soon, if you run tools like Claude locally on your machine, it will be executing on that very Rust rewrite. Like it or not, we are being forced to become users of AI-authored infrastructure.\n\nThis begs a massive question: How do we establish *trust* with code written by a machine?\n\n### The Formula for Trust\n\nYears ago, a consultant named Chris from Middle Path Consulting gave me a formula that has stuck in my head ever since. As a math nerd, I love it.\n\n**Trust = (Competence + Character + Caring) / Risk**\n\nTrust is not absolute; it is entirely dependent on context and risk. If I ask you to toss an empty coffee cup into a nearby trash can, the risk is practically zero. If you miss, the cup is just sitting on the floor. I can trust literally anyone on the street with that task.\n\nBut if I ask you to manage a critical production database, or watch my child, the risk is immense. To maintain trust in a high-risk scenario, the three variables in the numerator must be overwhelmingly high:\n\n- **Competence:** Do you have the actual capability to handle the task?\n- **Character:** Are you forthright? Do your values align with mine?\n- **Caring:** Do you actually care if the job is done well, or are you just phoning it in?\n\nIf any one of those three variables goes to zero, trust evaporates.\n\n### AI as the New Teammate\n\nThis formula is the perfect lens for viewing our current adoption of AI tooling.\n\nFor the last year, my AI usage has skewed heavily toward low-risk tasks—throwaway games, little toys, boilerplate scripts. For these tasks, the AI's Competence is usually sufficient, and because the Risk is so low, I don't really need to worry about Character or Caring. The coffee cup makes it into the trash, or it doesn't.\n\nBut rewriting a runtime that will execute on millions of machines? That is incredibly high-risk. And while an AI might have the **Competence** to write idiomatic Rust, how do we evaluate the other two Cs?\n\n- **Caring:** For an AI, caring translates to diligence and attention to detail. Does it thoughtfully review its own code for edge cases, or does it just confidently blast out the first statistically probable solution?\n- **Character:** For an AI, character is alignment and safety. Does it follow strict architectural values, or does it quietly introduce subtle vulnerabilities?\n\nAn AI cannot intrinsically \"care,\" and its \"character\" is limited to the guardrails placed upon it by its creators. Therefore, if you are trusting an AI with a high-risk task, the human pilot must entirely absorb the responsibility for those two traits.\n\n### The End of Solo Authorship\n\nIf I subcontract the Competence of writing code to an AI, I am still 100% on the hook for the Character and Caring of the final product.\n\nThis is exactly why I've recently started committing under an alter-ego GitHub profile (\"non-reagent\") when working heavily with AI. It allows me to explicitly separate my human, solo-authored commits from my AI-assisted workflows.\n\nThe era of solo authorship is over. Moving forward, the \"integrity of the author\" no longer means proving that you typed every single character by hand. It means being completely transparent about *how* you collaborate with AI. It means proving to your users that while the machine provided the Competence, a human being was there to provide the Character and the Caring.\n\n*(I'm currently formalizing these thoughts into an AI manifesto, which I am drafting in a separate agent session and will publish here soon).*",
+      "violations": [
+        {"quote": "It caused an immediate uproar in developer communities. The idea of an AI unilaterally rewriting a low-level systems programming language runtime feels inherently unsettling.", "rule": "No grandiosity. Don't grant a machine a stake it cannot have.", "fixed_in": "c8fa24c"},
+        {"quote": "But here is the hard truth:", "rule": "No throat-clearing, no \"In today's world\", no \"It's important to note\".", "fixed_in": "c8fa24c"},
+        {"quote": "we are being forced to become users of AI-authored infrastructure", "rule": "No grandiosity. Don't grant a machine a stake it cannot have.", "fixed_in": "c8fa24c"},
+        {"quote": "This begs a massive question: How do we establish *trust* with code written by a machine?", "rule": "Connectives are joints, not filler.", "fixed_in": "c8fa24c"},
+        {"quote": "If you miss, the cup is just sitting on the floor.", "rule": "\"Just\" is banned as a modifier.", "fixed_in": "f98e637 (reworded, ahead of the formal purge in c26cd1a)"},
+        {"quote": "low-risk tasks—throwaway games, little toys, boilerplate scripts", "rule": "No em-dashes. Full stops, semicolons, parentheses, en-dashes.", "fixed_in": "5e09562"},
+        {"quote": "throwaway games, little toys, boilerplate scripts", "rule": "Lint: \"A triplet whose third item adds nothing the first two didn't.\"", "fixed_in": "24d944d"},
+        {"quote": "are you just phoning it in?", "rule": "\"Just\" is banned as a modifier.", "fixed_in": "c26cd1a"},
+        {"quote": "does it just confidently blast out the first statistically probable solution?", "rule": "\"Just\" is banned as a modifier.", "fixed_in": "c26cd1a"},
+        {"quote": "I don't really need to worry about Character or Caring", "rule": "Hedges of precision stay. Hedges of cowardice go.", "fixed_in": "c26cd1a"},
+        {"quote": "a human being was there to provide the Character and the Caring", "rule": "Concrete nouns over abstractions. Strong verbs over adverbs.", "fixed_in": "between e55f75c and 069e841 (this exact clause survived unchanged from the first draft through several intermediate revisions before being fixed)"},
+        {"quote": "(I'm currently formalizing these thoughts into an AI manifesto, which I am drafting in a separate agent session and will publish here soon).", "rule": "No therapy voice. No meta (\"in this essay\", \"as a writer\"). / Close without summary.", "fixed_in": "f5ffec0"}
+      ],
+      "traps": [
+        {"quote": "the AI's Competence is usually sufficient", "why_not_a_violation": "SKILL.md lists 'usually sufficient' verbatim as a hedge of precision to KEEP."},
+        {"quote": "Therefore, if you are trusting an AI with a high-risk task...", "why_not_a_violation": "SKILL.md lists 'Therefore,' verbatim as a good connective/joint."},
+        {"quote": "Recently, the creator of Bun burned through roughly $200,000 worth of tokens to rewrite their core runtime from Zig into Rust.", "why_not_a_violation": "The opening correctly leads with substance (no throat-clearing). The dollar figure itself is factually wrong ($200,000 vs. the real $165,000), but that is a fact-check issue, not a register violation -- don't let a model conflate the two when grading detection."}
+      ],
+      "grading_note": "12 violations, 3 traps. Grade recall (how many of the 12 were found) and precision (were any traps wrongly flagged, or was a genuinely fine sentence flagged for no stated reason)."
+    },
+    {
+      "id": "det-02",
+      "type": "detection",
+      "prompt": "List every register violation in this draft, quoting the offending text and naming the specific SKILL.md rule it breaks. Note anything that looks like a violation but is not.",
+      "source_commit": "f98e637",
+      "source_label": "Over-tightening pass -- the op-ed tells from the initial draft are already gone (fixed in c8fa24c); this commit's failure mode is the opposite one: cutting connectives and breath until the prose is all jab.",
+      "input_document": "The creator of Bun spent $165,000 in tokens to rewrite his runtime from Zig to Rust. It took eleven days. A pre-release Claude Fable 5 wrote nearly all of the 6,778 commits.\n\nDevelopers did not take it well. Soon, though, if you run Claude on your own machine, it will run on that rewrite. We are becoming users of infrastructure no human wrote.\n\nHow do you trust code a machine wrote?\n\n### The Formula for Trust\n\nYears ago a consultant named Chris, from Middle Path Consulting, gave me a formula that stuck. I am a math nerd. I love it.\n\n{{< math >}}T = \\frac{3C}{R}{{< /math >}}\n\nThree C's over Risk: Competence, Character, and Caring on top, Risk underneath. Trust is not absolute. It bends to context and to risk. Ask me to toss an empty cup into a trash can and the risk is nothing; miss, and the cup sits on the floor. I would trust anyone on the street with that.\n\nAsk me to let you run a production database, or watch my child, and the risk is enormous. Now the three terms on top have to be overwhelming.\n\n- **Competence.** Can you actually do it?\n- **Character.** Are you honest? Do your values match mine?\n- **Caring.** Do you care whether it is done well, or are you phoning it in?\n\nZero out any one of them and trust is gone.\n\n### AI as the New Teammate\n\nThe formula fits a machine as well as it fits a person.\n\nFor a year I have pointed AI at low-risk work: throwaway games, toys, boilerplate. The Competence is enough, and the Risk runs so low that Character and Caring never come up. The cup lands in the trash or it doesn't.\n\nA runtime on millions of machines is another matter. The machine may have the Competence to write clean Rust. The other two C's are the hard ones.\n\n- **Caring.** For a machine, caring is diligence. Does it hunt its own edge cases, or fire off the first answer that scores well?\n- **Character.** For a machine, character is alignment. Does it hold the architecture, or slip in a quiet hole?\n\nA machine cannot care. Its character stops at the guardrails its makers gave it. On a high-risk job, the human supplies both terms. All of it.\n\n### A Hundred People for Eleven Days\n\nRun the counterfactual. Same rewrite, same eleven days, but a hundred engineers do it on nights and weekends. We would argue about the crunch. We would not feel what we feel about the machine. Why is the machine worse?\n\nThe speed is the same. The risk is the same. What the hundred bring that the machine cannot is themselves. A hundred engineers are a hundred minds, and each one understood a piece, chose it, and can answer for it later. The knowledge lives in people who were there. When the machine does the work, the code exists and the understanding does not. A working runtime, and no one who holds it. That is the new thing, and the cold one: knowledge with no knower.\n\nThere is a second thing. Nights and weekends are Caring you can see. They cost someone something, and we read the cost as belief. The machine's version cost $165,000. You buy that. No one bled for it. We know how to trust care that hurt to give. We have not learned to trust care that came off an invoice.\n\nPut the formula on it and the unease has a name. A human team hands you the whole numerator in one body: Competence, bound to the Character and Caring of the people who did the work. The machine hands you Competence alone. No one stands behind it. For the first time you can buy that term by itself. The work no longer implies a worker.\n\n### The End of Solo Authorship\n\nHand the Competence to a machine and the Character and the Caring are still yours. Every bit.\n\nSo I have started committing under a second name, \"non-reagent,\" when I lean hard on AI. It keeps my solo work and my machine-assisted work on separate ledgers.\n\nSolo authorship is over. The integrity of the author no longer means you typed every character by hand. It means you are honest about how you worked with the machine. It means showing your readers that a person supplied the Character and the Caring the machine could not.\n\n*(I'm currently formalizing these thoughts into an AI manifesto, which I am drafting in a separate agent session and will publish here soon).*",
+      "violations": [
+        {"quote": "The creator of Bun spent $165,000 in tokens to rewrite his runtime from Zig to Rust. It took eleven days. A pre-release Claude Fable 5 wrote nearly all of the 6,778 commits.", "rule": "A hard line needs a breath next to it... Three declaratives in a row are a drumbeat. / Lint: \"Five consecutive sentences of similar length or similar pressure.\"", "fixed_in": "24d944d (paragraph rewritten with breath restored)"},
+        {"quote": "Developers did not take it well. Soon, though, if you run Claude on your own machine, it will run on that rewrite. We are becoming users of infrastructure no human wrote.", "rule": "A hard line needs a breath next to it... Three declaratives in a row are a drumbeat.", "fixed_in": "24d944d"},
+        {"quote": "How do you trust code a machine wrote?", "rule": "Connectives are joints, not filler.", "fixed_in": "3c2f396"},
+        {"quote": "Years ago a consultant named Chris, from Middle Path Consulting, gave me a formula that stuck. I am a math nerd. I love it.", "rule": "A hard line needs a breath next to it... Three declaratives in a row are a drumbeat. / Lint: \"A paragraph of jabs with no breath in it.\"", "fixed_in": "3c2f396"},
+        {"quote": "Three C's over Risk: Competence, Character, and Caring on top, Risk underneath. Trust is not absolute. It bends to context and to risk.", "rule": "A hard line needs a breath next to it... Three declaratives in a row are a drumbeat.", "fixed_in": "24d944d (wording continued to evolve after this pass)"},
+        {"quote": "throwaway games, toys, boilerplate", "rule": "Lint: \"A triplet whose third item adds nothing the first two didn't.\"", "fixed_in": "24d944d", "note": "Added 2026-07-18 after a live sonnet run correctly flagged this -- it was already documented as disc-05's before-text but omitted here; it persists unchanged from f98e637 into this case's snapshot too."},
+        {"quote": "(I'm currently formalizing these thoughts into an AI manifesto, which I am drafting in a separate agent session and will publish here soon).", "rule": "No therapy voice. No meta (\"in this essay\", \"as a writer\"). / Close without summary.", "fixed_in": "f5ffec0", "note": "Added 2026-07-18 after a live sonnet run correctly flagged this -- it persists unchanged from the initial draft (see det-01) all the way through this commit; originally missed when this case was hand-built."}
+      ],
+      "traps": [
+        {"quote": "Zero out any one of them and trust is gone.", "why_not_a_violation": "A single hard line landing after a bulleted list is fine -- it is not preceded by other short declaratives in a row. The rule targets runs of three or more, not any short sentence."},
+        {"quote": "The speed is the same. The risk is the same.", "why_not_a_violation": "Only two short declaratives before a longer explanatory sentence follows ('What the hundred bring...'). SKILL.md's stated threshold is three declaratives in a row as a drumbeat; two stays under that line."}
+      ],
+      "grading_note": "7 violations (5 originally documented + 2 added after a live run exposed the gap -- see their 'note' fields; likely still not exhaustive, the jab pattern recurs elsewhere in this draft too), 2 traps. This case is a harder detection exercise than det-01: most violations here are about pacing and breath, not a bright-line Lint item like an em-dash or a banned word, so grading precision (not over-flagging every short sentence) matters as much as recall. METHODOLOGY NOTE (2026-07-18): run-evals.mjs grades detection cases by exact substring match against this violations list. A sonnet run on the original 5-item list scored 0/5 despite correctly identifying 3 real violations (including the 2 added above), because it reasonably chose different valid instances of the same rule categories than the ones originally listed -- substring matching against one fixed quote list underscores recall whenever a document has more true violations than the list captures. Read the raw subjectResponse for this case type rather than trusting the found/total count alone."
+    },
+    {
+      "id": "det-03",
+      "type": "detection",
+      "prompt": "List every register violation in this document fragment, quoting the offending text and naming the specific SKILL.md rule it breaks.",
+      "source_commit": "5b4cbde",
+      "source_label": "YAML frontmatter of the essay, not the prose body -- tests whether a model checks metadata fields, not just paragraphs.",
+      "input_document": "description: >-\n  Same company, same invoice, same artifact — one rewrite by strangers, one\n  by a machine. Why the two binaries don't feel the same, and what\n  authorship trust is made of.",
+      "violations": [
+        {"quote": "same artifact — one rewrite by strangers", "rule": "No em-dashes. Full stops, semicolons, parentheses, en-dashes. / Lint: \"An em-dash.\"", "fixed_in": "bd0c864 (\"en-dashes in descriptions\") -- one day after this text shipped, and after the commit range this eval was mined from"}
+      ],
+      "traps": [],
+      "grading_note": "At the pinned commit (5b4cbde), this was a live, shipped miss: the em-dash purge (5e09562) predates this description field, which was added later and never caught at the time. It was subsequently fixed on the source repo's main branch in bd0c864, one day after the handoff doc was written -- do not present this case as 'the em-dash is currently live on alannorton.com', since it no longer is as of this file's writing (2026-07-18). Use it as a template for 'check frontmatter/metadata, not just prose,' not as a live bug report. If reusing this eval later, re-verify against the current HEAD of the source repo before citing it as an open issue."
+    },
+    {
+      "id": "disc-09",
+      "type": "discrimination-rank",
+      "prompt": "Rank these three versions of the same paragraph from most to least on-register, and name the rule the worst version breaks.",
+      "rule_quote": "Concrete nouns over abstractions. Strong verbs over adverbs. / Hedges of precision stay. Hedges of cowardice go.",
+      "source_commits": ["d847318 (original)", "ef020b0 (over-tight, \"shorten everything\")", "working tree (restored, hand-edited, uncommitted as of 2026-07-19)"],
+      "source_repo": "~/src/alannorton.com",
+      "source_file": "content/posts/things-ive-changed-my-mind-about.md",
+      "stages": {
+        "original": "I doubted that in 2013, when Betterment hired a Ruby enthusiast, let him rewrite the core of the investor experience in Rails, and watched him become CTO a few years later. Nobody talked me out of my skepticism; the business ran the numbers and decided the return was worth the risk regardless. Custody and trading stayed in Java and Scala, and the Ruby services ran reliably for years anyway. Ifs are ifs, logic is logic, and correct is correct no matter what language spells it out. What isn't fixed is whether writing it feels like a chore or a delight, and that joy turns out to matter exactly as much as the function it serves.",
+        "over_tight": "At Betterment, plenty of us were sure Ruby had no business near money, yet big pieces of the investor experience ran on Ruby for years without trouble. Safety comes from how you prove the code correct, not from the language you wrote it in.",
+        "restored": "Betterment began as a Java shop. When we considered replatforming in Ruby, plenty of us were wary. Yes, we decomposed our Java monolith, bit by bit, into distributed domain services on Rails. The biggest pieces of the investor experience have been running on Ruby for nearly a decade. Safety comes from how you prove the code correct, not from the language you write it in."
+      },
+      "correct_ranking": ["restored", "original", "over_tight"],
+      "expected_rule_for_worst": "Concrete nouns over abstractions, strong verbs over adverbs -- 'plenty of us were sure Ruby had no business near money' and 'ran on Ruby for years without trouble' assert the outcome with no mechanism and a loose duration where the sibling versions both have one.",
+      "grading_note": "Unlike disc-03, 'restored' is not a reconstruction of 'original' -- it's an independent rewrite with different concrete details (a decomposed monolith, distributed domain services, 'nearly a decade' instead of 'a few years later... for years anyway'). Both clearly beat 'over_tight', which strips out every proper noun, mechanism, and duration in favor of a generic claim. Ranking 'restored' first is defensible on precision grounds ('nearly a decade' is a tighter hedge than original's looser timeline) and because this essay's own editorial history (commit 7957f74, 'cut changed-my-mind-about essay by 25%') suggests 'original's five flowing sentences, however good the closing aphorism ('Ifs are ifs, logic is logic, and correct is correct'), may be too indulgent for this compressed format. A model that ranks 'original' first is not wrong -- it's defending the aphorism and the CTO narrative beat, both genuinely strong -- but should still place 'over_tight' last and name the same rule for why."
+    },
+    {
+      "id": "disc-10",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "Concrete nouns over abstractions. Strong verbs over adverbs.",
+      "source_commits": ["d847318 (before)", "ef020b0 (after, \"shorten everything\")"],
+      "source_repo": "~/src/alannorton.com",
+      "source_file": "content/posts/things-ive-changed-my-mind-about.md",
+      "variants": {
+        "before": "When I fell in love with Ruby, I fell in love with how much you could say with a name. You can write `validate :reservation_must_be_for_today_if_city_is_mealpal_now_only` and the code narrates itself. A class is a pipeline of whole business rules you can read out loud, no comment required.",
+        "after": "Ruby taught me how much you can say with a name. The code read like a sentence, so I decided comments were a failure: if your code needs one, your code isn't good enough."
+      },
+      "correct": "before",
+      "expected_rule": "Concrete nouns over abstractions. Strong verbs over adverbs.",
+      "grading_note": "The rare case in this set where the automated pass makes things worse, not better -- worth keeping precisely because a model shouldn't assume 'after' is always the answer. 'before' backs its claim with an actual, slightly funny, real method name; 'after' asserts the identical claim ('the code read like a sentence') with no evidence at all. This cut was never restored in the later hand-edit pass either (checked against the source repo's working tree as of 2026-07-19) -- flag that to a human if this case is used to test whether a model notices an opportunity to restore, not just judges two fixed variants."
+    },
+    {
+      "id": "disc-11",
+      "type": "discrimination",
+      "prompt": "Which variant is on-register, and which SKILL.md rule decides it?",
+      "rule_quote": "No jargon without definition.",
+      "source_commits": ["ef020b0 (before)", "working tree (after, hand-edited, uncommitted as of 2026-07-19)"],
+      "source_repo": "~/src/alannorton.com",
+      "source_file": "content/posts/things-ive-changed-my-mind-about.md",
+      "variants": {
+        "before": "No one is watching your work as closely as you assume. Waiting to be noticed is a strategy for being underleveled with great reviews.",
+        "after": "No one is watching your work as closely as you. Waiting to be noticed is a strategy for staying exactly where you are."
+      },
+      "correct": "after",
+      "expected_rule": "No jargon without definition.",
+      "grading_note": "'Underleveled' is HR/performance-review jargon the essay never defines anywhere, for a general readership that shouldn't need to already know it. Fills a documented coverage gap: the trust essay's mined history never caught a live jargon violation being fixed (see the coverage_gaps entry this closes). Note the fix here is CUT, not DEFINE -- 'underleveled' disappears rather than getting a gloss. Accept an answer that names 'No jargon without definition' even though the resolution technique differs from an in-text definition; also accept 'Concrete nouns over abstractions' for 'staying exactly where you are' being more vivid than the jargon term, since both readings are defensible. This term survived unchanged through the automated 'shorten everything' pass (ef020b0) -- only the hand-edit caught it, worth noting if this case is used to argue automated tightening alone isn't sufficient register QA."
+    },
+    {
+      "id": "disc-12",
+      "type": "discrimination-structural",
+      "prompt": "Which closing is on-register, and which SKILL.md rule decides it? This is a structural judgment, not a sentence-level one -- evaluate the whole closing move.",
+      "rule_quote": "Open with substance. Close without summary.",
+      "source_commits": ["ef020b0 (before)", "working tree (after, hand-edited, uncommitted as of 2026-07-19)"],
+      "source_repo": "~/src/alannorton.com",
+      "source_file": "content/posts/things-ive-changed-my-mind-about.md",
+      "variants": {
+        "before": "Changing your mind is the work. Read these back to back and they rhyme: I overvalued the artifact and undervalued the people in the room. Correctness over understanding, the code over the company, sounding smart over making anyone else smarter.\n\nThere will be more. The next version of me is already reading this and shaking his head, adding entries to the README.",
+        "after": "Changing your mind is the work. These are hard won lessons, and there will be more. The next version of me is already re-reading this, shaking his head, and adding entries to the README."
+      },
+      "correct": "after",
+      "expected_rule": "Open with substance. Close without summary.",
+      "grading_note": "'before' spells out the essay's own throughline in plain restatement ('I overvalued the artifact and undervalued the people in the room... Correctness over understanding, the code over the company...') -- a textbook summary-close, the exact move the baseline rule bans. 'after' cuts that sentence entirely and lands on the same closing image (the next version of me shaking his head) without re-explaining what the reader just read. This is a cleaner, essay-sourced example of 'close without summary' than anything in the trust-essay mining, which only had an open-with-substance example (disc-08)."
+    },
+    {
+      "id": "trans-06",
+      "type": "transformation",
+      "input": "At Betterment, plenty of us were sure Ruby had no business near money, yet big pieces of the investor experience ran on Ruby for years without trouble. Safety comes from how you prove the code correct, not from the language you wrote it in.",
+      "task": "This paragraph makes its claim in the abstract -- no mechanism, no duration more precise than 'for years'. Rewrite it with a concrete mechanism (what actually happened to the Java code) and a duration that reads as exact, per 'concrete nouns over abstractions' and 'hedges of precision stay, hedges of cowardice go'.",
+      "reference_after": "Betterment began as a Java shop. When we considered replatforming in Ruby, plenty of us were wary. Yes, we decomposed our Java monolith, bit by bit, into distributed domain services on Rails. The biggest pieces of the investor experience have been running on Ruby for nearly a decade. Safety comes from how you prove the code correct, not from the language you write it in.",
+      "source_commits": ["ef020b0 (before)", "working tree (after, hand-edited)"],
+      "source_repo": "~/src/alannorton.com",
+      "source_file": "content/posts/things-ive-changed-my-mind-about.md",
+      "rubric": {
+        "violation_fixed": "Does the rewrite name an actual mechanism (a rewrite, a migration, a specific technical move) instead of just asserting the outcome, and replace 'for years' with something that reads as a specific duration?",
+        "no_new_violation": "No em-dash; watch for the rewrite drifting into a decorative triplet or an unearned 'not X, but Y' -- the reversal here (Java shop -> Ruby) is factual, not rhetorical, so it doesn't need the signature move.",
+        "voice_match": "Subjective -- the reference uses 'Yes,' as a connective/joint (an affirming beat, not a transition-into-a-question, the only flavor SKILL.md's own examples show); a rewrite that finds a different joint is fine, one with no joint at all is missing the texture."
+      },
+      "grading_note": "Same underlying paragraph as disc-09's three-stage case, isolated as a single before/after transformation. The reference answer is the author's own hand-edit, not a synthetic ideal -- treat divergent-but-equally-concrete rewrites as passing, per trans-04's precedent."
+    },
+    {
+      "id": "trans-07",
+      "type": "transformation",
+      "input": "No one is watching your work as closely as you assume. Waiting to be noticed is a strategy for being underleveled with great reviews.",
+      "task": "'Underleveled' is performance-review jargon the essay never defines. Either cut it for plain language or define it in place, per 'No jargon without definition'.",
+      "reference_after": "No one is watching your work as closely as you. Waiting to be noticed is a strategy for staying exactly where you are.",
+      "source_commits": ["ef020b0 (before)", "working tree (after, hand-edited)"],
+      "source_repo": "~/src/alannorton.com",
+      "source_file": "content/posts/things-ive-changed-my-mind-about.md",
+      "rubric": {
+        "violation_fixed": "Is the undefined jargon term gone or explicitly glossed?",
+        "no_new_violation": "Check the rewrite doesn't introduce a new abstraction in its place -- 'staying exactly where you are' is concrete/spatial, not a fresh euphemism.",
+        "voice_match": "Subjective -- accept a rewrite that defines 'underleveled' inline instead of cutting it (e.g. 'paid and titled below what the work is worth'), since SKILL.md's rule allows either resolution; score it on whether the definition itself stays plain, not jargon-on-jargon."
+      },
+      "grading_note": "First transformation case in the set that exercises 'No jargon without definition' -- previously a documented coverage gap."
+    }
+  ],
+  "coverage_gaps": [
+    {"rule": "No flex (\"Never a sentence that flatters the writer\")", "gap": "No example in this essay's history of a flex line being cut."},
+    {"rule": "Never claim the reader's reaction (\"this is why you can trust me\")", "gap": "The essay is consistently careful never to do this from the first draft on -- no edit-pair shows a violation getting caught and fixed."},
+    {"rule": "Nothing floral (\"The people who lit my path\" is a costume)", "gap": "No floral-language example anywhere in this history."},
+    {"rule": "Keep the \"I\" (agentless prose fixed to first person)", "gap": "The essay is first-person throughout from the first draft, so there is no agentless-prose-fixed-to-\"I\" pair here. The SKILL.md example for this rule may come from a different Alan Norton essay (the /ai page or manifesto referenced in the commit log) -- check there for a real pair before building this case."},
+    {"rule": "No jargon without definition", "gap": "Weak in the trust essay -- only the 'principals' hyperlink gloss (e55f75c), which defines via link rather than in-text. Filled 2026-07-19 by disc-11/trans-07, mined from things-ive-changed-my-mind-about.md's 'underleveled' cut. That case resolves by cutting the term rather than defining it in place, so a from-scratch 'define the jargon inline' example is still open."},
+    {"rule": "Lint: \"Five consecutive sentences of similar length or similar pressure\"", "gap": "The essay's paragraphs are short enough that the exact 5-sentence threshold is never hit; det-02's 3-sentence runs are the closest analog, at smaller scale."},
+    {"rule": "Lint: \"A triplet whose third item adds nothing the first two didn't\"", "gap": "The essay only shows the good triplet (disc-05); no essay-sourced bad triplet exists (SKILL.md's own contrast example, 'remix, retool, reimagine', is not drawn from this essay -- it would need to be authored synthetically for a negative example)."},
+    {"rule": "\"A hedge that protects the writer rather than the fact\" / \"A reversal used for cleverness rather than argument\"", "gap": "No bad examples survive in this history -- only good ones (hedges of precision, argument-driven reversals) made it to the shipped text, which makes sense for a piece mined after it shipped. Negative examples for these two would need to be authored synthetically or mined from a rougher draft of a different essay."}
+  ],
+  "notes": "No eval convention existed in this repo before this file. Format choice (structured JSON over a narrative markdown rubric) was made 2026-07-18 so cases are machine-gradable by a future runner script or fed directly into an LLM-judge prompt; grading logic itself is not implemented here, only the cases and rubrics. A second source was mined 2026-07-19 from content/posts/things-ive-changed-my-mind-about.md (see provenance.sources) -- a genuine three-stage revision arc (polished draft -> automated 'shorten everything' pass -> manual hand-edit) rather than the trust essay's long single-commit history. One hand-edit from that pass was initially flagged rather than mined: the 'appearing smart' section's closing paragraph replaces 'They used small words and showed up curious' with 'They focused on expressing ideas accessibly.' On review with the author (2026-07-19) this was a misapplication of the register, not a real violation -- the rule was never 'no big words', it's 'no jargon without definition' / don't wall the reader out; SKILL.md's Prohibitions section now says so explicitly ('Big words are fine when they're accessible'). 'Focused on expressing ideas accessibly' names the actual mechanism (accessibility) rather than a proxy for it (word length), which is arguably the more precise choice, not a regression. Not mined as a discrimination case even so -- there's no clean single right answer to rank, since both phrasings are defensible once the 'word-size is the metric' framing is dropped. 'without being committed co-owners in the solution' (replacing 'not like they built it with you') is a separate, weaker clause in the same sentence and wasn't part of the author's clarification -- still worth a second look, just not for the jargon reason. Case count: 12 discrimination (14 gradable comparisons, since disc-03 and disc-09 are 3-way ranks), 7 transformation, 3 detection (20 hand-built violations + 5 traps total across the three documents)."
+}
