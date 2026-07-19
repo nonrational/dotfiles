@@ -45,3 +45,7 @@
 # Skills may nest content (bin/, runs/, references/), so re-include every
 # depth — the one-level `!skills/*` form would leave nested files ignored.
 !skills/**
+
+# ...except a skill's own eval-run transcripts: timestamped, cost-bearing,
+# regenerated every run -- not something to accumulate in the repo.
+skills/*/results/
