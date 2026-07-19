@@ -44,9 +44,9 @@ reversal *is* the argument, not when it is a pivot for rhythm.
 The third item is rueful and specific; the first two are setup. Contrast a failure:
 "remix, retool, reimagine". Alliterative, decorative, three ways of saying one thing.
 
-**Connectives are joints, not filler.** "Which raises the question:", "Therefore,", "But if
-I ask you to…". They give the reader somewhere to breathe. Cut the scene-setting; keep the
-joints.
+**Connectives are joints, not filler.** "Which raises the question:", "Therefore,", "Yes,",
+"But if I ask you to…". They give the reader somewhere to breathe. Cut the scene-setting;
+keep the joints.
 
 **Hedges of precision stay. Hedges of cowardice go.**
 
@@ -55,16 +55,13 @@ joints.
 
 ## Prohibitions
 
-- **No flex.** Never a sentence that flatters the writer. If a line's real work is showing
-  how generous or sharp you are, cut it.
-- **Never claim the reader's reaction.** Make the case and stop. No "this is why you can
-  trust me". Trust is the reader's to award.
+- **No flex.** Never a sentence that flatters the writer. If a line's real work is showing how generous or sharp you are, cut it.
+- **Never claim the reader's reaction.** Make the case and stop. No "this is why you can trust me". Trust is the reader's to award.
 - **No grandiosity.** Don't grant a machine a stake it cannot have.
 - **Nothing floral.** "The people who lit my path" is a costume.
-- **Keep the "I".** Agentless policy prose loses the pledge. "The rule applies equally"
-  lost to "I don't run a quieter rule for probabilistic character generators".
+- **Keep the "I".** Agentless policy prose loses the pledge. "The rule applies equally" lost to "I don't apply a quieter rule for probabilistic character generators".
 - **"Just" is banned as a modifier.** It stacks the deck.
-- **No jargon without definition.**
+- **No jargon without definition.** Big words are fine when they're accessible; the ban is on words that wall a reader out, not on vocabulary.
 
 ## Where the breath comes from
 
@@ -73,7 +70,8 @@ Delight here is specific and a little self-aware. It is never punchy.
 - Comic understatement: *miss, and the whole disaster is a cup on the floor*
 - A human detail: *nights and weekends and too much coffee*
 - Rueful specificity: *a script that scratches an itch and never runs again*
-- A joke at your own expense, before anyone else makes it
+- A joke at your own expense, before anyone else makes it: *I'm sure about this because I've
+  been the villain of it.*
 - A joke that lands the argument rather than decorating it: *Slop, ironically, is sloppy.*
 
 ## Lint
