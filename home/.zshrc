@@ -56,7 +56,6 @@ function puma-dev-ln () {
   echo ln -sf $1 "~/.puma-dev/$(basename $1).loc"
 }
 
-alias git='hub'
 alias ls='ls -F'
 alias ll='ls -l'
 alias l='ls'

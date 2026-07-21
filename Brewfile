@@ -24,10 +24,10 @@ brew "fzf"                 # Command-line fuzzy finder written in Go
 brew "gettext"             # GNU internationalization (i18n) and localization (l10n) library
 brew "gh"                  # GitHub command-line tool
 brew "git"                 # Distributed revision control system
+brew "git-town"            # High-level command-line interface for Git (`git up` -> `git town sync`)
 brew "gnu-sed"             # GNU implementation of the famous stream editor
 brew "gnu-tar"             # GNU version of the tar archiving utility
 brew "gnupg"               # GNU Privacy Guard (OpenPGP)
-brew "hub"                 # Add GitHub support to git on the command-line (`git up` -> `hub sync`)
 brew "jq"                  # Lightweight and flexible command-line JSON processor
 brew "just"                # Handy way to save and run project-specific commands
 brew "libass"              # Subtitle renderer for the ASS/SSA subtitle format

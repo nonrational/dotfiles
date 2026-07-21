@@ -4,6 +4,9 @@ MAX_DEPTH=${1:-3}
 
 for d in $(find . -maxdepth $MAX_DEPTH -type d -name .git); do
     cd $(dirname "$d")
-    git up
+    # --no-push: a bulk sweep only fast-forwards and prunes, never publishes.
+    # </dev/null: in repos git-town isn't configured for, `git up` then fails
+    # with a one-line hint instead of launching the interactive setup assistant
+    git up --no-push < /dev/null
     cd - &> /dev/null
 done

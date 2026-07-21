@@ -5,12 +5,27 @@
   # Copy the current branch name
   bcp = "!git branch --show-current | pbcopy"
 
-  # Fetch and fast-forward local branches (hub is brew-installed)
-  up = "!git f && hub sync"
+  # Fetch, then sync all local branches and stacks, pruning merged ones
+  # (git-town is brew-installed; sync-tags=false keeps tag handling in `git f`)
+  up = "!git f && git town sync --all"
 
   # Browse code in a browser (falls back to `open` for non-GitHub remotes)
   bro = "!. ~/.githelpers && git_browse_web"
   pro = "!. ~/.githelpers && git_browse_pull_request"
+
+[git-town]
+  # Merge, not rebase: force-pushing a synced branch detaches inline review
+  # comments on its open PR. Explicit even though it's the current default.
+  sync-feature-strategy = merge
+  # Reach the GitHub API through gh's existing auth; no separate token.
+  github-connector = gh
+  # Branches git-town has no lineage for just fast-forward from their tracking
+  # branch instead of erroring/prompting for a parent — hub-sync parity, and it
+  # keeps `git town sync --all` (via `git up`) non-interactive.
+  unknown-branch-type = observed
+  # Don't push local tags to the remote as a side effect of syncing; `git f`
+  # (chained in the `up` alias) already fetches tags, forced.
+  sync-tags = false
 
 [merge]
   tool = smerge

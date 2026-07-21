@@ -3,9 +3,6 @@
   email = git@nonration.al
 [github]
   user = nonrational
-[hub]
-  protocol = https
-  user = nonrational
 
 [include]
   path = ~/.local/.gitconfig
