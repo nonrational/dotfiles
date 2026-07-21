@@ -1,1 +1,1 @@
-../../.claude/rules/prudence.md
+../../.agents/rules/prudence.md

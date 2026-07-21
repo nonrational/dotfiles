@@ -1,0 +1,5 @@
+# A skill's eval-run transcripts: timestamped, cost-bearing, regenerated every
+# run -- not something to accumulate in the repo. This exclusion used to live in
+# home/.claude/.gitignore; it moved here with the skills when .agents became the
+# source of truth (home/.claude/skills is now just a symlink into here).
+*/results/

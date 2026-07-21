@@ -1,1 +1,1 @@
-../../.claude/rules/language.md
+../../.agents/rules/language.md

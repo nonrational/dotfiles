@@ -1,1 +1,1 @@
-../../.claude/rules/workflow.md
+../../.agents/rules/workflow.md

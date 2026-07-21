@@ -1,1 +1,1 @@
-../../.claude/rules/improvement.md
+../../.agents/rules/improvement.md

@@ -1,4 +1,5 @@
 # source                 target                condition
+home/.agents             ~/.agents
 home/.bash_completion    ~/.bash_completion
 home/.bash_completion.d  ~/.bash_completion.d
 home/.bash_profile       ~/.bash_profile
