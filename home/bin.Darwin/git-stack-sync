@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+#
+# git-stack-sync — ripple a merge up a stack of PRs.
+#
+# Derives the stack from GitHub PR base refs (not a hardcoded list), then merges
+# each branch into its child, bottom-up, pushing as it goes. Stops at the first
+# conflict and leaves the tree exactly where you can fix it.
+#
+#   git-stack-sync                  # stack containing the current branch
+#   git-stack-sync feat/my-tip      # stack whose tip is this branch
+#   git-stack-sync --dry-run        # print the plan, touch nothing
+#
+# Merge, not rebase: these branches have open PRs with review threads on them.
+# `git rebase --update-refs` would sync the whole stack in one command, but it
+# force-pushes, which detaches review comments from their lines. If nothing is
+# under review yet, prefer the rebase.
+
+set -euo pipefail
+
+TRUNKS="main master"
+DRY_RUN=0
+TIP=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) DRY_RUN=1 ;;
+    -*) echo "unknown flag: $arg" >&2; exit 2 ;;
+    *) TIP="$arg" ;;
+  esac
+done
+
+[[ -n "$TIP" ]] || TIP="$(git branch --show-current)"
+[[ -n "$TIP" ]] || { echo "detached HEAD and no branch given" >&2; exit 2; }
+
+is_trunk() { for t in $TRUNKS; do [[ "$1" == "$t" ]] && return 0; done; return 1; }
+
+# Where is this branch checked out? Empty if nowhere.
+worktree_of() {
+  git worktree list --porcelain \
+    | awk -v want="refs/heads/$1" '/^worktree /{p=$2} /^branch /{if ($2==want) print p}'
+}
+
+# --- Build the chain by walking PR base refs upward -------------------------
+# Result: CHAIN = (main … tip), trunk first.
+chain=("$TIP")
+cursor="$TIP"
+while ! is_trunk "$cursor"; do
+  base="$(gh pr view "$cursor" --json baseRefName --jq .baseRefName 2>/dev/null || true)"
+  if [[ -z "$base" ]]; then
+    echo "no open PR for '$cursor' — can't tell what it stacks on." >&2
+    echo "Open its PR, or pass the tip of a fully-PR'd stack." >&2
+    exit 1
+  fi
+  for seen in "${chain[@]}"; do
+    [[ "$seen" == "$base" ]] && { echo "cycle in PR bases at '$base'" >&2; exit 1; }
+  done
+  chain=("$base" "${chain[@]}")
+  cursor="$base"
+done
+
+if [[ ${#chain[@]} -lt 2 ]]; then
+  echo "'$TIP' sits directly on trunk — nothing to ripple."
+  exit 0
+fi
+
+echo "Stack:"
+for ((i = 0; i < ${#chain[@]}; i++)); do
+  loc="$(worktree_of "${chain[$i]}")"
+  printf '  %s%s%s\n' "$([[ $i -gt 0 ]] && printf '  ↑ ')" "${chain[$i]}" \
+    "$([[ -n "$loc" ]] && printf '   [checked out: %s]' "$loc")"
+done
+echo
+
+if [[ $DRY_RUN -eq 1 ]]; then
+  for ((i = 1; i < ${#chain[@]}; i++)); do
+    echo "would merge ${chain[$((i - 1))]} -> ${chain[$i]}"
+  done
+  exit 0
+fi
+
+git fetch --all --prune --quiet
+
+# --- Ripple ----------------------------------------------------------------
+scratch=""
+cleanup() { [[ -n "$scratch" && -d "$scratch" ]] && git worktree remove --force "$scratch" 2>/dev/null || true; }
+trap cleanup EXIT
+
+for ((i = 1; i < ${#chain[@]}; i++)); do
+  parent="${chain[$((i - 1))]}"
+  child="${chain[$i]}"
+
+  # A branch already checked out somewhere must be merged *there* — git refuses
+  # to check it out twice. Otherwise borrow a scratch worktree.
+  wt="$(worktree_of "$child")"
+  if [[ -z "$wt" ]]; then
+    scratch="$(mktemp -d)/wt"
+    git worktree add --quiet "$scratch" "$child"
+    wt="$scratch"
+  fi
+
+  if [[ -n "$(git -C "$wt" status --porcelain)" ]]; then
+    echo "✗ $child has uncommitted changes in $wt — commit or stash, then re-run." >&2
+    exit 1
+  fi
+
+  # Only sync branches that are actually in step with the remote. Diverged local
+  # state means somebody rewrote history; guessing which side wins is not this
+  # script's job.
+  if git -C "$wt" rev-parse --verify --quiet "origin/$child" >/dev/null; then
+    local_sha="$(git -C "$wt" rev-parse "$child")"
+    remote_sha="$(git -C "$wt" rev-parse "origin/$child")"
+    if [[ "$local_sha" != "$remote_sha" ]]; then
+      if git -C "$wt" merge-base --is-ancestor "$local_sha" "$remote_sha"; then
+        git -C "$wt" merge --ff-only --quiet "origin/$child"
+      else
+        echo "✗ $child has diverged from origin/$child — reconcile it first." >&2
+        exit 1
+      fi
+    fi
+  fi
+
+  if git -C "$wt" merge-base --is-ancestor "origin/$parent" "$child"; then
+    echo "· $child already contains $parent"
+  else
+    echo "→ merging $parent into $child"
+    if ! git -C "$wt" merge --no-edit "origin/$parent"; then
+      echo >&2
+      echo "✗ conflict merging $parent into $child, in: $wt" >&2
+      echo "  Resolve there, 'git commit', push, then re-run to continue up the stack." >&2
+      [[ "$wt" == "$scratch" ]] && scratch=""   # keep it alive to fix in
+      exit 1
+    fi
+    git -C "$wt" push --quiet
+    echo "  pushed $child"
+  fi
+
+  if [[ "$wt" == "$scratch" ]]; then
+    git worktree remove --force "$scratch"
+    scratch=""
+  fi
+done
+
+echo
+echo "Stack synced."
