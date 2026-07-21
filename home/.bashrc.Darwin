@@ -1,14 +1,23 @@
 #!/usr/bin/env bash
 
+# macOS nags that zsh is the default now; bash here is deliberate
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
+# -w blocks until the tab closes, so tools that shell out to $EDITOR
+# (git commit, crontab -e) see the saved file; -n gives those short-lived
+# edits a window of their own
 export EDITNOW='subl -w'
 export EDITOR='subl -w -n'
+# -i case-insensitive search, -F quit if it fits on one screen, -R pass ANSI
+# colors through (git log/diff), -X leave output on screen after quitting
 export LESS="$LESS -i -F -R -X"
 
+# BSD tools (ls et al.) only colorize when CLICOLOR is set; TERM=xterm-color
+# for programs that gate color on the terminal type instead
 export CLICOLOR=1
 export TERM=xterm-color
 
+# /bin/ls pins the BSD ls no matter what PATH shuffling (GNU coreutils) does
 alias ls="/bin/ls -F"
 
 # Workaround for Homebrew tmuxinator issue
@@ -16,11 +25,18 @@ alias ls="/bin/ls -F"
 # https://discourse.brew.sh/t/why-does-tmuxinator-sets-gem-home/7296
 unset -v GEM_HOME
 
+# Raise the max open file descriptors (default 256/1024 is too low for dev servers, watchers, etc.)
+ulimit -n 4096
+
+# "(branch)" for the prompt: the sed drops every line but the current
+# ("* ") one, then rewraps it in parens
 parse_git_branch() {
   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
-# ... using \001 and \002 instead of \[ and \] can solve this issue.
+# \001/\002 mark the color codes as zero-width for readline so line wrapping
+# doesn't misplace the cursor — unlike \[ \], they also work when the codes
+# arrive via variables or command substitution rather than a literal PS1.
 # https://unix.stackexchange.com/a/447520/442723
 uber_prompt() {
   local        BLUE="\001\033[0;34m\002"
@@ -40,8 +56,13 @@ uber_prompt() {
 
 uber_prompt "\h:\W"
 
+# macOS keeps three separate machine names (HostName, Bonjour's LocalHostName,
+# and the UI's ComputerName); System Settings doesn't update them all, so set
+# the trio in one shot to keep them consistent
 scutil_set_hostname() {
   sudo scutil --set HostName "${1}.local"
   sudo scutil --set LocalHostName "$1"
   sudo scutil --set ComputerName "$1"
 }
+
+

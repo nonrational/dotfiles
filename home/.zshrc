@@ -36,8 +36,11 @@ setopt HIST_REDUCE_BLANKS
 setopt CORRECT
 setopt CORRECT_ALL
 
-export EDITNOW='subl'
-export EDITOR='subl -w'
+# -w blocks until the tab closes, so tools that shell out to $EDITOR
+# (git commit, crontab -e) see the saved file; -n gives those short-lived
+# edits a window of their own
+export EDITNOW='subl -w'
+export EDITOR='subl -w -n'
 export LESS="$LESS -i -F -R -X"
 
 alias ls="/bin/ls -F"
