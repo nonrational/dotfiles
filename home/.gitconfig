@@ -8,6 +8,8 @@
   path = ~/.local/.gitconfig
   # OS-specific config; git silently skips missing include paths.
   path = ~/.gitconfig.Darwin
+  # git-town aliases and config; deployed only when git-town is installed.
+  path = ~/.gitconfig.git-town
 
 [includeIf "gitdir:~/wrk/**"]
   path = ~/wrk/.gitconfig

@@ -43,7 +43,7 @@ parse_manifest() {
             exit 1
         fi
         case "$cond" in
-            "" | os=?* | host=?*) ;;
+            "" | os=?* | host=?* | tool=?*) ;;
             *)
                 echo "error: manifest line $lineno: unknown condition '$cond'" >&2
                 exit 1
@@ -79,6 +79,7 @@ condition_matches() {
         "") return 0 ;;
         os=*) [ "${1#os=}" = "$os" ] ;;
         host=*) [ "${1#host=}" = "$host" ] ;;
+        tool=*) command -v "${1#tool=}" >/dev/null 2>&1 ;;
         *) return 1 ;;
     esac
 }

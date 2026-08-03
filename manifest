@@ -12,6 +12,7 @@ home/.copilot            ~/.copilot
 home/.gemini             ~/.gemini
 home/.gitconfig          ~/.gitconfig
 home/.gitconfig.Darwin   ~/.gitconfig.Darwin   os=Darwin
+home/.gitconfig.git-town ~/.gitconfig.git-town tool=git-town
 home/.githelpers         ~/.githelpers
 home/.gitignore_global   ~/.gitignore_global
 home/.inputrc            ~/.inputrc

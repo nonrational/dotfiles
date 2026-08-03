@@ -1,0 +1,40 @@
+# git-town aliases and config. Included from ~/.gitconfig; the manifest deploys
+# this file only when git-town is installed, and git silently skips missing
+# include paths elsewhere.
+
+[alias]
+  # Fetch, then sync all local branches and stacks, pruning merged ones
+  # (sync-tags=false keeps tag handling in `git f`)
+  up = "!git f && git town sync --all"
+
+  append = town append         # add a new branch as a child of the current one
+  compress = town compress     # squash all commits on this branch into one
+  continue = town continue     # resume after resolving a conflict mid-sync
+  contribute = town contribute # mark branch as contribute (syncs like a feature branch but no PR)
+  delete = town delete         # delete branch locally and remotely
+  diff-parent = town diff-parent # show diff between this branch and its parent
+  down = town down             # switch to a child branch
+  hack = town hack             # start a new feature branch off the main branch
+  observe = town observe       # mark branch as observed (syncs but never pushes)
+  park = town park             # mark branch as parked (no sync until unparked)
+  prepend = town prepend       # insert a new branch between this one and its parent
+  propose = town propose       # open a pull request for the current branch
+  rename = town rename         # rename the current branch locally and remotely
+  repo = town repo             # open the repo in the browser
+  set-parent = town set-parent # reassign this branch's parent in the stack
+  ship = town ship             # merge into parent and delete the branch
+  sync = town sync             # sync current branch with its parent and remote
+
+[git-town]
+  # Merge, not rebase: force-pushing a synced branch detaches inline review
+  # comments on its open PR. Explicit even though it's the current default.
+  sync-feature-strategy = merge
+  # Reach the GitHub API through gh's existing auth; no separate token.
+  github-connector = gh
+  # Branches git-town has no lineage for just fast-forward from their tracking
+  # branch instead of erroring/prompting for a parent — keeps sync --all
+  # non-interactive on repos that haven't been fully configured.
+  unknown-branch-type = observed
+  # Don't push local tags to the remote as a side effect of syncing; `git f`
+  # (chained in the `up` alias) already fetches tags, forced.
+  sync-tags = false
