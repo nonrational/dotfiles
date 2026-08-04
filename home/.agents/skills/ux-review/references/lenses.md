@@ -61,6 +61,6 @@ Sweep every lens on each pass. Each is written as **Smell** (what you see) · **
 ## 9. Inclusive by construction
 
 - **Smell:** Meaning carried by color alone (a bare colored dot whose meaning lives only in a hover title). Hard-coded palette shades instead of semantic tokens.
-- **Ask:** Does this survive color-blindness and a theme switch? Is color ever the *only* signal?
+- **Ask:** Does this survive color-blindness and a theme switch? Is color ever the *only* signal? And before asserting what a color *means* — have you tested it on a case where the competing readings disagree? (See "Verifying a visual claim" in `SKILL.md`.)
 - **Fix:** Pair color with a glyph and a label — never color alone. Prefer numbers and labels over color for data. Use semantic design tokens, not raw shades, so themes and brand retunes propagate for free.
 - **e.g.:** A bare amber ● meant "sync pending," legible only on hover. Pair it with a label or chip, and keep the token semantic so dark mode and theme changes just work.
