@@ -1,6 +1,6 @@
 ---
 name: prose-register
-description: Register for essays, posts, and long-form prose in the author's voice: plain, warm, concrete, with breath between the hard lines. Use when drafting or editing an essay or blog post; when a draft reads clipped, cold, or relentless; when an editing pass has flattened the warmth out of something; or when the user asks for prose that sounds like them rather than like a style contract.
+description: "Register for essays, posts, and long-form prose in the author's voice: plain, warm, concrete, with breath between the hard lines. Use when drafting or editing an essay or blog post; when a draft reads clipped, cold, or relentless; when an editing pass has flattened the warmth out of something; or when the user asks for prose that sounds like them rather than like a style contract."
 forked-from: https://github.com/SHADOWPR0/beautiful_prose
 ---
 
