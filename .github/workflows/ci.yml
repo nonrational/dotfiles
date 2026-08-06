@@ -23,3 +23,8 @@ jobs:
           ./deploy.sh audit
       - run: make check-copilot-instructions
       - run: make check-skills
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: python3 -m pip install PyYAML==6.0.2
+      - run: make check-skill-frontmatter

@@ -49,6 +49,9 @@ check-skills:
 	fi
 	@echo "all skill symlinks resolve"
 
+check-skill-frontmatter:
+	@python3 scripts/check-skill-frontmatter.py
+
 # Run the full test suite: deploy.sh behavior + shell rc smoke tests.
 test:
 	./test/test_deploy.sh
@@ -133,4 +136,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
