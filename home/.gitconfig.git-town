@@ -3,9 +3,13 @@
 # include paths elsewhere.
 
 [alias]
-  # Fetch, then sync all local branches and stacks, pruning merged ones
+  # Fetch, then bring every local branch and stack up to date from its remote,
+  # pruning merged ones, without pushing anything. `up` runs constantly and
+  # sweeps all branches at once, so a push here publishes work we never chose to
+  # publish (most often local commits sitting on main). Pushing stays an explicit
+  # verb: `git sync` for this branch, `git propose` when it's ready for review.
   # (sync-tags=false keeps tag handling in `git f`)
-  up = "!git f && git town sync --all"
+  up = "!git f && git town sync --all --no-push"
 
   append = town append         # add a new branch as a child of the current one
   compress = town compress     # squash all commits on this branch into one
