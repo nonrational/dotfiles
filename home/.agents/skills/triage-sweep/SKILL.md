@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Move a queue of untriaged issues through the `triage` state machine **in bulk**, flipping as many as possible to `ready-for-agent` and compressing everything that genuinely needs the maintainer into one batched interview instead of forty scattered pings.
 
-The output is not a pile of labels. It is a set of issues that each carry a gated artifact — an agent brief, a set of needs-info questions, or a close recommendation with evidence — plus a report the maintainer can act on in one sitting. Downstream, `issue-sweep` turns the `ready-for-agent` yield into draft PRs.
+The output is not a pile of labels. It is a set of issues that each carry a gated artifact — an agent brief, a set of needs-info questions, or a close recommendation with evidence — plus a report the maintainer can act on in one sitting. Downstream, `issue-sweep` turns the `ready-for-agent` yield into reviewed PRs.
 
 **Use when** a backlog of unlabeled or `needs-triage` issues has piled up and the repo has a triage-label vocabulary. **Don't use** for one contentious issue with the maintainer present (that's `triage`, interactively), to implement anything (that's `issue-sweep`), on pull requests (`triage` handles a PR as an issue with attached code, interactively — this sweep triages issues only), or on a repo with no label vocabulary — establish one first, or the sweep has no states to move between.
 

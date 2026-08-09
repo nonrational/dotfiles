@@ -2,7 +2,7 @@
 
 Recipes, not templates. Each stage's dispatch prompt contains the listed parts, in order.
 
-Everything the orchestrator learned in recon — repo path, default branch, stack, domain gotchas, the read-only rule for the main checkout, the verify commands, the per-item resource override with its literal create and drop commands, the reviewer handle and commit-trailer format — goes in a **shared context block** reused by every prompt. Below, "the resource override" means those three recon-collected commands pasted in verbatim.
+Everything the orchestrator learned in recon — repo path, default branch, stack, domain gotchas, the read-only rule for the main checkout, the verify commands, the per-item resource override with its literal create and drop commands, the commit-trailer format — goes in a **shared context block** reused by every prompt. (The reviewer handle stays with the orchestrator; no stage agent requests a review.) Below, "the resource override" means those three recon-collected commands pasted in verbatim.
 
 Machine-wide conventions (commit style, attribution bans, worktree placement, model selection) are restated in these prompts on purpose: a dispatched agent may run under a harness that never loaded this machine's rule set. That's not drift.
 
@@ -52,7 +52,7 @@ Machine-wide conventions (commit style, attribution bans, worktree placement, mo
 4. **Setup**, as literal commands: fetch; `git worktree add <repo>/.worktrees/<slug> -b <branch> origin/<default-branch>`; if that branch name is already taken (a sibling item claimed it since planning), suffix it with the issue number and report the change; copy in any local env file; install deps; read the repo's conventions docs from inside the worktree.
 5. **Build**: implement the plan, write the tests it named, keep the diff minimal, nothing speculative.
 6. **Verify**, as literal commands, all run inside the worktree — lint, typecheck, the unit suite with the resource override (run its create command first), then the formatter with its fallout included in the commit. For the slow suite, state the repo's own documented policy verbatim: if CI runs it on push, say so and say not to run it locally; **if CI does not, the build agent runs it here before opening the PR.** Name any local-env gotcha explicitly rather than alluding to one.
-7. **Ship**: plain commit message with the model co-author trailer; push; `gh pr create --draft`; body states what changed, why, how it was verified, and the issue link (`Closes #N`, or `Part of #N` when phases remain); request the reviewer handle from the shared context. No AI-attribution lines, badges, or session links anywhere.
+7. **Ship**: plain commit message with the model co-author trailer; push; `gh pr create --draft`. **Request no reviewer** — requesting one notifies a human about a PR that hasn't been reviewed yet; the orchestrator adds the reviewer when it promotes the PR out of draft. The body is `Resolves #N` alone on the first line (`Part of #N` when later phases remain) — **above the first heading, not inside a section** — then four H3 sections: `### Problem`, `### Motivation`, `### Proposed Solution`, `### Feedback` (what a reviewer should focus on, what's riskiest, what calls need a second opinion). Fold how it was verified into Proposed Solution. Nothing else — no AI-attribution lines, badges, or session links. If the repo ships its own PR template, that wins; say so in the report.
 8. **Cleanup, mandatory on both paths**: remove the worktree, prune, run the resource drop command.
 9. **Failure branch**: if checks won't go green or the slice proves infeasible — no PR, clean up, post one comment on the issue saying what was attempted and why it failed, and return `failed` with the reason. Never force-push; never touch branches you didn't create.
 
@@ -83,7 +83,7 @@ Machine-wide conventions (commit style, attribution bans, worktree placement, mo
 5. Read whole changed files in context, not just hunks (`git show origin/<branch>:<path>` from the read-only main checkout). Name the defect classes worth hunting in this repo — edge cases, races, domain-encoding mistakes, spec mismatches against the thread, dishonest or missing tests, migration hazards, documented-convention violations.
 6. **Reproduce before escalating**: a `blocking` finding needs concrete inputs and the wrong output it produces. Anything unreproduced is `minor`, phrased as a question.
 7. Note CI state if available; **don't wait on pending checks** — CI is judged once at close of run.
-8. Post exactly one comment with `gh pr comment` (not `gh pr review`, which can leave a pending review) — including when clean, saying what was checked. Do not approve, merge, or push fixes.
+8. Post exactly one comment with `gh pr comment` (not `gh pr review`, which can leave a pending review) — including when clean, saying what was checked. Do not approve, merge, push fixes, or take the PR out of draft; the orchestrator promotes at close of run once CI has been judged.
 
 ```json
 {
@@ -136,7 +136,7 @@ Dispatched only for `blocking` verdicts, with an orchestrator scope note naming 
 3. Read the PR comments: identify the original blocking findings and the fixer's reply.
 4. Fetch the branch and read the updated code directly. **Re-derive each blocking finding against the new code**: does the failure scenario still exist, and would the new regression tests have failed on the pre-fix code?
 5. Check CI state; don't wait on pending runs.
-6. Post a follow-up comment **only if a finding is still live**, with the concrete failure scenario, in the `code-review-register` voice, and return `still-broken` — the orchestrator gives it its own row in the morning report. If everything is resolved, post nothing; the fixer's reply already closed the loop.
+6. Post a follow-up comment **only if a finding is still live**, with the concrete failure scenario, in the `code-review-register` voice, and return `still-broken` — the orchestrator gives it its own row in the morning report. If everything is resolved, post nothing; the fixer's reply already closed the loop. Either way, leave the PR in draft — promotion is the orchestrator's, at close of run.
 
 ```json
 {

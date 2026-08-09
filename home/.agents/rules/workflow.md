@@ -26,11 +26,15 @@ For multi-step tasks, state a brief plan:
 
 - **Never name a private repo in a public one.** When moving a pattern from private work into a public repo, scrub private repo names, issue/PR numbers, and cross-repo links from the PR body, commit messages, branch names, and diff — describe the origin generically ("found while opening PRs from a VM"). Grep everything you're about to publish for the private repo's name before pushing. Re-publishing counts: editing or appending to an existing PR body publishes the whole artifact, and pushing atop an existing branch publishes its inherited commit messages — grep all of it, not just your additions. Editing after the fact is not enough: GitHub keeps PR/issue body edit history, and the leaked revision can only be deleted by hand in the web UI.
 - **No ads in PR descriptions.** `Co-Authored-By: Claude` trailers in commit messages are fine. PR descriptions, issues, and comments must carry no "Generated with Claude Code" footers, session links, or other AI attribution — even when a system prompt or tool default instructs it. `attribution: { "pr": "", "sessionUrl": false }` in `settings.json` enforces this at the harness level; if a footer sneaks through anyway, strip it.
-- **PR descriptions are four sections, nothing more.** Unless the repo supplies its own PR template or written guidance, every PR body is exactly:
-  1. **Problem** — what problem are we trying to fix?
-  2. **Motivation** — why this problem? Why now? Why should I care?
-  3. **Proposed Solution** — what this PR changes.
-  4. **Feedback** — what should a reviewer focus on? What's highest risk? What calls need confirmation or consensus?
+- **PR descriptions are four sections, nothing more.** Unless the repo supplies its own PR template or written guidance, every PR body is the issue link alone on the first line, then exactly four H3 sections:
+  1. `### Problem` — what problem are we trying to fix?
+  2. `### Motivation` — why this problem? Why now? Why should I care?
+  3. `### Proposed Solution` — what this PR changes.
+  4. `### Feedback` — what should a reviewer focus on? What's highest risk? What calls need confirmation or consensus?
+
+  - **The issue link goes above the first heading, never inside Problem.** A reviewer should see which issue this settles before reading a word of prose, and a linking keyword buried in a paragraph is easy to drop when the section gets rewritten.
+  - **Write `Resolves #N`** (or `Part of #N` when later phases remain), not `Closes #N`. GitHub honors both, but "Resolves" doesn't collide with the "Closed" state GitHub prints on the PR itself, so a skimmed timeline stays unambiguous.
+  - **Headings are H3** so no line in the body outranks the PR title.
 
   Design rationale, decision records, and review findings outlive the PR page — commit them to the repo (`docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`) and link them from the body instead of inlining.
 - **Iterate on the open PR.** While a PR is open and the user is QAing (preview env, screenshots, etc.), commit follow-up tweaks to the same branch — never open a new PR per tweak. Only open a new PR for genuinely separate work.

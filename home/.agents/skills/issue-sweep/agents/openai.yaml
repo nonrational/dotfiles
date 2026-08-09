@@ -1,5 +1,5 @@
 interface:
   display_name: "Issue Sweep"
-  short_description: "Sweep triaged issues into reviewed draft PRs"
+  short_description: "Sweep triaged issues into reviewed PRs"
 policy:
   allow_implicit_invocation: false

@@ -1,15 +1,15 @@
 ---
 name: issue-sweep
-description: Sweep a queue of ready-for-agent issues into reviewed draft PRs in one unattended run — plan, build, adversarially review, fix and verify, one independent pipeline per issue.
+description: Sweep a queue of ready-for-agent issues into reviewed PRs in one unattended run — plan, build, adversarially review, fix and verify, one independent pipeline per issue.
 argument-hint: "Which repo, which issues, and how many at once?"
 disable-model-invocation: true
 ---
 
 # Issue Sweep
 
-Turn a queue of triaged issues into **reviewed draft PRs**, unattended, one independent pipeline per issue.
+Turn a queue of triaged issues into **reviewed PRs**, unattended, one independent pipeline per issue.
 
-The output is not a pile of branches. It is a set of draft PRs, each carrying a posted adversarial review, each blocking finding either fixed with a proven regression test or answered with evidence. The human wakes to reviews, not just diffs — and merges nothing they haven't read.
+The output is not a pile of branches. It is a set of PRs, each carrying a posted adversarial review, each blocking finding either fixed with a proven regression test or answered with evidence. Every PR is opened draft and promoted out of draft only once it survives its own review with green checks, so the draft flag tells the human where to look last. The human wakes to reviews, not just diffs — and merges nothing they haven't read.
 
 **Use when** the queue is already triaged and the repo has a green, runnable check suite. **Don't use** to triage (that's `triage`), to ship one attended slice with the human in the loop, to explore an unscoped idea, or on a repo where you can't run tests locally — a sweep with no verification just manufactures branches.
 
@@ -33,6 +33,8 @@ Each item flows through these stages independently. Nothing waits on a sibling.
 
 **Control flow.** Stages 4–5 fire automatically for a `blocking` verdict, in the same per-item chain — the run is unattended, so nothing waits for a human to read a verdict. **One fix round, never two.** Every other state is terminal and gets its own row in the morning report: `clean` / `minor` (done), `partial` / `could-not-fix` (the fixer disputed the finding or gave up), `still-broken` (the PR carries a live blocking comment — flag it hardest). Split the run into two scripts, stages 1–3 then 4–5, only when a human is awake and wants that gate.
 
+**Promotion out of draft is not a stage.** Every PR is born draft in stage 2 and no agent ever flips it; the orchestrator promotes in one pass at close of run, when it knows both the terminal verdict and the CI result (see "Close the run").
+
 ## 0. Recon before you dispatch anything
 
 The orchestrator does this itself, read-only, in the main checkout. **Dispatching before recon is the most expensive mistake in this pattern** — a build agent that discovers mid-run that half its issue already shipped burns an hour and produces a confused PR.
@@ -43,7 +45,7 @@ Deliverables:
 2. **A deduped queue.** Cross the queue against merged PRs, open PRs, and existing branches (`git log origin/<default>`, `gh pr list --state merged`, `git branch -a`). Phased issues are the trap: earlier slices often merged since triage, so the issue text describes work that is already done.
 3. **Shared-resource hazards, each with three literal commands.** Anything the items contend over when run at once: a test database, a fixed port, a cache directory, a rate-limited API, a lockfile. For each, write down the **override knob**, the **create command** and the **drop command**, verbatim and ready to paste into a dispatch prompt. If a resource has no override, serialize the items that need it. Don't hope.
 4. **The repo's verify commands and its own test policy**, read out of `CLAUDE.md` / `CONTRIBUTING.md` / the task runner: lint, typecheck, unit, integration/e2e — *and* what that repo says about narrow versus full local runs. Some repos push the slow suite to CI on purpose; some have no CI job for it, in which case the build agent runs it before opening the PR. Record any local-only gotcha by name — an unnamed gotcha can't be handed to an agent.
-5. **Attribution facts.** The reviewer handle to request on each PR, the commit trailer format, and whether the tracker requires a provenance disclaimer on issue comments (see "Where the disclaimer applies").
+5. **Attribution facts.** The commit trailer format, whether the tracker requires a provenance disclaimer on issue comments (see "Where the disclaimer applies"), and the reviewer handle — which the orchestrator keeps to itself and spends at promotion, not in any stage prompt.
 6. **A hint per item.** One or two sentences of prior-work context, verified against code and PR history, handed to that item's planner so it starts warm.
 7. **A concurrency cap.** Set by machine headroom (each item is a worktree, a dependency install and a scratch database) and by API rate limits. Default to 4 concurrent items unless you've measured otherwise. Cap the dispatched queue at that; the remainder stays queued and **appears in the morning report as not-attempted** — never silently dropped.
 
@@ -77,6 +79,7 @@ Stage 1 writes to the **issue tracker**, which is triage territory: if the repo'
 
 - **A `failed` build is recorded, not swallowed.** Comment on the issue with the reason and what was tried, so the next sweep doesn't re-attempt it blind. No automatic retry — a second attempt at a higher tier is the human's call, made from the report.
 - **CI is judged once, at close of run, never per stage** (which is why stages 3 and 5 never wait on pending checks). `gh pr checks` across every PR opened; re-run failures once, since a flake is not a regression. A CI failure that survives the re-run is a fix round dispatched against the **CI log** as its source of truth rather than a review comment — same discipline, including the proven-red regression test.
+- **Promote what earned it, in one pass, after CI is judged.** `gh pr ready <n>` then `gh pr edit <n> --add-reviewer <handle>` on every PR whose item ended `clean`, `minor` or `resolved` **and** whose checks are green. Everything else stays draft with no reviewer on it — `partial`, `could-not-fix`, `still-broken`, or CI still red after its fix round. Promotion and the review request are the same act: the ping is what pulls a human in, so it fires once, on work an agent is willing to vouch for. Draft then carries information — it means an agent knows something is wrong with this PR, so the human reads the ready ones first and the drafts last. A run cut short before this pass leaves everything draft and unassigned, which is the right failure mode; nobody is summoned to work nobody checked.
 - **Confirm nothing survives**: no worktrees, no scratch databases, with the literal commands, not from memory.
 - **Write a morning report that leads with the outcome table** — one row per queued issue: issue, PR, verdict, state (including skips, not-attempted, `still-broken`). The narrative goes underneath with the re-triage reasoning. The human should be able to decide what to open first from the first ten lines.
 
@@ -91,6 +94,9 @@ Before declaring the run done, apply `superpowers:verification-before-completion
 - A review that only exists in structured output.
 - Worktrees or scratch databases still alive after an item finished.
 - A `failed` build or a `still-broken` verdict that reached no one.
+- A `still-broken` PR marked ready for review, or a `clean` PR with green checks left in draft.
+- A reviewer requested by a stage agent, or sitting on a PR that never got promoted.
+- A PR body with the issue link buried in a section, or with sections the four-part shape doesn't name.
 - Every issue in the queue produced a PR. (Possible — but check that no planner forced one.)
 
 ## Rationalizations
@@ -107,3 +113,6 @@ Before declaring the run done, apply `superpowers:verification-before-completion
 | "Batch all plans, then all builds — it's tidier" | It's a barrier. One stalled planner costs you the whole run. |
 | "All twelve issues can run at once" | Twelve dependency installs and twelve agents against one rate limit. Cap it; queue the rest. |
 | "The build failed, the report will mention it" | The report is read once. The issue is read every sweep. Write it there. |
+| "Taking it out of draft is the human's call" | The human's call is merging. Draft means an agent found something wrong; leaving every clean PR in it makes the flag mean nothing and adds a click to each one. |
+| "The reviewer agent may as well promote its own PR" | It doesn't know CI yet, and a self-promoting reviewer is the fixer problem again. One pass, at close, by the orchestrator. |
+| "Request the reviewer at create — GitHub only notifies on ready anyway" | It notifies on request, draft or not. Four hours before the sweep has anything to show, you've pinged someone about a PR no agent has read yet. |
