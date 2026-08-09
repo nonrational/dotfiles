@@ -135,8 +135,9 @@ Dispatched only for `blocking` verdicts, with an orchestrator scope note naming 
 2. Shared context block.
 3. Read the PR comments: identify the original blocking findings and the fixer's reply.
 4. Fetch the branch and read the updated code directly. **Re-derive each blocking finding against the new code**: does the failure scenario still exist, and would the new regression tests have failed on the pre-fix code?
-5. Check CI state; don't wait on pending runs.
-6. Post a follow-up comment **only if a finding is still live**, with the concrete failure scenario, in the `code-review-register` voice, and return `still-broken` — the orchestrator gives it its own row in the morning report. If everything is resolved, post nothing; the fixer's reply already closed the loop. Either way, leave the PR in draft — promotion is the orchestrator's, at close of run.
+5. **If the PR merged while the round was in flight**: confirm the fix commit is an ancestor of the default branch (`git branch -r --contains <sha>`). A fix pushed after a squash-merge sits on the closed branch with green checks that gate nothing — the finding is still live in shipped code no matter what the branch tip says. The follow-up comment names the stranded commit and the cherry-pick re-land.
+6. Check CI state; don't wait on pending runs.
+7. Post a follow-up comment **only if a finding is still live**, with the concrete failure scenario, in the `code-review-register` voice, and return `still-broken` — the orchestrator gives it its own row in the morning report. If everything is resolved, post nothing; the fixer's reply already closed the loop. Either way, leave the PR in draft — promotion is the orchestrator's, at close of run.
 
 ```json
 {

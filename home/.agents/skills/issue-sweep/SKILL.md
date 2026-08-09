@@ -69,7 +69,7 @@ Each is enforced in the stage prompt it belongs to; here is the judgment behind 
 - **The review is a posted artifact.** The structured verdict dies with the run; the PR comment is what the human reads. Post one even when clean. Written in the `code-review-register` voice — if that skill isn't installed, fall back to the repo's review conventions and plain declarative prose.
 - **A `blocking` finding requires an empirical reproduction, not an argument.** Concrete inputs, the wrong output. Anything unreproduced is `minor`, phrased as a question.
 - **The regression test must be proven to bite.** Revert the fixed file, run the test, watch it fail, restore. A test that has never been red proves nothing.
-- **The verifier distrusts the fixer.** Re-derive every finding against the pushed code. Two questions each: does the failure scenario still exist, and would the new test have failed before?
+- **The verifier distrusts the fixer.** Re-derive every finding against the pushed code. Two questions each: does the failure scenario still exist, and would the new test have failed before? And when the PR merged mid-round, a third: is the fix commit an ancestor of the default branch? A squash-merge that lands seconds before the fixer pushes strands the fix on the closed branch — where its checks still run green and gate nothing.
 
 ### Where the disclaimer applies
 
@@ -79,6 +79,7 @@ Stage 1 writes to the **issue tracker**, which is triage territory: if the repo'
 
 - **A `failed` build is recorded, not swallowed.** Comment on the issue with the reason and what was tried, so the next sweep doesn't re-attempt it blind. No automatic retry — a second attempt at a higher tier is the human's call, made from the report.
 - **CI is judged once, at close of run, never per stage** (which is why stages 3 and 5 never wait on pending checks). `gh pr checks` across every PR opened; re-run failures once, since a flake is not a regression. A CI failure that survives the re-run is a fix round dispatched against the **CI log** as its source of truth rather than a review comment — same discipline, including the proven-red regression test.
+- **A PR merged mid-run gets a reachability check.** A human awake and merging while a fix round is in flight is a race the sweep must assume, not a surprise: for every PR that merged during the run, confirm each commit the run pushed to its branch is contained in the default branch (`git branch -r --contains <sha>`). A stranded fix is re-landed by cherry-picking it onto a fresh branch off the default and opening a follow-up PR that cites the tracking issue — never by pushing to the merged branch.
 - **Promote what earned it, in one pass, after CI is judged.** `gh pr ready <n>` then `gh pr edit <n> --add-reviewer <handle>` on every PR whose item ended `clean`, `minor` or `resolved` **and** whose checks are green. Everything else stays draft with no reviewer on it — `partial`, `could-not-fix`, `still-broken`, or CI still red after its fix round. Promotion and the review request are the same act: the ping is what pulls a human in, so it fires once, on work an agent is willing to vouch for. Draft then carries information — it means an agent knows something is wrong with this PR, so the human reads the ready ones first and the drafts last. A run cut short before this pass leaves everything draft and unassigned, which is the right failure mode; nobody is summoned to work nobody checked.
 - **Confirm nothing survives**: no worktrees, no scratch databases, with the literal commands, not from memory.
 - **Write a morning report that leads with the outcome table** — one row per queued issue: issue, PR, verdict, state (including skips, not-attempted, `still-broken`). The narrative goes underneath with the re-triage reasoning. The human should be able to decide what to open first from the first ten lines.
@@ -107,6 +108,7 @@ Before declaring the run done, apply `superpowers:verification-before-completion
 | "The bug is obvious, a repro is ceremony" | Confident findings dissolve under a repro more often than you'd like. No repro, no `blocking`. |
 | "The fix is right and the test passes" | A test that has never been red is decoration. Revert, run, watch it fail, restore. |
 | "The fixer says all three are resolved" | The fixer is the least reliable witness available. Re-derive against the pushed code. |
+| "The fixer pushed and its checks are green, so the fix shipped" | Green checks on a branch whose PR already merged gate nothing. Prove the commit is an ancestor of the default branch. |
 | "Posting the review duplicates the structured output" | The structured output dies with the run. The PR comment is the deliverable. |
 | "I'll clean up worktrees at the end" | Runs get cut short; the end never arrives. Clean up per item. |
 | "Two items can share the test database, they won't overlap" | Per-item chaining means they will. |
