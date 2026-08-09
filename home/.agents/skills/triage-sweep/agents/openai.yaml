@@ -1,0 +1,5 @@
+interface:
+  display_name: "Triage Sweep"
+  short_description: "Sweep untriaged issues toward ready-for-agent"
+policy:
+  allow_implicit_invocation: false
