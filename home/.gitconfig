@@ -121,6 +121,15 @@
 
 [pull]
   rebase = true
+[submodule]
+  # Move submodule checkouts to the SHA the superproject recorded on pull /
+  # checkout / switch. Without this, pulling a submodule bump updates the
+  # gitlink but leaves the old checkout in place, which reads as a dirty
+  # worktree and can be re-staged as an accidental downgrade.
+  # Note: does not apply to `clone` — a fresh clone still needs
+  # `make init-submodules`. And `git subup` (--remote) is the opposite
+  # operation: it jumps to upstream's tip so you can commit a version bump.
+  recurse = true
 [push]
   default = simple
   autoSetupRemote = true
