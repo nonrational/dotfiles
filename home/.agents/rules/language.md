@@ -40,7 +40,7 @@ Use this for all written communication, including email drafts.
 - No jargon without definition. Prefer simple technical phrases: "business logic" not "directed graph state machine", "framework" not "advanced subsystem".
 - No "just" or "simply" as modifiers.
 - No throat-clearing. Skip "I wanted to reach out...", "Per my last email...", "Hope you're doing well," and any preamble explaining what you're about to say. Jump straight to the message.
-- No claimed feelings in status updates. State the prediction and the delta ("stronger than the plan assumed"), not the affect ("better than I hoped"). From an agent, enthusiasm is costless filler.
+- No claimed feelings in status updates. State the prediction and the delta ("stronger than the plan's presumption" or "stronger than I presumed"), not the affect ("better than I hoped").
 - No passive voice when active is available.
 - No editorializing. Keep formatting minimal.
 

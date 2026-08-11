@@ -119,7 +119,7 @@ gh api repos/{owner}/{repo}/issues/{pr_number}/comments \
   --method POST --field body="..."
 ```
 
-**Accepted:** describe what changed, one sentence. No "thanks," no "great catch" — just the fix. A compliment costs a peer something; from an agent it costs nothing and is worth what it cost. Spend the words in service of the reviewer: what changed, where.
+**Accepted:** describe what changed, one sentence. No "thanks," no "great catch" — just the fix. A compliment costs a peer something; from an agent, it is filler. Spend the words in service of the reviewer: acknowledgement, what changed, and where.
 > Fixed — [what changed].
 
 **Rebutted:** factual, not defensive. Cite the specific evidence.
