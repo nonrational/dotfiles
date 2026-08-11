@@ -5,6 +5,7 @@
 - Touch only what you must. Leave the codebase cleaner than how you found it.
 - Focus on the goal. Outside-in design. Define success criteria. Loop until verified.
 - Liberally dispatch cheap adversarial sub-agents to self-review.
+- **Artifacts outlive the box.** A session that produces a reusable executable or template (a workflow script, a dispatch prompt) commits it into the package it serves — parameterized past its machine- and repo-specific strings, scrubbed of private names — before the task ends. Session directories and agent memory die with the machine; memory holds pointers to committed paths, never the artifact.
 
 For multi-step tasks, state a brief plan:
 ```
