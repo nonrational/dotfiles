@@ -13,6 +13,9 @@ Comments describe **why**, not what. The code already shows what it does.
 
 A comment earns its place when it names a constraint, tradeoff, or invariant that the code cannot show on its own.
 
+No comment is a valid result. Do not invent a rationale because a value or
+branch looks as though it ought to have one.
+
 ## The constraint test
 
 Before keeping or writing a comment, ask: does this name a specific constraint?
@@ -30,7 +33,9 @@ If there is no constraint, there is no comment.
 
 ## The failure mode
 
-Comments can *look* like why-comments while still being what-comments. The tell is performance or memory vocabulary used without a budget or spec:
+Comments can *look* like why-comments while still being what-comments. The tell
+is performance or memory vocabulary used without a budget, machine spec, or
+observed failure:
 
 ~~~elixir
 # Bad: describes mechanics, sounds technical, explains nothing about the decision
@@ -46,6 +51,32 @@ Comments can *look* like why-comments while still being what-comments. The tell 
 
 The bad version cannot answer *why 500 and not 250 or 2000*. The good version can.
 
+Sometimes the evidence supports the bound but not the exact number. Say that
+honestly. A comment may document a hidden second role without claiming the
+value is tuned:
+
+~~~elixir
+# One batch of records and results is the most held in memory at once.
+# Buffering the whole file exhausted the worker on large imports.
+@insert_batch_size 500
+~~~
+
+This earns its place because the code does not show that the insert size is
+also the memory window, and the observed failure explains why the window must
+stay bounded. It does not pretend that 500 is optimal.
+
+When the evidence does not explain the value, remove the comment instead of
+padding it with a generic tradeoff:
+
+~~~elixir
+# Bad: true of almost every chunk size, but not a reason for this one
+# Larger chunks use more memory. Smaller chunks use more CPU.
+@chunk_size 256_000
+
+# Better: leave the value uncommented until there is a real constraint to name
+@chunk_size 256_000
+~~~
+
 ## What-then-why trap
 
 A comment that opens with what the code does before landing on a constraint is still a what-comment. Drop the mechanical lead-in and open with the constraint.
@@ -60,11 +91,79 @@ A comment that opens with what the code does before landing on a constraint is s
 # yet, and the rescue clause only covers the lazy import loop that follows.
 ~~~
 
+A short orienting sentence is allowed when it names a semantic role that the
+syntax cannot show, such as a sentinel row or an audit copy. It must sit beside
+the relevant operation and lead directly to the reason:
+
+~~~elixir
+Enum.reduce(indexed_rows, summary, fn
+  # The sentinel row is not written. Its synthetic result preserves the source
+  # row number so an operator can find the cutoff.
+  {_row, index}, acc when index > @row_limit ->
+    add_limit_result(acc, index)
+end)
+~~~
+
+This is not permission to narrate ordinary expressions.
+
 ## Rewrite trap
 
 When editing a comment for "clarity" or "precision", do not replace plain-English constraint reasoning with mechanical description. Mechanical precision is not explanation.
 
 Diagnostic: if you can delete the comment, rename the identifier, and lose nothing about *the decision*, the comment was not earning its place.
+
+## Put the reason beside the decision
+
+Do not stack several explanations above a function and make the reader map each
+sentence to the body. When different lines earn their place for different
+reasons, put a short comment beside each line. Keep a function-level comment
+only when one invariant governs the whole function.
+
+This also keeps comments honest: a local explanation has to justify the
+operation it sits beside.
+
+~~~elixir
+# Bad: the reader has to map three reasons to three distant operations
+# Parse failures must happen before writes. Validation and import must share
+# line handling. The first row over the cap is needed to report truncation.
+defp validate(rows) do
+  rows
+  |> line_stream()
+  |> parse_rows()
+  |> Stream.drop(1)
+  |> Stream.take(@row_limit + 1)
+  |> Stream.run()
+end
+
+# Good: each reason sits beside the operation it protects
+defp validate(rows) do
+  rows
+  |> line_stream()
+  # Validation and import must share line handling. Otherwise validation can
+  # pass and the write path can fail after inserts begin.
+  |> parse_rows()
+  |> Stream.drop(1)
+  # The first row over the cap is required to report truncation, and it must
+  # validate before any writes.
+  |> Stream.take(@row_limit + 1)
+  # Force the lazy parser before writes. A malformed row must not arrive after
+  # the first batch commits.
+  |> Stream.run()
+end
+~~~
+
+## Match the scope of the claim
+
+Do not describe a bounded guarantee as a universal one. The comment should be
+no stronger than the code:
+
+~~~elixir
+# Bad: the cap means this is not the whole file
+# Validates the full file before writing.
+
+# Good: says exactly what is covered
+# Validates every row the capped import can consume before writing.
+~~~
 
 ## What to cut
 
@@ -72,10 +171,13 @@ Diagnostic: if you can delete the comment, rename the identifier, and lose nothi
 - Describes internal mechanics without naming a constraint.
 - Would make equal sense in library documentation as in this specific codebase.
 - A TODO/FIXME with no ticket reference and no condition that resolves it.
+- A generic tradeoff offered without evidence for the chosen value.
+- A test comment that repeats the test name.
 
 ## What to keep
 
 - The constraint behind this value over adjacent alternatives.
+- A hidden second role of a value, when tied to a concrete constraint.
 - A known failure mode you worked around, with enough detail to recognize it later.
 - An invariant the type system cannot enforce ("must be called after X initializes").
 - Anything that would genuinely surprise a reader who knows the language and library.
@@ -91,11 +193,31 @@ Test comments follow different rules. The question is not "why did you make this
 
 Cut test comments that just describe the test setup in prose when the test body already shows it clearly.
 
+Split comments by the code they explain. Put the known regression above the
+test; put fixture accounting and measurement caveats beside the assertion:
+
+~~~elixir
+# A 12x parser footprint exhausted the worker on large files.
+test "keeps parser overhead below the file-size budget" do
+  csv = large_csv()
+  {result, peak} = measure_peak(fn -> parse(csv) end)
+
+  assert result == :ok
+
+  # `csv` was allocated before the baseline, so `peak` is parser overhead only.
+  # Runtime-wide sampling may include unrelated allocations.
+  assert peak < byte_size(csv) / 4
+end
+~~~
+
 ## Lint
 
 Fail a comment if any is true:
 
 - Describes what a function or expression does without naming a constraint.
-- Uses performance or memory vocabulary without a budget or machine spec.
+- Uses performance or memory vocabulary without a budget, machine spec, or observed failure.
 - Removing it and renaming the identifier covers the same ground.
 - Names how the code works rather than why this approach was chosen.
+- Sits above a whole function when it explains one pipe stage or branch.
+- Claims a broader guarantee than the code enforces.
+- Repeats a test name instead of explaining why the case or fixture exists.
