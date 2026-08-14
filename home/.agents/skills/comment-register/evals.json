@@ -1,0 +1,303 @@
+{
+  "skill": "comment-register",
+  "skill_path": "home/.agents/skills/comment-register/SKILL.md",
+  "description": "Discrimination, transformation, and detection cases derived from an anonymized production comment review. The author removed unsupported rationale, moved surviving explanations beside the operations they protect, narrowed overbroad claims, and split test-level history from assertion-level caveats.",
+  "provenance": {
+    "date_mined": "2026-08-13",
+    "source": "An anonymized production diff and the author's final hand-edited comments.",
+    "anonymization": "Project names, vendors, schema names, domain identifiers, exact production limits, and source paths were replaced with neutral examples.",
+    "evidence_map": [
+      "A generic chunk-size tradeoff was deleted because no evidence justified the chosen number.",
+      "A batch-size comment survived because it named a hidden memory-window role and an observed exhaustion failure.",
+      "A dense function-level explanation was split across the exact lazy-parser, shared-parser, limit, and write operations it governed.",
+      "A branch-specific truncation explanation moved from the top of a caller to the guarded clause that creates the synthetic result.",
+      "A claim of full validation was narrowed to the rows a capped operation can consume.",
+      "A test comment repeating the test name was deleted.",
+      "A known memory regression stayed above the test while baseline accounting and sampling caveats moved beside the assertion.",
+      "Comments about sub-binary views and sensitive-data containment stayed because they name surprising runtime behavior and an external requirement."
+    ]
+  },
+  "case_types": {
+    "discrimination": "Pick the better commented variant, including cases where the correct answer has no comment. Grade on the chosen variant and the rule named.",
+    "transformation": "Rewrite comments without changing behavior. Deleting or relocating comments is allowed. Grade against the rubric rather than exact wording.",
+    "detection": "Find every failing comment in a mixed snippet while leaving valid technical comments alone. Grade recall against violations and precision against traps."
+  },
+  "cases": [
+    {
+      "id": "disc-01",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "No comment is a valid result. Do not invent a rationale because a value or branch looks as though it ought to have one.",
+      "evidence": "The final edit removed an unsupported chunk-size explanation.",
+      "variants": {
+        "generic_comment": "# Larger chunks use more memory. Smaller chunks use more CPU.\n@chunk_size 192_000",
+        "no_comment": "@chunk_size 192_000"
+      },
+      "correct": "no_comment",
+      "expected_rule": "No comment is a valid result; delete generic tradeoffs that do not explain the chosen value.",
+      "grading_note": "The generic statement is true of nearly every chunk size and supplies no budget, machine spec, or observed failure. Do not reward it merely for sounding technical."
+    },
+    {
+      "id": "disc-02",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "A comment may document a hidden second role without claiming the value is tuned.",
+      "evidence": "The final batch-size comment named both a memory-window role and an observed exhaustion failure.",
+      "variants": {
+        "mechanical": "# Insert 400 tickets at a time to reduce memory use.\n@insert_batch_size 400",
+        "constraint": "# One batch of tickets and results is the most held in memory at once.\n# Buffering the whole export exhausted the worker on large datasets.\n@insert_batch_size 400"
+      },
+      "correct": "constraint",
+      "expected_rule": "Keep a comment that names a hidden second role and ties it to an observed failure without pretending the exact value is optimal.",
+      "grading_note": "The better comment explains why a bounded window exists and what else the constant governs. It does not claim that 400 is specially tuned."
+    },
+    {
+      "id": "disc-03",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "Put the reason beside the decision.",
+      "evidence": "A dense function-top block was split across the parser stages it governed.",
+      "variants": {
+        "function_block": "# Parse failures must happen before writes. Validation and the write path must\n# share line handling. The first row over the cap is needed to report truncation.\ndefp validate(rows) do\n  rows\n  |> line_stream()\n  |> parse_rows()\n  |> Stream.drop(1)\n  |> Stream.take(@row_limit + 1)\n  |> Stream.run()\nend",
+        "local_comments": "defp validate(rows) do\n  rows\n  |> line_stream()\n  # Validation and the write path must share line handling. Otherwise validation\n  # can pass and writing can fail after inserts begin.\n  |> parse_rows()\n  |> Stream.drop(1)\n  # The first row over the cap is required to report truncation, and it must\n  # validate before any writes.\n  |> Stream.take(@row_limit + 1)\n  # Force the lazy parser before writes. A malformed row must not arrive after\n  # the first batch commits.\n  |> Stream.run()\nend"
+      },
+      "correct": "local_comments",
+      "expected_rule": "Put each reason beside the pipe stage it protects instead of stacking a mapping exercise above the function.",
+      "grading_note": "Both variants contain similar facts. Placement is the deciding distinction."
+    },
+    {
+      "id": "disc-04",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "Sits above a whole function when it explains one pipe stage or branch.",
+      "evidence": "A truncation explanation moved from a caller's header to the guarded clause that creates the result.",
+      "variants": {
+        "distant": "# The extra record is not written. Its synthetic result preserves the source\n# row number so an operator can find the cutoff.\ndefp import(records) do\n  Enum.reduce(records, new_summary(), fn\n    {_record, index}, acc when index > @row_limit -> add_limit_result(acc, index)\n    {record, _index}, acc -> write_record(acc, record)\n  end)\nend",
+        "beside_branch": "defp import(records) do\n  Enum.reduce(records, new_summary(), fn\n    # The sentinel record is not written. Its synthetic result preserves the\n    # source row number so an operator can find the cutoff.\n    {_record, index}, acc when index > @row_limit -> add_limit_result(acc, index)\n    {record, _index}, acc -> write_record(acc, record)\n  end)\nend"
+      },
+      "correct": "beside_branch",
+      "expected_rule": "A branch-specific reason belongs beside that branch, not above the whole function.",
+      "grading_note": "The short orienting sentence is allowed because 'sentinel record' names a semantic role that the guard syntax cannot show."
+    },
+    {
+      "id": "disc-05",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "Do not describe a bounded guarantee as a universal one.",
+      "evidence": "A full-validation claim was narrowed to the rows the capped operation could read.",
+      "variants": {
+        "overclaim": "# Validates the full archive before restoring any entries.\nentries |> Stream.take(@restore_limit) |> validate()",
+        "bounded": "# Validates every entry the capped restore can consume before writing.\nentries |> Stream.take(@restore_limit) |> validate()"
+      },
+      "correct": "bounded",
+      "expected_rule": "Match the scope of the claim to the bounded behavior the code actually enforces.",
+      "grading_note": "The code cannot validate entries after the cap. Calling this a full-archive guarantee is false."
+    },
+    {
+      "id": "disc-06",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "A short orienting sentence is allowed when it names a semantic role that the syntax cannot show.",
+      "evidence": "The final branch comment kept one orienting sentence because the extra row's sentinel role was otherwise hidden.",
+      "variants": {
+        "mechanical": "# If the index is greater than the limit, call add_limit_result.\n{_row, index}, acc when index > @row_limit -> add_limit_result(acc, index)",
+        "semantic": "# The sentinel row is not written. Its synthetic result preserves the source\n# row number so an operator can find the cutoff.\n{_row, index}, acc when index > @row_limit -> add_limit_result(acc, index)"
+      },
+      "correct": "semantic",
+      "expected_rule": "An orienting what-sentence is allowed only when it names a hidden semantic role and immediately gives the reason.",
+      "grading_note": "The mechanical variant restates the guard and function call. The semantic variant explains why the branch exists."
+    },
+    {
+      "id": "disc-07",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "A test comment that repeats the test name.",
+      "evidence": "The final edit deleted a comment that only restated the test title.",
+      "variants": {
+        "duplicate": "# The streaming parser must match the string parser.\ntest \"streaming parser matches string parser on quoted fields\" do\n  assert via_stream(input()) == via_string(input())\nend",
+        "no_comment": "test \"streaming parser matches string parser on quoted fields\" do\n  assert via_stream(input()) == via_string(input())\nend"
+      },
+      "correct": "no_comment",
+      "expected_rule": "Delete test comments that repeat the test name instead of explaining why the case or fixture exists.",
+      "grading_note": "The assertion and title already say everything in the comment."
+    },
+    {
+      "id": "disc-08",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "Split comments by the code they explain.",
+      "evidence": "The final test kept the known failure above the test and moved measurement caveats beside the assertion.",
+      "variants": {
+        "single_block": "# An 11x parser footprint exhausted the worker. The fixture is allocated before\n# the baseline. Runtime-wide sampling may include unrelated allocations, and\n# the threshold is three times the expected peak.\ntest \"keeps parser overhead below the input-size budget\" do\n  payload = large_input()\n  {result, peak} = measure_peak(fn -> parse(payload) end)\n  assert result == :ok\n  assert peak < byte_size(payload) / 3\nend",
+        "split": "# An 11x parser footprint exhausted the worker on large inputs.\ntest \"keeps parser overhead below the input-size budget\" do\n  payload = large_input()\n  {result, peak} = measure_peak(fn -> parse(payload) end)\n  assert result == :ok\n\n  # `payload` was allocated before the baseline, so `peak` is parser overhead only.\n  # Runtime-wide sampling may include unrelated allocations.\n  assert peak < byte_size(payload) / 3\nend"
+      },
+      "correct": "split",
+      "expected_rule": "Put the known regression above the test and the measurement caveat beside the assertion it qualifies.",
+      "grading_note": "The facts are not redundant: they govern different scopes and should be placed accordingly."
+    },
+    {
+      "id": "disc-09",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "Anything that would genuinely surprise a reader who knows the language and library.",
+      "evidence": "A runtime note survived because slicing returns a view rather than copying bytes.",
+      "variants": {
+        "no_comment": "{binary_part(contents, offset, length), offset + length}",
+        "runtime_note": "# `binary_part/3` returns a view, so this slice does not copy the source.\n{binary_part(contents, offset, length), offset + length}"
+      },
+      "correct": "runtime_note",
+      "expected_rule": "Keep a concise note about surprising platform behavior when it explains the memory consequence.",
+      "grading_note": "This case prevents the evaluator from learning that deletion is always preferred."
+    },
+    {
+      "id": "disc-10",
+      "type": "discrimination",
+      "prompt": "Which version follows comment-register, and which rule decides it?",
+      "rule_quote": "An external requirement.",
+      "evidence": "A sensitive-data comment survived because a parser error contained the submitted payload and could reach logs or durable metadata.",
+      "variants": {
+        "mechanical": "# Ignore the detailed message and return a generic reason.\n{:error, {:malformed_input, _message}} -> cancel(job, \"malformed input\")",
+        "constraint": "# Parser errors include the submitted row. Customer data must not reach logs\n# or durable job metadata.\n{:error, {:malformed_input, _message}} -> cancel(job, \"malformed input\")"
+      },
+      "correct": "constraint",
+      "expected_rule": "Keep a comment that names the sensitive-data containment requirement and the surprising source of the data.",
+      "grading_note": "The mechanical version says what the pattern does. The constraint version says why the detail must be discarded."
+    },
+    {
+      "id": "trans-01",
+      "type": "transformation",
+      "input": "# Parse failures must happen before writes. Validation and the write path must\n# share line handling. The first row over the cap is needed to report truncation.\ndefp validate(rows) do\n  rows\n  |> line_stream()\n  |> parse_rows()\n  |> Stream.drop(1)\n  |> Stream.take(@row_limit + 1)\n  |> Stream.run()\nend",
+      "task": "Edit comments only. Preserve behavior, but move each reason beside the exact operation it protects. Return only the revised code.",
+      "rule_quote": "Put the reason beside the decision.",
+      "reference_after": "defp validate(rows) do\n  rows\n  |> line_stream()\n  # Validation and the write path must share line handling. Otherwise validation\n  # can pass and writing can fail after inserts begin.\n  |> parse_rows()\n  |> Stream.drop(1)\n  # The first row over the cap is required to report truncation, and it must\n  # validate before any writes.\n  |> Stream.take(@row_limit + 1)\n  # Force the lazy parser before writes. A malformed row must not arrive after\n  # the first batch commits.\n  |> Stream.run()\nend",
+      "rubric": {
+        "violation_fixed": "Is the function-top block gone, with each surviving reason placed beside parse_rows, Stream.take, or Stream.run?",
+        "placement": "Does every comment clearly govern the next operation rather than the whole function?",
+        "no_new_violation": "No behavior changes, no speculative rationale, and no mechanical narration added."
+      },
+      "grading_note": "Exact wording may vary. The three reasons and their local placement are the point."
+    },
+    {
+      "id": "trans-02",
+      "type": "transformation",
+      "input": "# Larger chunks use more memory. Smaller chunks use more CPU.\n@chunk_size 192_000",
+      "task": "Edit the comment according to comment-register. There is no budget, machine spec, benchmark, or observed failure available. Return only the revised code.",
+      "rule_quote": "No comment is a valid result.",
+      "reference_after": "@chunk_size 192_000",
+      "rubric": {
+        "violation_fixed": "Is the unsupported comment deleted rather than polished?",
+        "placement": "Not applicable; the correct result has no comment.",
+        "no_new_violation": "The value and code remain unchanged, and no invented evidence is introduced."
+      },
+      "grading_note": "A rewrite that supplies a plausible-sounding reason fails. The task explicitly says no evidence is available."
+    },
+    {
+      "id": "trans-03",
+      "type": "transformation",
+      "input": "# Validates the full archive before restoring any entries.\nentries |> Stream.take(@restore_limit) |> validate()",
+      "task": "Rewrite the comment so it states the strongest guarantee the code actually provides. Return only the revised code.",
+      "rule_quote": "Do not describe a bounded guarantee as a universal one.",
+      "reference_after": "# Validates every entry the capped restore can consume before writing.\nentries |> Stream.take(@restore_limit) |> validate()",
+      "rubric": {
+        "violation_fixed": "Does the comment stop claiming that entries beyond the cap are validated?",
+        "placement": "The comment may remain above the expression because one invariant governs the whole expression.",
+        "no_new_violation": "No new mechanics or unsupported behavior are added."
+      },
+      "grading_note": "Accept equivalent wording such as 'validates the capped prefix before restoring it'."
+    },
+    {
+      "id": "trans-04",
+      "type": "transformation",
+      "input": "# An 11x parser footprint exhausted the worker. The fixture is allocated before\n# the baseline. Runtime-wide sampling may include unrelated allocations, and\n# the threshold is three times the expected peak.\ntest \"keeps parser overhead below the input-size budget\" do\n  payload = large_input()\n  {result, peak} = measure_peak(fn -> parse(payload) end)\n  assert result == :ok\n  assert peak < byte_size(payload) / 3\nend",
+      "task": "Edit comments only. Keep the known regression at test scope, but move assertion-specific accounting and measurement caveats beside the assertion. Return only the revised code.",
+      "rule_quote": "Split comments by the code they explain.",
+      "reference_after": "# An 11x parser footprint exhausted the worker on large inputs.\ntest \"keeps parser overhead below the input-size budget\" do\n  payload = large_input()\n  {result, peak} = measure_peak(fn -> parse(payload) end)\n  assert result == :ok\n\n  # `payload` was allocated before the baseline, so `peak` is parser overhead only.\n  # Runtime-wide sampling may include unrelated allocations.\n  assert peak < byte_size(payload) / 3\nend",
+      "rubric": {
+        "violation_fixed": "Is the known regression kept above the test while baseline and sampling caveats move beside the peak assertion?",
+        "placement": "Do the comments now match test scope versus assertion scope?",
+        "no_new_violation": "No test behavior changes and no useful caveat is lost."
+      },
+      "grading_note": "The exact margin sentence may be retained beside the assertion if it stays concise."
+    },
+    {
+      "id": "det-01",
+      "type": "detection",
+      "prompt": "Review these inline comments with comment-register. List every failing comment and the rule it breaks. Do not flag comments that earn their place.",
+      "input_document": "# Larger chunks use more memory. Smaller chunks use more CPU.\n@chunk_size 192_000\n\n# Parse all records and drop the header before writing.\ndefp restore(records) do\n  records\n  |> Stream.drop(1)\n  |> Stream.take(@restore_limit)\n  |> validate()\nend\n\n# Validates the full backup before restoring any records.\ndefp validate(records), do: Enum.each(records, &validate_record!/1)\n\ndefp slice(contents, offset, length) do\n  # `binary_part/3` returns a view, so this slice does not copy the source.\n  binary_part(contents, offset, length)\nend\n\n# Decoder errors include the submitted payload. Submitted data must not reach\n# logs or durable task metadata.\ndefp public_reason({:decode_error, _details}), do: \"invalid payload\"",
+      "violations": [
+        {
+          "quote": "Larger chunks use more memory. Smaller chunks use more CPU.",
+          "rule": "Generic performance tradeoff without a budget, machine spec, or observed failure.",
+          "reason": "It does not explain the chosen chunk size."
+        },
+        {
+          "quote": "Parse all records and drop the header before writing.",
+          "rule": "Mechanical narration without a constraint.",
+          "reason": "The pipeline already shows these operations."
+        },
+        {
+          "quote": "Validates the full backup before restoring any records.",
+          "rule": "Claims a broader guarantee than the capped caller enforces.",
+          "reason": "Only the prefix passed by restore/1 is validated."
+        }
+      ],
+      "traps": [
+        {
+          "quote": "`binary_part/3` returns a view",
+          "why_valid": "Surprising runtime behavior with a concrete copy-avoidance consequence."
+        },
+        {
+          "quote": "Decoder errors include the submitted payload",
+          "why_valid": "Names a sensitive-data containment requirement."
+        }
+      ]
+    },
+    {
+      "id": "det-02",
+      "type": "detection",
+      "prompt": "Review these test comments with comment-register. List every failing comment and the rule it breaks. Do not flag comments that explain a fixture, known failure, or measurement caveat.",
+      "input_document": "# The streaming parser must match the string parser.\ntest \"streaming parser matches string parser\" do\n  assert via_stream(input()) == via_string(input())\nend\n\n# This creates a long padding row and then parses it.\ntest \"a quoted field crossing the boundary remains one row\" do\n  boundary = 64_000\n  # Put the opening quote 7 bytes before the boundary so the record crosses it.\n  padded = fixture_with_quote_at(boundary - 7)\n  assert parse(padded) == expected_rows()\nend\n\n# A 9x parser footprint exhausted the worker on large inputs.\ntest \"keeps parser overhead below the input-size budget\" do\n  payload = large_input()\n  {result, peak} = measure_peak(fn -> parse(payload) end)\n  assert result == :ok\n\n  # `payload` was allocated before the baseline, so `peak` is parser overhead only.\n  # Runtime-wide sampling may include unrelated allocations.\n  assert peak < byte_size(payload) / 3\nend",
+      "violations": [
+        {
+          "quote": "The streaming parser must match the string parser.",
+          "rule": "Repeats the test name.",
+          "reason": "It does not explain why this case exists."
+        },
+        {
+          "quote": "This creates a long padding row and then parses it.",
+          "rule": "Narrates obvious test setup.",
+          "reason": "The fixture call and assertion already show that."
+        }
+      ],
+      "traps": [
+        {
+          "quote": "Put the opening quote 7 bytes before the boundary",
+          "why_valid": "Explains why this fixture, rather than a nearby one, exercises the boundary."
+        },
+        {
+          "quote": "A 9x parser footprint exhausted the worker",
+          "why_valid": "Names the known failure the test guards against."
+        },
+        {
+          "quote": "`payload` was allocated before the baseline",
+          "why_valid": "Explains measurement accounting beside the assertion."
+        }
+      ]
+    }
+  ],
+  "coverage_gaps": [
+    {
+      "rule": "TODO/FIXME comments need a ticket or resolving condition.",
+      "gap": "No TODO or FIXME appeared in the evidence."
+    },
+    {
+      "rule": "A comment that belongs in library documentation rather than this codebase.",
+      "gap": "The evidence contained local implementation comments, not misplaced API documentation."
+    },
+    {
+      "rule": "Renaming an identifier can replace the comment.",
+      "gap": "The cleaned diff included deletion for repeated tests and unsupported rationale, but no clean rename-before/after pair."
+    }
+  ],
+  "notes": "The suite deliberately includes valid technical comments as traps. A model that applies 'why, not what' as 'delete every comment' should fail disc-09, disc-10, and both detection cases. Case count: 10 discrimination, 4 transformation, 2 detection."
+}

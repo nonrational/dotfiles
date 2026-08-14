@@ -40,16 +40,16 @@ observed failure:
 ~~~elixir
 # Bad: describes mechanics, sounds technical, explains nothing about the decision
 # `drain_batch/1` materializes each upstream element before dispatching it.
-# Feeding it 500-item batches bounds allocations per worker.
-@batch_size 500
+# Feeding it 400-item batches bounds allocations per worker.
+@batch_size 400
 
 # Good: names the constraint and states the tradeoff
-# 500-item batches on a 2 GB worker. Smaller batches cap memory but waste
+# 400-item batches on a 2 GB worker. Smaller batches cap memory but waste
 # scheduling overhead. Larger ones risk OOM under backpressure.
-@batch_size 500
+@batch_size 400
 ~~~
 
-The bad version cannot answer *why 500 and not 250 or 2000*. The good version can.
+The bad version cannot answer *why 400 and not 200 or 1600*. The good version can.
 
 Sometimes the evidence supports the bound but not the exact number. Say that
 honestly. A comment may document a hidden second role without claiming the
@@ -57,13 +57,24 @@ value is tuned:
 
 ~~~elixir
 # One batch of records and results is the most held in memory at once.
-# Buffering the whole file exhausted the worker on large imports.
-@insert_batch_size 500
+# Buffering the whole input exhausted the worker on large datasets.
+@insert_batch_size 400
 ~~~
 
 This earns its place because the code does not show that the insert size is
 also the memory window, and the observed failure explains why the window must
-stay bounded. It does not pretend that 500 is optimal.
+stay bounded. It does not pretend that 400 is optimal.
+
+A surprising runtime guarantee is also evidence when the implementation relies
+on it. It does not need a separate budget:
+
+~~~elixir
+# `binary_part/3` returns a view, so this slice does not copy the source.
+binary_part(contents, offset, length)
+~~~
+
+The no-copy guarantee explains why this operation is safe for the intended
+memory behavior. A comment about unrelated runtime trivia would still fail.
 
 When the evidence does not explain the value, remove the comment instead of
 padding it with a generic tradeoff:
@@ -71,10 +82,10 @@ padding it with a generic tradeoff:
 ~~~elixir
 # Bad: true of almost every chunk size, but not a reason for this one
 # Larger chunks use more memory. Smaller chunks use more CPU.
-@chunk_size 256_000
+@chunk_size 192_000
 
 # Better: leave the value uncommented until there is a real constraint to name
-@chunk_size 256_000
+@chunk_size 192_000
 ~~~
 
 ## What-then-why trap
@@ -88,7 +99,7 @@ A comment that opens with what the code does before landing on a constraint is s
 
 # Good: opens with the constraint
 # Malformed headers must raise before any rows commit — no summary to report
-# yet, and the rescue clause only covers the lazy import loop that follows.
+# yet, and the rescue clause only covers the lazy write loop that follows.
 ~~~
 
 A short orienting sentence is allowed when it names a semantic role that the
@@ -124,7 +135,7 @@ operation it sits beside.
 
 ~~~elixir
 # Bad: the reader has to map three reasons to three distant operations
-# Parse failures must happen before writes. Validation and import must share
+# Parse failures must happen before writes. Validation and the write path must share
 # line handling. The first row over the cap is needed to report truncation.
 defp validate(rows) do
   rows
@@ -139,7 +150,7 @@ end
 defp validate(rows) do
   rows
   |> line_stream()
-  # Validation and import must share line handling. Otherwise validation can
+  # Validation and the write path must share line handling. Otherwise validation can
   # pass and the write path can fail after inserts begin.
   |> parse_rows()
   |> Stream.drop(1)
@@ -162,7 +173,7 @@ no stronger than the code:
 # Validates the full file before writing.
 
 # Good: says exactly what is covered
-# Validates every row the capped import can consume before writing.
+# Validates every row the capped restore can consume before writing.
 ~~~
 
 ## What to cut
@@ -188,25 +199,36 @@ Test comments follow different rules. The question is not "why did you make this
 
 - The invariant being exercised ("proves `Stream.with_index` keeps counting across the chunk boundary")
 - Why this fixture and not an adjacent one ("sized so the character's first byte lands 1 byte before the boundary")
-- A known failure the test guards against ("the eager path OOM-killed the worker at 13× the file size")
+- A known failure the test guards against ("the eager path OOM-killed the worker at 9x the input size")
 - A measurement caveat that could produce a false negative ("`:erlang.memory(:total)` is VM-wide — a large concurrent allocation can eat into the margin")
 
 Cut test comments that just describe the test setup in prose when the test body already shows it clearly.
+
+Naming an invariant is not enough when the test title already names the same
+invariant:
+
+~~~elixir
+# Bad: repeats the title instead of adding a reason for the case
+# The streaming parser must match the string parser.
+test "streaming parser matches string parser" do
+  assert via_stream(input()) == via_string(input())
+end
+~~~
 
 Split comments by the code they explain. Put the known regression above the
 test; put fixture accounting and measurement caveats beside the assertion:
 
 ~~~elixir
-# A 12x parser footprint exhausted the worker on large files.
+# An 11x parser footprint exhausted the worker on large inputs.
 test "keeps parser overhead below the file-size budget" do
-  csv = large_csv()
-  {result, peak} = measure_peak(fn -> parse(csv) end)
+  payload = large_input()
+  {result, peak} = measure_peak(fn -> parse(payload) end)
 
   assert result == :ok
 
-  # `csv` was allocated before the baseline, so `peak` is parser overhead only.
+  # `payload` was allocated before the baseline, so `peak` is parser overhead only.
   # Runtime-wide sampling may include unrelated allocations.
-  assert peak < byte_size(csv) / 4
+  assert peak < byte_size(payload) / 3
 end
 ~~~
 
@@ -215,7 +237,7 @@ end
 Fail a comment if any is true:
 
 - Describes what a function or expression does without naming a constraint.
-- Uses performance or memory vocabulary without a budget, machine spec, or observed failure.
+- Uses performance or memory vocabulary without a budget, machine spec, observed failure, or runtime guarantee the implementation relies on.
 - Removing it and renaming the identifier covers the same ground.
 - Names how the code works rather than why this approach was chosen.
 - Sits above a whole function when it explains one pipe stage or branch.
