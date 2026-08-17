@@ -15,6 +15,7 @@ home/.gitconfig.Darwin   ~/.gitconfig.Darwin   os=Darwin
 home/.gitconfig.git-town ~/.gitconfig.git-town tool=git-town
 home/.githelpers         ~/.githelpers
 home/.gitignore_global   ~/.gitignore_global
+home/.tool-versions      ~/.tool-versions
 home/.inputrc            ~/.inputrc
 home/.irbrc              ~/.irbrc
 home/.nethackrc          ~/.nethackrc
