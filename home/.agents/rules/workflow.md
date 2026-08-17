@@ -22,6 +22,7 @@ For multi-step tasks, state a brief plan:
 
 - Comments describe *why*, not *what*. Only add a "what" comment when the code is particularly dense.
 - NEVER use Conventional Commit prefixes (e.g., "fix:", "feat:", "fix(deps):"). Use plain, descriptive commit messages.
+- Use `uv` rather than `pip` for temporary Python dependencies and one-off script environments.
 
 ## Git & PR Hygiene
 
@@ -44,3 +45,4 @@ For multi-step tasks, state a brief plan:
 - **Commit auto-formatter diffs.** If `prettier` / `eslint --fix` / equivalent reformats files outside the PR's scope, commit them on the same branch. CI lint will fail on them otherwise — there is no "separate formatting sweep PR".
 - **Don't escape backticks in quoted heredocs.** When writing PR / issue / comment bodies via `gh … --body "$(cat <<'EOF' … EOF)"`, write backticks raw. The `'EOF'` quoting disables shell expansion, so `\`` survives literally and GitHub renders the backslash.
 - **Don't pass `--delete-branch` to `gh pr merge`** when the repo has auto-delete enabled. The synchronous delete races with GitHub's auto-retarget of stacked dependent PRs and can auto-close the next PR in the stack instead of retargeting it. Let the repo's auto-delete handle cleanup.
+- **Verify review follow-ups against the same interface.** Before saying a follow-up change addresses review feedback, confirm it changes the same public surface. A GraphQL path does not cover an equivalent REST path, and vice versa.
