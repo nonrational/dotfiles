@@ -65,4 +65,15 @@ scutil_set_hostname() {
   sudo scutil --set ComputerName "$1"
 }
 
+# New local terminal windows land in tmux (new -A: attach or create "main").
+# The TERM_PROGRAM allowlist excludes ssh, scripts, and IDE shells — but not
+# agent shells, which inherit iTerm's TERM_PROGRAM, so the agent env markers
+# do that job. NO_TMUX=1 opts a shell out. exec means detaching closes the
+# window: the window is a view of the session, not a shell that ran tmux.
+if [[ $- == *i* && -z "$TMUX" && -z "$NO_TMUX" && -z "$CLAUDECODE" && -z "$AI_AGENT" ]] \
+    && [[ "$TERM_PROGRAM" == "iTerm.app" || "$TERM_PROGRAM" == "Apple_Terminal" ]] \
+    && command -v tmux &> /dev/null; then
+  exec tmux new-session -A -s main
+fi
+
 
