@@ -19,10 +19,12 @@
 !plugins/
 !plugins/marketplaces/
 
-# Tracked top-level config files.
+# Tracked top-level config files. CLAUDE.md is named exactly — a bare `!*.md`
+# would also re-include runtime markdown like queue.md, whose contents (queued
+# tasks from private repos) must never reach this public repo.
 !.gitignore
 !settings.json
-!*.md
+!CLAUDE.md
 !sync-plugins.sh
 
 # .keep markers so otherwise-empty config directories get committed. `**`
