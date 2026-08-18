@@ -1,11 +1,13 @@
 ---
-description: Queue a task for after current work — appends to ~/.claude/queue.md without interrupting
+description: Queue a task — ensures the session task list exists, captures current work on it, and adds the argument as the next pending task
+argument-hint: "task to queue"
+allowed-tools: TaskCreate, TaskUpdate, TaskList
 ---
 
-Append the following task to `~/.claude/queue.md`:
+Queue the following without interrupting the current work:
 
-```bash
-echo "- [ ] $ARGUMENTS" >> ~/.claude/queue.md
-```
+$ARGUMENTS
 
-Then respond with a single line: "Queued: $ARGUMENTS" — nothing else. Do not start working on the task.
+1. Run TaskList. If there is in-flight work this session and it isn't on the list, create a task for it (TaskCreate) and mark it in_progress (TaskUpdate) — the queue needs the current work as its head. If nothing is in flight, skip this step.
+2. Create a pending task for the quoted text above (TaskCreate). If step 1 identified current work, block the new task on it (TaskUpdate addBlockedBy) so it is explicitly next.
+3. Reply with a single line: "Queued: $ARGUMENTS" — nothing else. Do not start the queued task; return to the current work.
