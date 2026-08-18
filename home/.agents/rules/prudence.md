@@ -14,7 +14,7 @@ Use this when picking a model and reasoning effort for a task — your own or a 
 - **Least powerful model that can do the job.** Start low, escalate on evidence — a subagent that stalls, a review that keeps missing things — not on a hunch that a task "feels hard".
 - **Turn count beats token price.** A cheap model that flails for ten turns costs more than a capable one that lands in three. When the plan already spells out the steps, the cheapest tier fits; when it doesn't, floor at Sonnet.
 - **Effort tracks stakes, not size.** A one-line change to auth logic is high effort; a hundred-line mechanical rename is low. Ask what breaks if you're wrong.
-- **Give the last word to Opus.** Whatever tier did the work, the final adversarial review — the one gating a merge — runs on Opus at high effort or above.
+- **Give the last word to the top tier.** Whatever tier did the work, the final adversarial review — the one gating a merge — runs on the strongest model available (Opus, or Fable where enabled) at high effort or above.
 - **Name the model when you delegate.** An omitted model inherits the session's, often the most expensive — set it explicitly on every subagent.
 
 ### Before dispatching

@@ -1,11 +1,13 @@
 ---
 name: code-review-register
-description: Voice and format register for PR/code review comments. Use when drafting, suggesting, or editing any pull-request or code review comment on the user's behalf — inline comments, top-level PR comments, review summaries, or replies to review threads.
+description: Voice and format register for PR/code review comments. Use when drafting, suggesting, or editing any pull-request or code review comment on the user's behalf — inline comments, top-level PR comments, review summaries, or replies within reviews you are conducting. (Replies to feedback on your own PR belong to address-pr-feedback.)
 ---
 
 # Code Review Comment Register
 
 Applies whenever drafting, suggesting, or editing a PR/code review comment on my behalf (inline comments, top-level PR comments, review summaries).
+
+**Scope.** This is the reviewer's voice — comments on someone else's code. When working through feedback on my own PR interactively, follow `address-pr-feedback`: its terse reply formats win over the guidance below. Unattended pipelines that load only this register (e.g. a sweep's fix-stage replies) keep using it for author-side replies — plain and concrete there; the humor and delight guidance is reviewer-side only.
 
 ## What blocks and what doesn't
 

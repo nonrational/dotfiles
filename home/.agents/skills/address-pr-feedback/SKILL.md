@@ -9,6 +9,8 @@ description: 'Fetch, triage, and address review comments on your own open PR. Us
 
 Reviewer feedback is a signal: someone took time to leave a note, so they probably care about it. The default is to accept and implement, not interrogate. The bar for pushing back is "this is actively wrong or inconsistent with the codebase" — not "I'd have done it differently."
 
+**Precedence.** This skill owns the author side of review. `superpowers:receiving-code-review` fires on the same trigger — its verify-before-implementing discipline is compatible (step 2 here requires the same), but where the postures disagree, this skill's accept-bias wins. `code-review-register` is the reviewer's voice; replies posted by this workflow use the formats in step 6 below, not the register's warmth.
+
 ## Workflow
 
 **Present a plan and get confirmation before touching any code or posting any replies.** The point is to catch mistriages before they land — a reviewer might have meant something different, or you might have grepped the wrong thing. Don't implement. Don't reply. Wait for the go-ahead.

@@ -51,7 +51,7 @@ OS-conditional logic, deploy strategy, tests, AI-agent config.
 **First, load prior decisions** so the same ideas aren't re-litigated every run:
 
 ```
-.claude/skills/find-inspiration/bin/triage-issues.py --summarize-decisions
+~/.claude/skills/find-inspiration/bin/triage-issues.py --summarize-decisions
 ```
 
 (Invoke the script directly — its shebang uses the system python3. A bare `python3` dies in the
@@ -125,13 +125,13 @@ back into the JSON. Do not create anything yet.
 Run the helper **dry-run first**, show the user exactly what will be created/skipped, then for real:
 
 ```
-.claude/skills/find-inspiration/bin/triage-issues.py --run /tmp/find-inspiration-run.json --dry-run
-.claude/skills/find-inspiration/bin/triage-issues.py --run /tmp/find-inspiration-run.json
+~/.claude/skills/find-inspiration/bin/triage-issues.py --run /tmp/find-inspiration-run.json --dry-run
+~/.claude/skills/find-inspiration/bin/triage-issues.py --run /tmp/find-inspiration-run.json
 ```
 
 The script is idempotent (dedups on a stable `[find-inspiration:<id>]` title marker), ensures labels
 exist, builds the issue body from the structured fields, and appends ALL decisions (including
-rejects, with rationale) to `.claude/skills/find-inspiration/decisions.jsonl` so future runs can
+rejects, with rationale) to `~/.claude/skills/find-inspiration/decisions.jsonl` so future runs can
 pre-filter. The log lives inside the skill dir on purpose — a dotdir at repo root would be symlinked
 into `$HOME` by `link-dotfiles.sh`. `reject` items create no issue.
 

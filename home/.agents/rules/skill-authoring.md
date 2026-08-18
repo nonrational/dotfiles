@@ -38,7 +38,7 @@ When a portable artifact comes from someone else's work, record it in **frontmat
 - `forked-from: <url>`. A derivative. You kept the skeleton and changed the rules.
 
 ```bash
-grep -rnE '^(source|forked-from): https?://' .claude/skills/*/SKILL.md
+grep -rnE '^(source|forked-from): https?://' <tooling-dirs>   # e.g. the skills AND commands trees
 ```
 
 Anchor on the URL, not the key. A bare `source:` also matches template blocks *inside* a skill's body, where the same word means something else entirely.

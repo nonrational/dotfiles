@@ -2,7 +2,7 @@
 description: Queue a task for after current work — appends to ~/.claude/queue.md without interrupting
 ---
 
-Append the following task to `~/.claude/queue.md` using a bash heredoc:
+Append the following task to `~/.claude/queue.md`:
 
 ```bash
 echo "- [ ] $ARGUMENTS" >> ~/.claude/queue.md

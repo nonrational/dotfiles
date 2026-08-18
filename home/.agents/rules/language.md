@@ -2,6 +2,8 @@
 
 Use this for all written communication, including email drafts.
 
+Scoped registers extend this guide and win where they apply: `code-review-register` for PR/code-review comments, `prose-register` for essays and posts.
+
 ---
 
 ## Voice and Tone
