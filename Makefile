@@ -59,6 +59,22 @@ test:
 
 deploy:
 	./deploy.sh apply
+	@$(MAKE) skip-mutable-settings
+
+# Antigravity writes workspace trust state into its tracked settings.json
+# through the ~/.gemini symlink, so private repo paths accumulate in a file
+# this public repo tracks — committing them would name private repos here.
+# skip-worktree keeps that churn out of git status and out of commits; the
+# flag is per-clone, so deploy re-applies it. To commit a deliberate settings
+# edit: make unskip-mutable-settings, stage everything EXCEPT the
+# trustedWorkspaces key, commit, then make skip-mutable-settings again.
+skip-mutable-settings:
+	@git update-index --skip-worktree home/.gemini/antigravity-cli/settings.json
+	@echo "skip-worktree set on antigravity settings.json"
+
+unskip-mutable-settings:
+	@git update-index --no-skip-worktree home/.gemini/antigravity-cli/settings.json
+	@echo "skip-worktree cleared on antigravity settings.json"
 
 # Ensures home/.copilot/instructions/*.instructions.md (per-file symlinks
 # required by the Copilot CLI's *.instructions.md filename suffix) mirror
