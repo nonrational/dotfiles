@@ -39,7 +39,27 @@
       "command(just format-check)",
       "command(npm run)",
       "command(node ace test)",
-      "command(git commit)"
+      "command(git commit)",
+      "command(git rebase)",
+      "command(grep)",
+      "command(git checkout)",
+      "command(git)",
+      "command(make)",
+      "command(vim)",
+      "command(echo)",
+      "command(export)",
+      "command(cp)",
+      "command(touch)",
+      "command(tail)",
+      "command(wc)",
+      "command(curl)",
+      "command(wget)",
+      "command(tar)",
+      "command(unzip)",
+      "command(zip)",
+      "command(jq)",
+      "command(tree)",
+      "command(docker)"
     ]
   }
 }
