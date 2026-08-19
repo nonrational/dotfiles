@@ -21,5 +21,17 @@
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/record-session-cost.sh"
+          }
+        ]
+      }
+    ]
   }
 }

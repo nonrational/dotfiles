@@ -40,7 +40,20 @@ IFS=$'\037' read -r model effort pct cache cost dir < <(
 [[ $cache =~ ^[0-9]+$ ]] || cache=""
 [[ $cost =~ ^[0-9.]+$ ]] || cost=0
 
-DIM=$'\033[2m' CYAN=$'\033[36m' GREEN=$'\033[32m' YELLOW=$'\033[33m' RED=$'\033[31m' RESET=$'\033[0m'
+# Month-to-date cost: sum of completed sessions from the log + current session.
+monthly_total=""
+monthly_log="${HOME}/.claude/session-costs.jsonl"
+if [[ -s "$monthly_log" ]]; then
+  month_prefix=$(date +%Y-%m)
+  prev=$(jq -rs --arg m "$month_prefix" \
+    '[.[] | select(.date | startswith($m)) | .cost] | add // 0' \
+    "$monthly_log" 2>/dev/null)
+  if [[ "$prev" =~ ^[0-9.]+$ ]]; then
+    monthly_total=$(awk "BEGIN { printf \"%.2f\", $prev + $cost }")
+  fi
+fi
+
+DIM=$'\033[2m' CYAN=$'\033[36m' GREEN=$'\033[32m' YELLOW=$'\033[33m' RED=$'\033[31m' ORANGE=$'\033[38;2;255;183;102m' RESET=$'\033[0m'
 
 # Thresholds run opposite ways: high context is bad, high cache hit is good.
 ramp_up() { if [ "$1" -ge 90 ]; then echo "$RED"; elif [ "$1" -ge 70 ]; then echo "$YELLOW"; else echo "$GREEN"; fi; }
@@ -51,6 +64,16 @@ segments=("${CYAN}${model}${RESET}")
 segments+=("$(ramp_up "$pct")ctx ${pct}%${RESET}")
 [ -n "$cache" ] && segments+=("$(ramp_down "$cache")cache ${cache}%${RESET}")
 segments+=("${YELLOW}$(printf '$%.2f' "$cost")${RESET}")
+if [ -n "$monthly_total" ]; then
+  budget_file="${HOME}/.claude/.statusline.local"
+  budget=$(grep -E '^MONTHLY_BUDGET=' "$budget_file" 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
+  if [[ "$budget" =~ ^[0-9.]+$ ]]; then
+    mtd_pct=$(awk "BEGIN { printf \"%d\", ($monthly_total / $budget) * 100 + 0.5 }")
+    segments+=("${ORANGE}MTD ${mtd_pct}%${RESET}")
+  else
+    segments+=("${ORANGE}MTD $(printf '$%.2f' "$monthly_total")${RESET}")
+  fi
+fi
 [ -n "$dir" ] && segments+=("${dir##*/}")
 
 # Ask git about the workspace, not about wherever this script happened to run.
