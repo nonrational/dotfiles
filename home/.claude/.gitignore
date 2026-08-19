@@ -25,6 +25,7 @@
 !.gitignore
 !settings.json
 !CLAUDE.md
+!statusline.sh
 !sync-plugins.sh
 
 # .keep markers so otherwise-empty config directories get committed. `**`
