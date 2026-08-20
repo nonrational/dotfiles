@@ -8,8 +8,9 @@ home/.bashrc.Darwin      ~/.bashrc.Darwin      os=Darwin
 home/.bashrc.Linux       ~/.bashrc.Linux       os=Linux
 home/.bashrc.nyx         ~/.bashrc.nyx         host=nyx
 home/.claude             ~/.claude
-home/.copilot            ~/.copilot
+home/.config/kitty       ~/.config/kitty       os=Darwin
 home/.config/opencode/opencode.jsonc ~/.config/opencode/opencode.jsonc
+home/.copilot            ~/.copilot
 home/.gemini             ~/.gemini
 home/.gitconfig          ~/.gitconfig
 home/.gitconfig.Darwin   ~/.gitconfig.Darwin   os=Darwin
@@ -28,8 +29,6 @@ home/.vim                ~/.vim
 home/.vimrc              ~/.vimrc
 home/.zprofile           ~/.zprofile
 home/.zshrc              ~/.zshrc
-home/.config/kitty       ~/.config/kitty       os=Darwin
 home/bin.Darwin          ~/bin                 os=Darwin
 home/bin.Linux           ~/bin                 os=Linux
-home/kitty               ~/.config/kitty
 fonts                    ~/Library/Fonts/dotfiles          os=Darwin
