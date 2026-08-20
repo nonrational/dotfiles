@@ -337,13 +337,14 @@ test_audit_skips_unmatched_condition() {
 test_manifest_covers_link_dotfiles() {
     # Mirror link-dotfiles.sh's find + exclude list, against the real repo
     # (not a sandbox fixture) so this proves coverage of the actual manifest.
-    # .agents is an in-repo root (source of truth for rules/skills/ext),
-    # not a deploy target, so it's excluded like .gitmodules and .macos.
+    # .agents is an in-repo root (source of truth for rules/skills/ext), and
+    # .config contains individually deployed app configs. Neither is a deploy
+    # target, so both are excluded like .gitmodules and .macos.
     local linked
     linked="$(cd "$ROOT/home" && find . -maxdepth 1 -name '.*' \
         ! -name '.' ! -name '.AppleDouble' ! -name '.DS_Store' \
         ! -name '.git' ! -name '.github' ! -name '.gitignore' \
-        ! -name '.gitmodules' ! -name '.macos' ! -name '.agents' -exec basename {} \; | sort)"
+        ! -name '.gitmodules' ! -name '.macos' ! -name '.agents' ! -name '.config' -exec basename {} \; | sort)"
     local sources
     sources="$(grep -v '^[[:space:]]*#' "$ROOT/manifest" | awk 'NF{print $1}' | sort -u)"
     local missing="" f
@@ -360,6 +361,58 @@ test_manifest_covers_link_dotfiles() {
         ok "manifest covers every link-dotfiles.sh-linked path"
     else
         bad "manifest covers every link-dotfiles.sh-linked path (missing:$missing)"
+    fi
+}
+
+test_opencode_instructions_cover_rules() {
+    local result
+    set +e
+    result="$(ROOT="$ROOT" python3 - <<'PY'
+import json
+import os
+from pathlib import Path
+
+root = Path(os.environ["ROOT"])
+rules = {
+    f"~/.agents/rules/{path.name}"
+    for path in (root / "home/.agents/rules").glob("*.md")
+}
+config_path = root / "home/.config/opencode/opencode.jsonc"
+
+try:
+    instructions = json.loads(config_path.read_text())["instructions"]
+except (json.JSONDecodeError, KeyError) as error:
+    raise SystemExit(f"invalid OpenCode instructions: {error}")
+
+configured = set(instructions)
+errors = []
+
+if len(instructions) != len(configured):
+    errors.append("duplicate instruction paths")
+
+missing = sorted(rules - configured)
+stale = sorted(configured - rules)
+if missing:
+    errors.append(f"missing rules: {', '.join(missing)}")
+if stale:
+    errors.append(f"stale instruction paths: {', '.join(stale)}")
+
+for instruction in instructions:
+    if instruction.startswith("~/.agents/"):
+        path = root / "home/.agents" / instruction.removeprefix("~/.agents/")
+        if not path.is_file():
+            errors.append(f"unresolved instruction: {instruction}")
+
+if errors:
+    raise SystemExit("; ".join(errors))
+PY
+)"
+    status=$?
+    set -e
+    if [ "$status" = 0 ]; then
+        ok "OpenCode instructions exactly cover shared rules"
+    else
+        bad "OpenCode instructions exactly cover shared rules ($result)"
     fi
 }
 
@@ -388,6 +441,7 @@ test_audit_reports_missing
 test_audit_reports_drift
 test_audit_skips_unmatched_condition
 test_manifest_covers_link_dotfiles
+test_opencode_instructions_cover_rules
 
 echo
 echo "$pass passed, $fail failed"

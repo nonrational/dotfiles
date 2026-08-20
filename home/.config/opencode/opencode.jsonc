@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "~/.agents/rules/improvement.md",
+    "~/.agents/rules/language.md",
+    "~/.agents/rules/macos-interactions.md",
+    "~/.agents/rules/markdown.md",
+    "~/.agents/rules/prudence.md",
+    "~/.agents/rules/queue.md",
+    "~/.agents/rules/skill-authoring.md",
+    "~/.agents/rules/workflow.md"
+  ]
+}
