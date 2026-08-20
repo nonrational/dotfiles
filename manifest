@@ -31,3 +31,5 @@ home/.zshrc              ~/.zshrc
 home/.config/kitty       ~/.config/kitty       os=Darwin
 home/bin.Darwin          ~/bin                 os=Darwin
 home/bin.Linux           ~/bin                 os=Linux
+home/kitty               ~/.config/kitty
+fonts                    ~/Library/Fonts/dotfiles          os=Darwin
