@@ -11,13 +11,8 @@
 # font_family      Source Code Pro
 # font_family      Meslo LG M
 # font_family      Fantasque Sans Mono
-# font_family      family='Atkinson Hyperlegible Mono' variable_name=AtkinsonHyperlegibleMono style=ExtraLight
-font_family      family="Panic Sans"
-
-font_size        12.0
-bold_font        auto
-italic_font      auto
-bold_italic_font auto
+# font_family      Atkinson Hyperlegible Mono
+font_size 14.0
 
 # Cursor (iTerm: Cursor Type 2 = box, Blinking Cursor = false)
 cursor_shape block
@@ -79,6 +74,10 @@ map cmd+shift+d no_op
 # tabs aren't in use here.
 map cmd+w close_window
 
-# BEGIN_KITTY_FONTS
 
+# BEGIN_KITTY_FONTS
+font_family      family='Atkinson Hyperlegible Mono' style=ExtraLight variable_name=AtkinsonHyperlegibleMono
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
 # END_KITTY_FONTS

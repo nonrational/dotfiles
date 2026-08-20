@@ -69,6 +69,7 @@ cask "handy"               # Speech to text application
 cask "istat-menus"         # ($) | System monitoring app
 cask "iterm2"              # Terminal emulator as alternative to Apple's Terminal app
 cask "karabiner-elements"  # Keyboard customiser
+cask "kitty"               # GPU-based terminal emulator
 cask "maccy"               # clipboard history manager | Clipboard manager
 cask "macfuse"             # File system integration
 cask "moom"                # ($) | Utility to move and zoom windows—on one display
