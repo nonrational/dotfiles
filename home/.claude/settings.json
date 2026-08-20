@@ -29,6 +29,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/record-session-cost.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/record-turn-end.sh"
           }
         ]
       }
