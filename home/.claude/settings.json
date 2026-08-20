@@ -33,6 +33,20 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/record-turn-end.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ring-tmux-bell.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ring-tmux-bell.sh"
           }
         ]
       }
