@@ -19,6 +19,7 @@ home/.tool-versions      ~/.tool-versions
 home/.inputrc            ~/.inputrc
 home/.irbrc              ~/.irbrc
 home/.nethackrc          ~/.nethackrc
+home/.pi/agent/AGENTS.md ~/.pi/agent/AGENTS.md tool=pi
 home/.profile            ~/.profile
 home/.railsrc            ~/.railsrc
 home/.screenrc           ~/.screenrc

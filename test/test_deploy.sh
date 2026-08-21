@@ -353,6 +353,13 @@ test_manifest_covers_link_dotfiles() {
         if git -C "$ROOT" status --porcelain --ignored -- "home/$f" 2>/dev/null | grep -q '^!!'; then
             continue
         fi
+        # home/.pi is linked file-by-file rather than whole: ~/.pi also holds
+        # pi's sessions, auth.json, and trust.json, plus whatever the host
+        # provisioned there. Require an entry underneath it, not one for it.
+        if [ "$f" = ".pi" ]; then
+            grep -q '^home/\.pi/' <<<"$sources" || missing="$missing $f"
+            continue
+        fi
         grep -qxF "home/$f" <<<"$sources" || missing="$missing $f"
     done
     grep -qxF "home/bin.$(uname)" <<<"$sources" || missing="$missing bin.$(uname)"
