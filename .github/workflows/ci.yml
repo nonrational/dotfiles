@@ -23,6 +23,7 @@ jobs:
           ./deploy.sh audit
       - run: make check-copilot-instructions
       - run: make check-skills
+      - run: make check-pi-agents
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"

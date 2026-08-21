@@ -1,0 +1,17 @@
+# Allowlist approach: ignore everything, then explicitly allow tracked files.
+#
+# Only individual files under here are symlinked into ~/.pi (see the manifest),
+# so pi's runtime state stays in the real ~/.pi/agent and never reaches this
+# repo. The default-deny is insurance against that changing: sessions/ holds
+# full transcripts, trust.json records private workspace paths, and auth.json
+# holds provider credentials -- exactly the categories home/.claude/.gitignore
+# exists to keep out of a public repo.
+
+*
+
+# Re-include the config directory entry itself. Per gitignore rules, a file
+# cannot be re-included if its parent directory is excluded.
+!agent/
+
+!.gitignore
+!agent/AGENTS.md

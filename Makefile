@@ -116,6 +116,15 @@ check-copilot-instructions:
 		echo "copilot instructions mirror home/.agents/rules"; \
 	fi
 
+# Pi loads exactly one global context file (~/.pi/agent/AGENTS.md) and supports
+# neither @-imports nor a rules directory, so home/.agents/rules/*.md can't be
+# symlinked in the way home/.copilot/instructions mirrors them -- they're
+# concatenated into home/.pi/agent/AGENTS.md instead. Same failure mode as the
+# copilot mirror (a rule rename silently stops reaching the harness), so the
+# same guard: self-heal locally, fail the build in CI.
+check-pi-agents:
+	@./scripts/build-pi-agents.sh
+
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
 	mkdir -p $$HOME/.config
@@ -152,4 +161,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-copilot-instructions check-pi-agents test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
