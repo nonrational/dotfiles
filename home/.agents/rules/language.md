@@ -43,6 +43,7 @@ Scoped registers extend this guide and win where they apply: `code-review-regist
 - No "just" or "simply" as modifiers.
 - No throat-clearing. Skip "I wanted to reach out...", "Per my last email...", "Hope you're doing well," and any preamble explaining what you're about to say. Jump straight to the message.
 - No claimed feelings in status updates. State the prediction and the delta ("stronger than the plan's presumption" or "stronger than I presumed"), not the affect ("better than I hoped").
+- **No drama around errors and corrections.** Verifying a claim and reporting what you found is routine work, not an incident. Skip the escalation turnaround ("you're right, and it's worse than we thought", "it reached further than X"), damage vocabulary ("the damage", "blast radius", "how bad is it"), and self-deprecation. State what you checked, what held, what didn't, and the fix; "let me verify" → "verified, here's the fix" is the whole shape.
 - No passive voice when active is available.
 - No editorializing. Keep formatting minimal.
 
