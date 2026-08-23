@@ -19,19 +19,40 @@ The current strategy is the DEFAULT target for leaf steals but is **not sacred**
 ~2011). A foundation steal may replace part of it ONLY if it clears the outsized-benefit bar.
 "Fits my existing setup" is the right filter for leaf steals and the WRONG filter for foundation ones.
 
-## Destination context (this repo — known; don't re-derive)
+## Destination context (this repo — shape is stable; verify specifics)
 
-- **Deploy:** bespoke `Makefile` + `link-dotfiles.sh` (has interactive diff/merge) symlinking
-  root dotfiles into `$HOME`.
-- **Shell:** bash-first (Homebrew bash via `chsh`); zsh files present but secondary.
-- **OS/host branching:** `.Darwin`/`.Linux` filename suffixes, `bin.Darwin`/`bin.Linux`,
-  per-host `.bashrc.<hostname>`.
-- **Packages:** Homebrew `Brewfile`. **Runtimes:** pinned with **asdf** (`.tool-versions`).
+Trust the shape below. **Verify any claim you are going to put in an item — a line number, a
+count, whether a target exists — against `origin/main`, not the working tree.** This repo usually
+has a feature branch checked out, and an item built on unlanded work files an issue that describes
+a state main has never been in.
+
+- **Deploy:** `manifest` + `deploy.sh` — symlink-only, `apply` / `audit`, `--dry-run`. Three
+  whitespace columns: source, target, optional condition (`os=Darwin|Linux`, `host=<name>`,
+  `tool=<name>`). Adding copy/concat/generate is a parked decision, recorded in
+  `docs/superpowers/specs/2026-07-06-manifest-deploy-spike-design.md`.
+- **Layout:** sources under `home/`, targets mostly `~/.x` — but already mixed, not uniformly
+  home-root: `home/.config/*` targets `~/.config/`, `fonts` targets `~/Library/Fonts/dotfiles`.
+- **Shell:** bash-first (Homebrew bash via `chsh`); zsh files present but secondary. Per window:
+  `.bash_profile` → `.bashrc` → `.bashrc.<platform>` → `.bashrc.<host>`.
+- **OS/host branching:** `.Darwin`/`.Linux` filename suffixes, `bin.Darwin`/`bin.Linux` → `~/bin`,
+  per-host `.bashrc.<hostname>`, plus the manifest's condition column.
+- **Packages:** Homebrew `Brewfile` (brew, cask and mas lines in one file). **Runtimes:** asdf
+  `.tool-versions` — check it for the current set; it pins several ecosystems, not just one.
+- **Agent config:** `home/.agents` is the source of truth for rules and skills, shared across
+  harnesses by symlink shims (`~/.claude/rules`, `~/.claude/skills`) and per-file mirrors
+  (`home/.copilot/instructions/*.instructions.md`). Renames dangle these silently, so
+  `make check-symlinks`, `check-skills`, `check-copilot-instructions` and `check-skill-frontmatter`
+  guard them. Many skills are vendored via the `mattpocock-skills` submodule and are not editable here.
 - **macOS defaults:** imperative `.macos` + `make macos-*`. **Vendored:** git submodules.
-- **CI:** `.github/workflows/ci.yml` runs `make link-dotfiles` on macOS — a smoke test, not real tests.
+- **Tests:** `make test` = `test/test_deploy.sh` + `test/test_shell.sh`, both sandboxing a
+  throwaway `$HOME`.
+- **CI:** `.github/workflows/ci.yml` on ubuntu + macOS runs `make test`, a deploy apply/audit
+  against a temp `$HOME`, and the check targets. No real installation is exercised — Homebrew,
+  asdf and bootstrap are never run, so nothing proves a new machine comes up.
 
-For a **leaf steal**, translate into the above: new config = root dotfile + `make link-*`;
-OS-specific = suffix file or `bin.*`; packages = `Brewfile`; bash-first.
+For a **leaf steal**, translate into the above: new config = a file under `home/` plus a `manifest`
+row; OS-specific = suffix file, `bin.*`, or an `os=` condition; per-host = a `host=` condition;
+packages = `Brewfile`; agent rules and skills = `home/.agents` plus the harness shims; bash-first.
 
 ## Phase 1 — Acquire the source (read-only)
 
@@ -51,11 +72,13 @@ OS-conditional logic, deploy strategy, tests, AI-agent config.
 **First, load prior decisions** so the same ideas aren't re-litigated every run:
 
 ```
-~/.claude/skills/find-inspiration/bin/triage-issues.py --summarize-decisions
+<skill-dir>/bin/triage-issues.py --summarize-decisions
 ```
 
-(Invoke the script directly — its shebang uses the system python3. A bare `python3` dies in the
-asdf shim because this repo pins no python.)
+(`<skill-dir>` is the directory holding this SKILL.md — resolve it rather than assuming
+`~/.claude/skills/...`, which depends on which checkout is deployed on this machine. Invoke the
+script directly rather than via `python3 script.py`: its shebang pins the system interpreter, so it
+does not depend on the asdf-pinned python in `.tool-versions` being installed here.)
 
 This returns the latest decision per `id` (last decision wins). Use **stable, idea-scoped ids**
 (`manifest-deploy`, `secrets`, `xdg`, `zsh-migration`, `mise-vs-asdf`) that name the *idea for this
@@ -125,15 +148,15 @@ back into the JSON. Do not create anything yet.
 Run the helper **dry-run first**, show the user exactly what will be created/skipped, then for real:
 
 ```
-~/.claude/skills/find-inspiration/bin/triage-issues.py --run /tmp/find-inspiration-run.json --dry-run
-~/.claude/skills/find-inspiration/bin/triage-issues.py --run /tmp/find-inspiration-run.json
+<skill-dir>/bin/triage-issues.py --run /tmp/find-inspiration-run.json --dry-run
+<skill-dir>/bin/triage-issues.py --run /tmp/find-inspiration-run.json
 ```
 
 The script is idempotent (dedups on a stable `[find-inspiration:<id>]` title marker), ensures labels
 exist, builds the issue body from the structured fields, and appends ALL decisions (including
-rejects, with rationale) to `~/.claude/skills/find-inspiration/decisions.jsonl` so future runs can
-pre-filter. The log lives inside the skill dir on purpose — a dotdir at repo root would be symlinked
-into `$HOME` by `link-dotfiles.sh`. `reject` items create no issue.
+rejects, with rationale) to `decisions.jsonl` beside this SKILL.md so future runs can pre-filter.
+The log lives inside the skill dir on purpose — it travels with the skill and survives a fresh
+clone, where a path outside it would not. `reject` items create no issue.
 
 The script never mutates or closes existing issues. When a `reconsider` changes a decision, it
 prints a WARN — relabel or close the old issue by hand before moving on.
