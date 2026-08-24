@@ -4,8 +4,8 @@
 """File find-inspiration triage decisions as GitHub issues and log them durably.
 
 Usage:
-  triage-issues.py --summarize-decisions
-  triage-issues.py --run RUN.json [--dry-run]
+    triage-issues.py --summarize-decisions
+    triage-issues.py --run RUN.json [--dry-run]
 
 Reads a run JSON (schema in ../SKILL.md). Items decided `adopt` or `spike` become
 GitHub issues; `reject` items are logged only. Every decision is appended to
@@ -125,8 +125,10 @@ def issue_body(item, run):
 def fetch_issues():
     """All issues once, matched client-side — gh's --search index lags fresh
     issues, which would break dedup on an immediate re-run."""
-    out = gh("issue", "list", "-R", REPO, "--state", "all",
-             "--json", "number,title,url", "--limit", "500")
+    out = gh(
+        "issue", "list", "-R", REPO, "--state", "all",
+        "--json", "number,title,url", "--limit", "500",
+    )
     return json.loads(out or "[]")
 
 
@@ -143,8 +145,10 @@ def ensure_labels(names):
     for name in names:
         if name not in have:
             color, description = LABELS[name]
-            gh("label", "create", name, "-R", REPO,
-               "--color", color, "--description", description)
+            gh(
+                "label", "create", name, "-R", REPO,
+                "--color", color, "--description", description,
+            )
 
 
 def append_record(path, record):
@@ -179,9 +183,11 @@ def cmd_run(run_path, decisions_path, dry_run):
                 issue_url = existing["url"]
                 print(f"SKIP    {item['id']}: issue #{existing['number']} already exists")
                 if prior and prior.get("decision") != decision:
-                    print(f"WARN    {item['id']}: decision changed "
-                          f"{prior['decision']} -> {decision}; issue #{existing['number']} "
-                          f"keeps its old labels/body — update or close it by hand")
+                    print(
+                        f"WARN    {item['id']}: decision changed "
+                        f"{prior['decision']} -> {decision}; issue #{existing['number']} "
+                        f"keeps its old labels/body — update or close it by hand"
+                    )
             elif dry_run:
                 print(f"CREATE  {item['id']}: [{decision}] \"{item['title']} {marker}\"")
             else:
@@ -195,8 +201,10 @@ def cmd_run(run_path, decisions_path, dry_run):
         else:
             print(f"LOG     {item['id']}: reject — {item.get('rationale', '')}")
             if prior and prior.get("decision") in ("adopt", "spike") and prior.get("issue_url"):
-                print(f"WARN    {item['id']}: previously filed as {prior['decision']} "
-                      f"({prior['issue_url']}) — close that issue by hand")
+                print(
+                    f"WARN    {item['id']}: previously filed as {prior['decision']} "
+                    f"({prior['issue_url']}) — close that issue by hand"
+                )
 
         # Append when the decision is new/changed, or to heal a missing URL
         # (e.g. a crash after issue creation left the log without it).
@@ -228,8 +236,10 @@ def cmd_run(run_path, decisions_path, dry_run):
         print(f"PASS    {item['id']}: untriaged — will resurface next run")
 
     if dry_run:
-        print(f"\ndry-run: no issues, labels or log entries written "
-              f"({would_log} decision(s) would be logged)")
+        print(
+            f"\ndry-run: no issues, labels or log entries written "
+            f"({would_log} decision(s) would be logged)"
+        )
     elif would_log:
         print(f"\nlogged {would_log} decision(s) to {decisions_path} — commit it")
 

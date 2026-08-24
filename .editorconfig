@@ -1,0 +1,36 @@
+root = true
+
+# Canonical conventions for files authored in this repository. Bundled fonts
+# retain their upstream formatting.
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[{Makefile,.gitmodules}]
+indent_style = tab
+
+[.macos]
+# Shell continuations in this inherited macOS settings script use tabs.
+indent_style = tab
+
+[*.md]
+# Markdown indentation and trailing spaces are structural.
+indent_style = unset
+indent_size = unset
+trim_trailing_whitespace = false
+
+[{fonts/**,home/.vim/**}]
+# Preserve bundled upstream files rather than prescribing local conventions.
+indent_style = unset
+indent_size = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset

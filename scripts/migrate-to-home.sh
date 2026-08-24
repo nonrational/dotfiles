@@ -159,7 +159,7 @@ rollback() {
         if [ -n "$expected" ]; then
             die "tracked changes present that this rollback did not make:
 $expected
-       Commit them first — rollback reverses renames and a stash can't survive them."
+        Commit them first — rollback reverses renames and a stash can't survive them."
         fi
     fi
 
@@ -226,8 +226,8 @@ preflight() {
     if [ "$live" != "0" ] && [ "${deployed#"$DOTS"/}" != "$deployed" ]; then
         if [ "$apply" = 1 ]; then
             die "$live Claude Code process(es) running, and ~/.claude points into $DOTS.
-       This migration moves ~/.claude out from under them.
-       Quit Claude Code entirely, then re-run from a plain terminal."
+          This migration moves ~/.claude out from under them.
+          Quit Claude Code entirely, then re-run from a plain terminal."
         fi
         warn "$live Claude Code process(es) running — fine for a dry run, but --apply will refuse."
     fi
@@ -242,7 +242,7 @@ preflight() {
     if [ -n "$dirty" ]; then
         die "uncommitted tracked changes beyond the agent settings files this handles:
 $dirty
-       Commit them first (a checkout across the home/ rename can't carry a stash)."
+        Commit them first (a checkout across the home/ rename can't carry a stash)."
     fi
 
     # An untracked copy of this script in the checkout shadows the tracked path
@@ -250,8 +250,8 @@ $dirty
     if git -C "$DOTS" status --porcelain -- scripts/migrate-to-home.sh 2>/dev/null | grep -q '^??'; then
         if [ "$apply" = 1 ]; then
             die "untracked scripts/migrate-to-home.sh in $DOTS shadows the tracked path
-       and will block the checkout. Delete it (run this from a copy outside the
-       tree), then re-run."
+          and will block the checkout. Delete it (run this from a copy outside the
+          tree), then re-run."
         fi
         warn "untracked scripts/migrate-to-home.sh present — fine for a dry run, but --apply will refuse (it blocks the checkout)."
     fi
@@ -267,8 +267,8 @@ $dirty
 
     [ ! -e "$DOTS/.git/modules/home" ] \
         || die ".git/modules/home exists — a buggy earlier run moved the object store.
-       Git keys it by submodule name, not path; move it back under .git/modules/
-       to match the [submodule \"...\"] name before retrying."
+          Git keys it by submodule name, not path; move it back under .git/modules/
+          to match the [submodule \"...\"] name before retrying."
 
     # A half-finished run must be rolled back, not layered over: a second
     # journal would snapshot already-rewritten config, and the two would only
@@ -282,7 +282,7 @@ $dirty
             hint="No journal found in $JOURNAL_DIR; reconcile by hand before retrying."
         fi
         die "$DOTS/home already exists — an earlier run got partway.
-       $hint"
+        $hint"
     fi
 }
 
@@ -344,7 +344,7 @@ plan_legacy() {
         elif [ ! -d "$entry" ] || [ -L "$entry" ]; then
             :   # tracked file: the checkout moves it, nothing for us to do
         elif git -C "$DOTS" status --porcelain --ignored=matching -- "$legacy/$base" 2>/dev/null \
-             | grep -qE '^(\?\?|!!)'; then
+            | grep -qE '^(\?\?|!!)'; then
             printf 'merge\t%s\n' "$base"
         elif git -C "$DOTS" ls-files --stage -- "$legacy/$base" | grep -q '^160000'; then
             :   # Holds a submodule worktree. The dedicated re-wire step relocates

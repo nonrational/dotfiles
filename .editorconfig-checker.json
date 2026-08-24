@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/editorconfig-checker/editorconfig-checker/v3.11.1/.editorconfig-checker.schema.json",
+  "NoColor": true,
+  "Exclude": [
+    "^etc/",
+    "^fonts/",
+    "^home/\\.agents/ext/",
+    "^home/\\.agents/skills/[^/]+/runs/",
+    "^home/\\.bash_completion\\.d/VBoxManage\\.bash$",
+    "^home/\\.gemini/",
+    "^home/\\.vim/",
+    "^home/bin\\.Darwin/(code|subl)$",
+    "^karabiner/"
+  ]
+}

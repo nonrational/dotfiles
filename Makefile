@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+EDITORCONFIG_CHECKER ?= editorconfig-checker
 
 default:
 	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
@@ -51,6 +52,14 @@ check-skills:
 
 check-skill-frontmatter:
 	@python3 scripts/check-skill-frontmatter.py
+
+check-editorconfig:
+	@if ! command -v "$(EDITORCONFIG_CHECKER)" >/dev/null 2>&1; then \
+		echo "editorconfig-checker is required to check .editorconfig compliance." >&2; \
+		echo "Install it with: brew install editorconfig-checker" >&2; \
+		exit 1; \
+	fi
+	@$(EDITORCONFIG_CHECKER) -no-color
 
 # Run the full test suite: deploy.sh behavior + shell rc smoke tests.
 test:
@@ -152,4 +161,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

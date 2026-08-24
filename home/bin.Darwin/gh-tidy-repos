@@ -37,9 +37,9 @@ Behavior:
   3. Removes any repositories that have one or more stars.
   4. Sorts remaining repositories by creation date (oldest first).
   5. For each repository, prints metadata and asks:
-     [a]rchive, [d]elete, or [c]ontinue (skip).
+    [a]rchive, [d]elete, or [c]ontinue (skip).
   6. Executes `gh repo archive` or `gh repo delete` with `--yes`
-     based on the user's choice.
+    based on the user's choice.
 
 Requirements:
   - Python 3.6+

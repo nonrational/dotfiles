@@ -23,6 +23,11 @@ jobs:
           ./deploy.sh audit
       - run: make check-copilot-instructions
       - run: make check-skills
+      - name: Set up editorconfig-checker
+        uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c
+        with:
+          version: v3.11.1
+      - run: make check-editorconfig
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"

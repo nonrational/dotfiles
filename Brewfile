@@ -15,6 +15,7 @@ brew "bash-completion"     # Programmable completion for Bash 3.2
 brew "beads"               # Memory upgrade for your coding agent
 brew "coreutils"           # GNU File, Shell, and Text utilities
 brew "duti"                # Select default apps for documents and URL schemes on macOS
+brew "editorconfig-checker"  # Verify files follow .editorconfig
 brew "ffmpeg"              # Play, record, convert, and stream select audio and video codecs
 brew "figlet"              # Banner-like program prints strings as ASCII art
 brew "findutils"           # Collection of GNU find, xargs, and locate
@@ -95,4 +96,3 @@ cask "wavebox"             # Cookie-segmented browser for better account managem
 mas "Amphetamine", id: 937984704
 mas "Xcode", id: 497799835
 mas "Windows App", id: 1295203466
-

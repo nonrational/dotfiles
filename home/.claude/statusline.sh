@@ -81,7 +81,7 @@ fmt_dur() {
 since_turn=""
 stamp_file="${HOME}/.claude/turn-end/${session_id}"
 if [ -n "$session_id" ] && [ -r "$stamp_file" ] && read -r last_end < "$stamp_file" \
-   && [[ $last_end =~ ^[0-9]+$ ]]; then
+  && [[ $last_end =~ ^[0-9]+$ ]]; then
   elapsed=$(( $(date +%s) - last_end ))
   # A clock change can put the stamp in the future; show nothing over a lie.
   if [ "$elapsed" -ge 0 ]; then
