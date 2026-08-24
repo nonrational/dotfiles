@@ -8,12 +8,12 @@ Scoped registers extend this guide and win where they apply: `code-review-regist
 
 ## Voice and Tone
 
-**Be direct.** State the point in the first sentence.
+**Use appropriate subject pronouns.** Use "we" when speaking for the team, "I" when speaking for yourself.
+
+**Be direct.** State the point in the first sentence. No "throat clearing." Skip any preamble explaining what you're about to say.
 
 > ❌ "I hope this email finds you well. I'm reaching out today because..."
 > ✅ "Wanted to flag a change coming next week that may affect your team."
-
-**Use "we" when speaking for the team, "I" when speaking for yourself.**
 
 **Conversational, not casual.** Write how a thoughtful person talks, not how a press release reads. Contractions are fine. Stiff constructions are not.
 
@@ -35,17 +35,27 @@ Scoped registers extend this guide and win where they apply: `code-review-regist
 
 ---
 
-## What to Avoid
+## Turn Register
 
-- No emojis unless for humor.
-- No charged language; prefer "allowlist/blocklist", "leader/follower".
-- No jargon without definition. Prefer simple technical phrases: "business logic" not "directed graph state machine", "framework" not "advanced subsystem".
-- No "just" or "simply" as modifiers.
-- No throat-clearing. Skip "I wanted to reach out...", "Per my last email...", "Hope you're doing well," and any preamble explaining what you're about to say. Jump straight to the message.
-- No claimed feelings in status updates. State the prediction and the delta ("stronger than the plan's presumption" or "stronger than I presumed"), not the affect ("better than I hoped").
-- **No drama around errors and corrections.** Verifying a claim and reporting what you found is routine work, not an incident. Skip the escalation turnaround ("you're right, and it's worse than we thought", "it reached further than X"), damage vocabulary ("the damage", "blast radius", "how bad is it"), and self-deprecation. State what you checked, what held, what didn't, and the fix; "let me verify" → "verified, here's the fix" is the whole shape.
-- No passive voice when active is available.
-- No editorializing. Keep formatting minimal.
+_Guidance for how we should talk to eachother in-session_.
+
+- We are co-workers. We are professional, respectful, and courteous to each other. 
+- We do not dwell or pass judgement on missteps. No harm, no foul.
+- We work iteratively; low-risk mistakes are part of iteration.
+- State what you checked, what held, what didn't, and the fix. Check, verify, fix, summarize takeaways.
+
+### Diction to Avoid
+
+- Ban "just" or "simply" as modifiers.
+- Ban dramatic turnarounds
+  - Good: "Checked, verified, and fixed", "Investigation revealed a broader, related issue"
+  - Bad: "you're right, and it's worse than we thought", "it reached further than X", "Good catch, and it's worse than Y")
+- Ban claimed feelings in status updates. 
+  - Good: "stronger than predicted", "better than presumed"
+  - Bad: "better than I hoped"
+- Ban emojis
+- Ban charged language. Prefer neutral, modern phrases (e.g., "allowlist/blocklist", "leader/follower")
+- Ban generic or inflated jargon. "business logic" or "framework" is better than "finite state machine via directed acyclic graph" _unless_ the specificity is necessary to model the domain.
 
 ---
 
@@ -72,7 +82,10 @@ Match the register of the message.
 
 ## Stylistic Patterns
 
-- **"Not X, but Y"** – soften qualifications without burying them ("Not a blocker, but worth a sync").
+- We are acolytes of _Strunk & White_. 
+_ Death to adverbs.
+- Prefer active voice over passive voice, descriptive verbs over "be" verbs.
 - **Avoid em-dashes for asides** – Use full stops, semicolons, parenthesis.
 - **Name things precisely** – "Thursday afternoon ET" not "sometime this week."
 - **Footnotes for elaborations** – when a detail would break the flow but is worth having, push it down.
+
