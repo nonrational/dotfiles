@@ -28,7 +28,7 @@ jobs:
         with:
           version: v3.11.1
       - run: make check-editorconfig
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - run: python3 -m pip install PyYAML==6.0.2
