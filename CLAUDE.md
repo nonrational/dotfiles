@@ -10,8 +10,8 @@ Public dotfiles (`nonrational/dotfiles`), deployed by symlinking `home/` entries
 
 - `make test` — full suite: `test/test_deploy.sh` + `test/test_shell.sh`. Run either script directly for one suite; both sandbox a throwaway `$HOME` under mktemp and never touch the real one.
 - `./deploy.sh apply|audit [--dry-run]` — manifest-driven symlink deploy/verify. `make deploy` = apply plus re-asserting the skip-worktree flag (see Gotchas).
-- `make check-symlinks` — fail on any dangling tracked symlink; `make check-skills` — same, scoped to `home/.agents/skills` (safe in CI); `make check-copilot-instructions` — self-heals the per-file mirror of rules into `home/.copilot/instructions/` (run after renaming anything in `home/.agents/rules/`); `make check-skill-frontmatter` — needs PyYAML.
-- CI (`.github/workflows/ci.yml`) runs `make test`, a deploy apply+audit against a temp `$HOME`, and all the check targets, on macOS and ubuntu.
+- `make check-symlinks` — fail on any dangling tracked symlink; `make check-skills` — same, scoped to `home/.agents/skills` (safe in CI); `make check-copilot-instructions` — self-heals the per-file mirror of rules into `home/.copilot/instructions/` (run after renaming anything in `home/.agents/rules/`); `make check-skill-frontmatter` — needs PyYAML; `make check-editorconfig` — needs `editorconfig-checker`.
+- `make preflight` — the one definition of "safe to commit": `test` plus every `check-*` target. CI runs this same target (plus a deploy apply+audit against a temp `$HOME`, kept separate since it exercises the deploy mechanism rather than checking committed content), on macOS and ubuntu — a new `check-*` target is picked up by both without a second edit to `ci.yml`.
 
 ## Architecture
 
