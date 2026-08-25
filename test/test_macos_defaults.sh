@@ -216,6 +216,119 @@ test_check_counts_rows() {
     fi
 }
 
+# A row whose condition does not match is skipped before any `defaults` call,
+# so this case needs no Darwin gate.
+test_audit_skips_unmatched_condition() {
+    sandbox
+    row NSGlobalDomain SomeKey bool true os=NoSuchOS > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "^skip: " <<<"$out"; then
+        ok "unmatched os condition is skipped"
+    else
+        bad "unmatched os condition is skipped (status=$status, out=$out)"
+    fi
+}
+
+test_audit_ok_when_value_matches() {
+    darwin_only "audit reports ok when the live value matches" || return 0
+    sandbox
+    defaults write "$DOMAIN" Flag -bool true
+    row "$DOMAIN" Flag bool true > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "^ok: " <<<"$out"; then
+        ok "audit reports ok when the live value matches"
+    else
+        bad "audit reports ok when the live value matches (status=$status, out=$out)"
+    fi
+}
+
+# `defaults` stores booleans as 0/1 but the table keeps them readable as
+# true/false, so every bool comparison depends on normalizing both sides.
+test_audit_normalizes_bools() {
+    darwin_only "audit normalizes true against a stored 1" || return 0
+    sandbox
+    defaults write "$DOMAIN" Flag -bool true
+    row "$DOMAIN" Flag bool YES > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "^ok: " <<<"$out"; then
+        ok "audit normalizes true/YES/1 to the same value"
+    else
+        bad "audit normalizes true/YES/1 to the same value (status=$status, out=$out)"
+    fi
+}
+
+test_audit_reports_drift() {
+    darwin_only "audit reports drift with both values" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -int 3
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 1 ] && grep -q "^drift: .*want=7 live=3" <<<"$out"; then
+        ok "audit reports drift with want and live"
+    else
+        bad "audit reports drift with want and live (status=$status, out=$out)"
+    fi
+}
+
+# An absent key and a mismatched key need different fixes, so they get
+# different labels; conflating them made the design probe unreadable.
+test_audit_reports_missing() {
+    darwin_only "audit reports an absent key as missing" || return 0
+    sandbox
+    defaults write "$DOMAIN" Other -int 1
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 1 ] && grep -q "^missing: " <<<"$out" && ! grep -q "^drift: " <<<"$out"; then
+        ok "audit reports an absent key as missing, not drift"
+    else
+        bad "audit reports an absent key as missing, not drift (status=$status, out=$out)"
+    fi
+}
+
+test_audit_reports_type_drift() {
+    darwin_only "audit reports a changed storage type as drift" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -string 7
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 1 ] && grep -q "^drift: .*type want=int live=string" <<<"$out"; then
+        ok "audit reports a changed storage type as drift"
+    else
+        bad "audit reports a changed storage type as drift (status=$status, out=$out)"
+    fi
+}
+
+# noaudit rows must never influence the exit code, or every audit on a machine
+# with Safari settings would exit non-zero forever.
+test_audit_skips_noaudit_rows_without_failing() {
+    darwin_only "audit skips noaudit rows and still exits 0" || return 0
+    sandbox
+    row "$DOMAIN" Missing bool true noaudit=tcc > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "^skip: .*(tcc)" <<<"$out"; then
+        ok "audit skips noaudit rows and still exits 0"
+    else
+        bad "audit skips noaudit rows and still exits 0 (status=$status, out=$out)"
+    fi
+}
+
+test_audit_filters_by_domain_and_key() {
+    darwin_only "audit honors the domain and key filter" || return 0
+    sandbox
+    defaults write "$DOMAIN" First -bool true
+    defaults write "$DOMAIN" Second -bool true
+    {
+        row "$DOMAIN" First bool true
+        row "$DOMAIN" Second bool true
+    } > "$TABLE"
+    mdefaults audit "$DOMAIN" Second
+    if [ "$status" = 0 ] && grep -q "Second" <<<"$out" && ! grep -q "First" <<<"$out"; then
+        ok "audit honors the domain and key filter"
+    else
+        bad "audit honors the domain and key filter (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -230,6 +343,14 @@ test_hash_inside_value_is_not_a_comment
 test_indented_comment_is_a_comment
 test_key_with_spaces_parses
 test_check_counts_rows
+test_audit_skips_unmatched_condition
+test_audit_ok_when_value_matches
+test_audit_normalizes_bools
+test_audit_reports_drift
+test_audit_reports_missing
+test_audit_reports_type_drift
+test_audit_skips_noaudit_rows_without_failing
+test_audit_filters_by_domain_and_key
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

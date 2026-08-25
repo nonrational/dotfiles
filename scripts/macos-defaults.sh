@@ -148,6 +148,104 @@ row_selected() {
     return 0
 }
 
+source "$DOTS/scripts/host-id.sh"
+os="$(os_id)"
+host="$(host_id)"
+
+condition_matches() {
+    case "$1" in
+        "" | noaudit=*) return 0 ;;
+        os=*) [ "${1#os=}" = "$os" ] ;;
+        host=*) [ "${1#host=}" = "$host" ] ;;
+        *) return 1 ;;
+    esac
+}
+
+defaults_read() {
+    local domain="$1" key="$2"
+    case "$domain" in
+        currentHost:*) defaults -currentHost read "${domain#currentHost:}" "$key" 2>/dev/null ;;
+        *) defaults read "$domain" "$key" 2>/dev/null ;;
+    esac
+}
+
+defaults_read_type() {
+    local domain="$1" key="$2" out
+    case "$domain" in
+        currentHost:*)
+            out="$(defaults -currentHost read-type "${domain#currentHost:}" "$key" 2>/dev/null)" || return 1
+            ;;
+        *)
+            out="$(defaults read-type "$domain" "$key" 2>/dev/null)" || return 1
+            ;;
+    esac
+    printf '%s\n' "${out#Type is }"
+}
+
+table_type_of() {
+    case "$1" in
+        boolean) printf 'bool\n' ;;
+        integer) printf 'int\n' ;;
+        dictionary) printf 'dict\n' ;;
+        *) printf '%s\n' "$1" ;;
+    esac
+}
+
+normalize() {
+    case "$1" in
+        bool)
+            case "$2" in
+                true | TRUE | True | YES | Yes | yes | 1) printf '1\n' ;;
+                false | FALSE | False | NO | No | no | 0) printf '0\n' ;;
+                *) printf '%s\n' "$2" ;;
+            esac
+            ;;
+        *) printf '%s\n' "$2" ;;
+    esac
+}
+
+audit_row() {
+    local i="$1"
+    local domain="${t_domain[$i]}" key="${t_key[$i]}" type="${t_type[$i]}"
+    local value="${t_value[$i]}" status="${t_status[$i]}"
+    local live want live_type
+
+    case "$status" in
+        noaudit=*)
+            echo "skip: $domain $key (${status#noaudit=})"
+            return 0
+            ;;
+    esac
+
+    if ! live="$(defaults_read "$domain" "$key")"; then
+        echo "missing: $domain $key"
+        failures=$((failures + 1))
+        return 0
+    fi
+
+    # A `raw` row is written with no type flag, so `defaults` infers the stored
+    # type and the table has no claim to assert against it.
+    if [ "$type" != raw ]; then
+        if live_type="$(defaults_read_type "$domain" "$key")"; then
+            live_type="$(table_type_of "$live_type")"
+            if [ "$live_type" != "$type" ]; then
+                echo "drift: $domain $key type want=$type live=$live_type"
+                failures=$((failures + 1))
+                return 0
+            fi
+        fi
+    fi
+
+    want="$(normalize "$type" "$value")"
+    live="$(normalize "$type" "$live")"
+    if [ "$want" = "$live" ]; then
+        echo "ok: $domain $key"
+    else
+        echo "drift: $domain $key want=$want live=$live"
+        failures=$((failures + 1))
+    fi
+}
+
 main() {
     local i n
     parse_table
@@ -163,10 +261,14 @@ main() {
     i=0
     while [ "$i" -lt "$n" ]; do
         if row_selected "$i"; then
-            case "$mode" in
-                audit) audit_row "$i" ;;
-                apply) apply_row "$i" ;;
-            esac
+            if ! condition_matches "${t_status[$i]}"; then
+                echo "skip: ${t_domain[$i]} ${t_key[$i]} (${t_status[$i]})"
+            else
+                case "$mode" in
+                    audit) audit_row "$i" ;;
+                    apply) apply_row "$i" ;;
+                esac
+            fi
         fi
         i=$((i + 1))
     done
