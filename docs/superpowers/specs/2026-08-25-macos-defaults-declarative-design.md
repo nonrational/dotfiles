@@ -33,15 +33,17 @@ Every `defaults write` in `.macos`, parsed with a shell shim and compared agains
 |---|---|---|
 | Auditable, matches live | 154 | The healthy core |
 | Genuine drift | 4 | Listed above |
-| TCC-blocked | 40 | Safari 35, Mail 5 |
-| Actually unset | 9 | Key absent from a readable domain |
+| TCC-blocked | 44 | Safari 35, Mail 5, TextEdit 3, addressbook 1 |
+| Actually unset | 5 | Key absent from a domain that reads fine |
 | Genuinely complex | 11 | `array` / `dict` / `dict-add` / `date` |
 
 Four of the complex rows (`com.apple.mail NSUserKeyEquivalents`, `DraftsViewerAttributes` ×3) are blocked by TCC *and* by their container types. They are marked `noaudit=complex`, because that is the binding constraint: granting Full Disk Access would still leave them uncomparable.
 
 ### TCC is a hard constraint
 
-`~/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist` exists and is written regularly, but `ls` on that directory returns `Operation not permitted` and `defaults read com.apple.Safari` reports the domain does not exist. That is TCC, not a missing key. Those 40 rows cannot be audited from a shell without granting Full Disk Access to the terminal, and CI can never have it.
+`~/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist` exists and is written regularly, but `ls` on that directory returns `Operation not permitted` and `defaults read com.apple.Safari` reports the domain does not exist. That is TCC, not a missing key. Those 44 rows cannot be audited from a shell without granting Full Disk Access to the terminal, and CI can never have it.
+
+The test that separates the two cases is whether the *domain* reads, not whether the key does: `defaults read com.apple.Safari` fails, while `defaults read com.apple.GameCenter` succeeds and only the key is absent. `com.apple.TextEdit` and `com.apple.addressbook` look unset but fail the domain read and own TCC container directories, so they belong with Safari and Mail. An earlier draft of this spec put them in the unset bucket by checking `defaults domains`, which lists `com.apple.TextEdit` even though reading it fails.
 
 Granting FDA was considered and rejected: it makes audit results depend on a machine-configuration step this repo cannot enforce or verify.
 
@@ -146,7 +148,7 @@ Seeding fills values from live. The four drifting rows are held back as a decisi
 | `com.apple.ActivityMonitor OpenMainWindow` | accept. If it drifts back, the app rewrites it on quit and the row wants a `noaudit=` marker |
 | `.GlobalPreferences com.apple.mouse.scaling` | **reapply** — the table wins; mouse acceleration should be off |
 
-The 9 unset rows enter as `noaudit=unset` so the baseline is green: `helpviewer DevMode`, `addressbook ABShowDebugMenu`, `TextEdit` ×3, `QuickTimePlayerX MGPlayMovieOnOpen`, `Siri` ×2, `GameCenter GKInviteAlertEnabled`.
+The 5 unset rows enter as `noaudit=unset` so the baseline is green: `helpviewer DevMode`, `QuickTimePlayerX MGPlayMovieOnOpen`, `Siri` ×2, `GameCenter GKInviteAlertEnabled`.
 
 ## What `.macos` keeps
 

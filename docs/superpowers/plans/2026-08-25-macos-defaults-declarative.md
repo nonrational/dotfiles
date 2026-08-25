@@ -887,7 +887,7 @@ test_dry_run_changes_nothing() {
 }
 
 # audit cannot tell whether a noaudit row needs writing, so apply always writes
-# one. Without this, the 40 TCC rows would never be applied on a fresh Mac.
+# one. Without this, the 44 TCC rows would never be applied on a fresh Mac.
 test_apply_writes_noaudit_rows() {
     darwin_only "apply writes noaudit rows unconditionally" || return 0
     sandbox
@@ -1494,7 +1494,7 @@ for r in tcc unset complex; do printf '%-8s %s\n' "$r" "$(grep -c "noaudit=$r$" 
 grep -cvE '^[[:space:]]*(#|$)' macos-defaults
 ```
 
-Expected: `tcc 40`, `unset 9`, `complex 11`, total 218, leaving 158 rows with no status. A material difference means the machine changed since the probe, which is worth reading before continuing rather than accepting silently.
+Expected: `tcc 44`, `unset 5`, `complex 11`, total 218, leaving 158 rows with no status. A material difference means the machine changed since the probe, which is worth reading before continuing rather than accepting silently.
 
 - [ ] **Step 6: Read the generated table**
 
