@@ -4,6 +4,7 @@
 set -euf -o pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$ROOT/scripts/host-id.sh"
 BASE="$(mktemp -d "${TMPDIR:-/tmp}/test-deploy.XXXXXX")"
 BASE="$(cd "$BASE" && pwd)"
 trap 'rm -rf "$BASE"' EXIT
@@ -22,8 +23,9 @@ sandbox() {
     SB="$BASE/$sb_count"
     REPO="$SB/repo"
     FAKEHOME="$SB/home"
-    mkdir -p "$REPO" "$FAKEHOME"
+    mkdir -p "$REPO" "$FAKEHOME" "$REPO/scripts"
     cp "$ROOT/deploy.sh" "$REPO/deploy.sh"
+    cp "$ROOT/scripts/host-id.sh" "$REPO/scripts/host-id.sh"
     echo "content-rc" > "$REPO/rc"
     mkdir "$REPO/bin.any"
     echo "content-tool" > "$REPO/bin.any/tool"
@@ -202,8 +204,8 @@ test_apply_skips_unmatched_condition() {
 
 test_apply_matches_os_and_host() {
     sandbox
-    os_now="$(uname)"
-    host_now="$(uname -n | sed -e 's/\.lan$//g' -e 's/\.local$//g')"
+    os_now="$(os_id)"
+    host_now="$(host_id)"
     printf 'rc\t~/.rc\tos=%s\nbin.any\t~/bin\thost=%s\n' "$os_now" "$host_now" > "$REPO/manifest"
     deploy apply
     if [ "$status" = 0 ] && [ "$(readlink "$FAKEHOME/.rc")" = "$REPO/rc" ] \
@@ -356,7 +358,7 @@ test_manifest_covers_link_dotfiles() {
         fi
         grep -qxF "home/$f" <<<"$sources" || missing="$missing $f"
     done
-    grep -qxF "home/bin.$(uname)" <<<"$sources" || missing="$missing bin.$(uname)"
+    grep -qxF "home/bin.$(os_id)" <<<"$sources" || missing="$missing bin.$(os_id)"
     if [ -z "$missing" ]; then
         ok "manifest covers every link-dotfiles.sh-linked path"
     else
