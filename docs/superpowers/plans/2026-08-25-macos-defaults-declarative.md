@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the 217 `defaults write` lines in `.macos` with a reviewable table and a script that reports when macOS has drifted away from it.
+**Goal:** Replace the 218 `defaults write` lines in `.macos` with a reviewable table and a script that reports when macOS has drifted away from it.
 
 **Architecture:** A tab-delimited table (`macos-defaults`) holds one row per setting. `scripts/macos-defaults.sh` reads it in four modes: `check` validates the file, `audit` compares each row against the live machine, `apply` writes rows that differ, and `accept` rewrites rows to match what is live. Rows that cannot be compared (TCC-protected containers, unset keys, `array`/`dict` values) carry a `noaudit=<reason>` marker: they are still written by `apply`, but `audit` reports them as `skip` and they never affect the exit code.
 
@@ -31,7 +31,7 @@
 | `scripts/macos-defaults.sh` (create) | Parser plus the four modes. The only thing that knows the table format. |
 | `scripts/migrate-macos-defaults.sh` (create) | One-shot generator: parses `.macos` into the table. Committed so the transcription is reviewable. |
 | `test/test_macos_defaults.sh` (create) | Parser tests run everywhere; `defaults`-backed tests are Darwin-gated. |
-| `.macos` (modify) | Loses all 217 `defaults write` lines; keeps the imperative tail. |
+| `.macos` (modify) | Loses all 218 `defaults write` lines; keeps the imperative tail. |
 | `Makefile` (modify) | `macos-audit`, `macos-apply`, `macos-accept`, `check-macos-defaults`; `macos` gains the apply step. |
 | `.editorconfig` (modify) | A `[macos-defaults]` stanza declaring the tabs as data separators. |
 | `CLAUDE.md` (modify) | Commands and Architecture entries for the new table. |
@@ -1291,7 +1291,7 @@ comments are the why carried over from .macos."
 
 ### Task 5: Generate the table from `.macos`
 
-Transcribes 217 rows mechanically. The generator is committed rather than run and discarded so the transcription is reviewable, following the `scripts/migrate-to-home.sh` precedent.
+Transcribes 218 rows mechanically. The generator is committed rather than run and discarded so the transcription is reviewable, following the `scripts/migrate-to-home.sh` precedent.
 
 **Files:**
 - Create: `scripts/migrate-macos-defaults.sh`
@@ -1308,7 +1308,7 @@ Create `scripts/migrate-macos-defaults.sh`:
 ```bash
 #!/bin/bash
 # One-shot: split .macos into the macos-defaults table (default) and the
-# imperative lines that stay behind (--remainder). Committed so the 217-row
+# imperative lines that stay behind (--remainder). Committed so the 218-row
 # transcription can be reviewed rather than trusted.
 set -euf -o pipefail
 
@@ -1477,7 +1477,7 @@ echo "declared=$declared rows=$rows"
 [ "$declared" = "$rows" ] && echo "no rows dropped"
 ```
 
-Expected: `declared=217 rows=217 / no rows dropped`. If the counts differ, a `defaults write` form is unhandled; find it by diffing the domain/key pairs rather than guessing.
+Expected: `declared=218 rows=218 / no rows dropped`. If the counts differ, a `defaults write` form is unhandled; find it by diffing the domain/key pairs rather than guessing.
 
 - [ ] **Step 4: Verify the table parses**
 
@@ -1485,7 +1485,7 @@ Expected: `declared=217 rows=217 / no rows dropped`. If the counts differ, a `de
 ./scripts/macos-defaults.sh check
 ```
 
-Expected: `ok: 217 rows in <repo>/macos-defaults`. A failure here names the offending line; the likely causes are a tab that survived a continuation join or a container row that missed its `noaudit=complex`.
+Expected: `ok: 218 rows in <repo>/macos-defaults`. A failure here names the offending line; the likely causes are a tab that survived a continuation join or a container row that missed its `noaudit=complex`.
 
 - [ ] **Step 5: Verify the marker counts match the design probe**
 
@@ -1494,7 +1494,7 @@ for r in tcc unset complex; do printf '%-8s %s\n' "$r" "$(grep -c "noaudit=$r$" 
 grep -cvE '^[[:space:]]*(#|$)' macos-defaults
 ```
 
-Expected: `tcc 40`, `unset 9`, `complex 11`, total 217. These are the numbers the spec's probe recorded. A material difference means the machine changed since the probe, which is worth reading before continuing rather than accepting silently.
+Expected: `tcc 40`, `unset 9`, `complex 11`, total 218, leaving 158 rows with no status. A material difference means the machine changed since the probe, which is worth reading before continuing rather than accepting silently.
 
 - [ ] **Step 6: Read the generated table**
 
@@ -1506,7 +1506,7 @@ Skim `macos-defaults` end to end. Confirm each row's comment still sits above th
 git add scripts/migrate-macos-defaults.sh macos-defaults
 git commit -m "Generate the macos-defaults table from .macos
 
-217 rows transcribed mechanically, with each setting's comment carried
+218 rows transcribed mechanically, with each setting's comment carried
 across. Container types get noaudit=complex; keys that will not read get
 noaudit=tcc when the whole domain is unreadable and noaudit=unset when only
 the key is absent.
@@ -1536,7 +1536,7 @@ Machine-specific and run once. Its test is `audit` exiting 0.
 for label in ok drift missing skip; do printf '%-8s %s\n' "$label" "$(grep -c "^$label:" /tmp/audit-before.txt)"; done
 ```
 
-Expected: `ok 153`, `drift 4`, `missing 0`, `skip 60`. `missing` should be zero because Task 5 already marked every unreadable key.
+Expected: `ok 154`, `drift 4`, `missing 0`, `skip 60`. `missing` should be zero because Task 5 already marked every unreadable key.
 
 - [ ] **Step 2: Confirm the four drifts are the ones the spec predicted**
 
@@ -1584,7 +1584,7 @@ Expected: `write:` on the apply, then `-1` from the read.
 for label in ok drift missing skip; do printf '%-8s %s\n' "$label" "$(grep -c "^$label:" /tmp/audit-after.txt)"; done
 ```
 
-Expected: `exit=0`, `ok 157`, `drift 0`, `missing 0`, `skip 60`.
+Expected: `exit=0`, `ok 158`, `drift 0`, `missing 0`, `skip 60`.
 
 - [ ] **Step 6: Ask the owner before probing TCC writes**
 
@@ -1622,7 +1622,7 @@ rewrites itself. The fourth, .GlobalPreferences com.apple.mouse.scaling,
 goes the other way — the table disables mouse acceleration and the machine
 had turned it back on, which is the drift this change exists to catch.
 
-audit now exits 0: 157 ok, 60 skipped."
+audit now exits 0: 158 ok, 60 skipped."
 ```
 
 ---
@@ -1767,7 +1767,7 @@ up on both legs without an ci.yml edit."
 | Comparison is not a naive string equality | bool normalization, type drift, missing vs drift | Task 2 Step 5 |
 | Apply never prompts for a password in tests | Full suite runs with no `Password:` prompt | Task 3 Step 5 |
 | Accept preserves the commentary carried from `.macos` | Comment and blank-line placement asserted | Task 4 Step 5 |
-| No setting was lost in transcription | 217 declared = 217 rows; marker counts match the probe | Task 5 Steps 3 and 5 |
+| No setting was lost in transcription | 218 declared = 218 rows; marker counts match the probe | Task 5 Steps 3 and 5 |
 | The table describes this machine | `audit` exits 0 | Task 6 Step 5 |
 | `.macos` still runs | `bash -n`, zero uncommented `defaults write` | Task 7 Step 4 |
 | CI covers all of it on both platforms | `make preflight` | Task 7 Step 8 |

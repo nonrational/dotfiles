@@ -6,9 +6,9 @@
 
 ## Problem
 
-`.macos` is a one-way imperative script. It writes 217 `defaults write` lines and keeps no record of desired state, so nothing detects when macOS or an application rewrites a setting after an OS update, a manual change in System Settings, or an app's own housekeeping.
+`.macos` is a one-way imperative script. It writes 218 `defaults write` lines and keeps no record of desired state, so nothing detects when macOS or an application rewrites a setting after an OS update, a manual change in System Settings, or an app's own housekeeping.
 
-A read-only probe of all 217 lines against this machine (nyx, macOS 26) found four settings already untrue:
+A read-only probe of all 218 lines against this machine (macOS 26) found four settings already untrue:
 
 | Row | `.macos` declares | Live |
 |---|---|---|
@@ -31,7 +31,7 @@ Every `defaults write` in `.macos`, parsed with a shell shim and compared agains
 
 | Bucket | Count | Meaning |
 |---|---|---|
-| Auditable, matches live | 153 | The healthy core |
+| Auditable, matches live | 154 | The healthy core |
 | Genuine drift | 4 | Listed above |
 | TCC-blocked | 40 | Safari 35, Mail 5 |
 | Actually unset | 9 | Key absent from a readable domain |
@@ -66,7 +66,7 @@ com.apple.Safari	AlwaysRestoreSessionAtLaunch	bool	true	noaudit=tcc
 - **key** — verbatim; may contain spaces. `com.apple.print.PrintingPrefs "Quit When Finished"` and `com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)"` are why this file is tab-delimited rather than whitespace-columned like `manifest`.
 - **type** — `bool`, `int`, `float`, `string`, `raw` (written with no type flag), plus `array`, `dict`, `dict-add`, `date` on `noaudit=complex` rows.
 - **value** — human form. Booleans read `true`/`false` in the file; normalization happens at compare time.
-- **status** — omitted on the 157 live rows. Otherwise `noaudit=tcc`, `noaudit=unset`, or `noaudit=complex`. The parser also accepts `os=` and `host=`, unused today, so a second Mac needs no format change.
+- **status** — omitted on the 158 live rows. Otherwise `noaudit=tcc`, `noaudit=unset`, or `noaudit=complex`. The parser also accepts `os=` and `host=`, unused today, so a second Mac needs no format change.
 
 ### Why `noaudit=` and not `skip=`
 
@@ -77,7 +77,7 @@ Those 60 rows still have to be *written* on a fresh Mac, or `.macos` cannot reti
 Three of these are deliberate departures from `deploy.sh`.
 
 1. **A line is a comment only if its first non-whitespace character is `#`.** `deploy.sh` uses `${line%%#*}`, which would eat a `#` inside a value. No value contains one today; the parser should not depend on that staying true.
-2. **Split tabs by parameter expansion, never `IFS=$'\t' read`.** Bash treats tab as IFS *whitespace*, so it collapses runs of tabs and drops a leading one. An empty column silently shifts every field left and the run reports plausible nonsense. The probe that produced this design hit exactly this and reported 215 of 217 keys missing before the bug was found.
+2. **Split tabs by parameter expansion, never `IFS=$'\t' read`.** Bash treats tab as IFS *whitespace*, so it collapses runs of tabs and drops a leading one. An empty column silently shifts every field left and the run reports plausible nonsense. The probe that produced this design hit exactly this and reported almost every key missing before the bug was found.
 3. **Four or five fields, nothing else, or a hard error naming the line — and nothing runs.** Only the trailing `status` field may be omitted, so there is no shift risk. It is omitted rather than left empty because `.editorconfig` sets `trim_trailing_whitespace = true` and a five-field row with an empty status would end in a tab.
 4. Validate the whole file before acting on any row, matching `deploy.sh`.
 
@@ -135,7 +135,7 @@ This is the same trust level as `sh .macos` — a shell script from this repo, r
 
 `scripts/migrate-macos-defaults.sh` generates the table by parsing `.macos` with a `defaults` shell shim. Committed rather than run and discarded, following the `scripts/migrate-to-home.sh` precedent, so the transcription is reviewable rather than trusted.
 
-**Verification:** re-parse `.macos` at its pre-change commit, re-parse the generated table, and diff the `domain/key/type/value` sets. They must be identical except for rows explicitly accepted. That is a one-command proof that nothing was dropped across 217 lines.
+**Verification:** re-parse `.macos` at its pre-change commit, re-parse the generated table, and diff the `domain/key/type/value` sets. They must be identical except for rows explicitly accepted. That is a one-command proof that nothing was dropped across 218 lines.
 
 Seeding fills values from live. The four drifting rows are held back as a decision rather than auto-accepted:
 
@@ -150,7 +150,7 @@ The 9 unset rows enter as `noaudit=unset` so the baseline is green: `helpviewer 
 
 ## What `.macos` keeps
 
-All 217 `defaults write` lines leave. Roughly 45 lines remain: the System Settings quit, the sudo keepalive, `nvram SystemAudioVolume`, `systemsetup -settimezone`, the nine `PlistBuddy` Finder-view calls, both `chflags`, `lsregister`, the Dock `find -delete`, `tmutil disable`, the closing `killall` loop, and the final echo.
+All 218 `defaults write` lines leave. Roughly 45 lines remain: the System Settings quit, the sudo keepalive, `nvram SystemAudioVolume`, `systemsetup -settimezone`, the nine `PlistBuddy` Finder-view calls, both `chflags`, `lsregister`, the Dock `find -delete`, `tmutil disable`, the closing `killall` loop, and the final echo.
 
 It keeps its filename and gains a header comment pointing at `macos-defaults`. Nothing is symlinked to it — it has no `manifest` entry — so a later rename to `scripts/macos-imperative.sh` costs nothing but muscle memory.
 
