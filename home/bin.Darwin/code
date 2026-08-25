@@ -1,1 +1,10 @@
-/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code
+#!/usr/bin/env bash
+# Canonical target per VS Code's own docs -- normally installed onto PATH by
+# the app itself (Command Palette > "Shell Command: Install 'code' command in
+# PATH"). This wrapper covers machines where that hasn't been run yet.
+app="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+if [ ! -x "$app" ]; then
+  echo "code: Visual Studio Code.app not found in /Applications" >&2
+  exit 1
+fi
+exec "$app" "$@"

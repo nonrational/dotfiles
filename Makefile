@@ -125,6 +125,10 @@ check-copilot-instructions:
 		echo "copilot instructions mirror home/.agents/rules"; \
 	fi
 
+# The one definition of "safe to commit" -- CI runs this same target, so a
+# new check-* target is covered by both the moment it's added here.
+preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions
+
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
 	mkdir -p $$HOME/.config
@@ -161,4 +165,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
