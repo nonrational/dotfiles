@@ -515,6 +515,40 @@ test_accept_honors_the_filter() {
     fi
 }
 
+# A complex row's value column is an eval argument tail, and `defaults read`
+# returns a multi-line plist dump for an array. Rewriting the row splices those
+# newlines into the table and breaks every row after it.
+test_accept_never_rewrites_a_readable_complex_row() {
+    darwin_only "accept leaves a readable complex row byte-identical" || return 0
+    sandbox
+    defaults write "$DOMAIN" Langs -array en fr
+    row "$DOMAIN" Langs array '"en" "fr"' noaudit=complex > "$TABLE"
+    before="$(cksum < "$TABLE")"
+    mdefaults accept
+    if [ "$status" = 0 ] && [ "$(cksum < "$TABLE")" = "$before" ] \
+        && [ "$(wc -l < "$TABLE")" -eq 1 ]; then
+        ok "accept leaves a readable complex row byte-identical"
+    else
+        bad "accept leaves a readable complex row byte-identical (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
+# The tcc marker records that a domain is unreadable under TCC, which a sandbox
+# cannot simulate. A readable key with the marker set is the same code path.
+test_accept_never_rewrites_a_tcc_row() {
+    darwin_only "accept leaves a noaudit=tcc row untouched even when the key reads" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -int 3
+    row "$DOMAIN" Count int 7 noaudit=tcc > "$TABLE"
+    before="$(cksum < "$TABLE")"
+    mdefaults accept
+    if [ "$status" = 0 ] && [ "$(cksum < "$TABLE")" = "$before" ]; then
+        ok "accept leaves a noaudit=tcc row untouched even when the key reads"
+    else
+        bad "accept leaves a noaudit=tcc row untouched even when the key reads (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -550,6 +584,8 @@ test_accept_leaves_matching_rows_alone
 test_accept_promotes_a_readable_unset_row
 test_accept_updates_the_type_when_it_drifts
 test_accept_honors_the_filter
+test_accept_never_rewrites_a_readable_complex_row
+test_accept_never_rewrites_a_tcc_row
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

@@ -316,6 +316,18 @@ apply_row() {
     write_row "$domain" "$key" "$type" "$value"
 }
 
+# A tcc row's key does not read at all, and a complex row's value column is an
+# eval argument tail rather than a serialization `defaults read` could match, so
+# the compare would always differ and rewrite the row with a multi-line plist
+# dump — splicing newlines into a one-row-per-line file.
+accept_candidate() {
+    local i="$1"
+    case "${t_status[$i]}" in
+        noaudit=tcc | noaudit=complex) return 1 ;;
+    esac
+    row_selected "$i" && condition_matches "${t_status[$i]}"
+}
+
 run_accept() {
     local i n idx live live_type new_status tmp line trimmed
     local new_row=()
@@ -324,7 +336,7 @@ run_accept() {
     i=0
     while [ "$i" -lt "$n" ]; do
         new_row[$i]=""
-        if row_selected "$i" && condition_matches "${t_status[$i]}"; then
+        if accept_candidate "$i"; then
             if live="$(defaults_read "${t_domain[$i]}" "${t_key[$i]}")"; then
                 new_status="${t_status[$i]}"
                 # The marker only recorded that the key was unreadable at seed
@@ -354,7 +366,7 @@ run_accept() {
         i=$((i + 1))
     done
 
-    tmp="$(mktemp "${TMPDIR:-/tmp}/macos-defaults.XXXXXX")"
+    tmp="$(mktemp "$TABLE.XXXXXX")"
     idx=0
     while IFS= read -r line || [ -n "$line" ]; do
         trimmed="${line#"${line%%[![:space:]]*}"}"
