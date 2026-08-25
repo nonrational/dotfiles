@@ -380,13 +380,16 @@ test_dry_run_changes_nothing() {
 }
 
 # audit cannot tell whether a noaudit row needs writing, so apply always writes
-# one. Without this, the 40 TCC rows would never be applied on a fresh Mac.
+# one. The live value is pre-set to MATCH the table here: an ordinary row would
+# report ok: and skip, so only an unconditional write reports write:.
 test_apply_writes_noaudit_rows() {
     darwin_only "apply writes noaudit rows unconditionally" || return 0
     sandbox
+    defaults write "$DOMAIN" Count -int 7
     row "$DOMAIN" Count int 7 noaudit=unset > "$TABLE"
     mdefaults apply
-    if [ "$status" = 0 ] && [ "$(defaults read "$DOMAIN" Count)" = 7 ]; then
+    if [ "$status" = 0 ] && grep -q "^write: " <<<"$out" && ! grep -q "^ok: " <<<"$out" \
+        && [ "$(defaults read "$DOMAIN" Count)" = 7 ]; then
         ok "apply writes noaudit rows unconditionally"
     else
         bad "apply writes noaudit rows unconditionally (status=$status, out=$out)"
@@ -415,6 +418,100 @@ test_apply_skips_unmatched_condition() {
         ok "apply skips an unmatched condition"
     else
         bad "apply skips an unmatched condition (status=$status, out=$out)"
+    fi
+}
+
+test_accept_updates_a_drifting_value() {
+    darwin_only "accept rewrites a drifting row to the live value" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -int 3
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && grep -q "	int	3$" "$TABLE"; then
+        ok "accept rewrites a drifting row to the live value"
+    else
+        bad "accept rewrites a drifting row to the live value (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
+# The comments carried over from .macos are the most valuable thing in the
+# table, and accept rewrites the file wholesale.
+test_accept_preserves_comments_and_blanks() {
+    darwin_only "accept preserves comments and blank lines" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -int 3
+    {
+        printf '# a banner\n'
+        printf '\n'
+        printf '# why this setting exists\n'
+        row "$DOMAIN" Count int 7
+    } > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && [ "$(head -1 "$TABLE")" = "# a banner" ] \
+        && [ "$(sed -n 3p "$TABLE")" = "# why this setting exists" ] \
+        && [ -z "$(sed -n 2p "$TABLE")" ]; then
+        ok "accept preserves comments and blank lines"
+    else
+        bad "accept preserves comments and blank lines (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
+test_accept_leaves_matching_rows_alone() {
+    darwin_only "accept leaves a matching row byte-identical" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -int 7
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    before="$(cksum < "$TABLE")"
+    mdefaults accept
+    if [ "$status" = 0 ] && [ "$(cksum < "$TABLE")" = "$before" ]; then
+        ok "accept leaves a matching row byte-identical"
+    else
+        bad "accept leaves a matching row byte-identical (status=$status, out=$out)"
+    fi
+}
+
+# The 9 noaudit=unset rows exist because their key was absent at seed time. Once
+# a key becomes readable the marker is stale, and only accept can clear it.
+test_accept_promotes_a_readable_unset_row() {
+    darwin_only "accept clears noaudit=unset once the key reads" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -int 3
+    row "$DOMAIN" Count int 7 noaudit=unset > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && ! grep -q "noaudit=unset" "$TABLE" && grep -q "	int	3$" "$TABLE"; then
+        ok "accept clears noaudit=unset once the key reads"
+    else
+        bad "accept clears noaudit=unset once the key reads (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
+test_accept_updates_the_type_when_it_drifts() {
+    darwin_only "accept rewrites the type column too" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -string seven
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && grep -q "	string	seven$" "$TABLE"; then
+        ok "accept rewrites the type column too"
+    else
+        bad "accept rewrites the type column too (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
+test_accept_honors_the_filter() {
+    darwin_only "accept honors the domain and key filter" || return 0
+    sandbox
+    defaults write "$DOMAIN" First -int 1
+    defaults write "$DOMAIN" Second -int 2
+    {
+        row "$DOMAIN" First int 9
+        row "$DOMAIN" Second int 9
+    } > "$TABLE"
+    mdefaults accept "$DOMAIN" Second
+    if [ "$status" = 0 ] && grep -q "First	int	9$" "$TABLE" && grep -q "Second	int	2$" "$TABLE"; then
+        ok "accept honors the domain and key filter"
+    else
+        bad "accept honors the domain and key filter (status=$status, table=$(cat "$TABLE"))"
     fi
 }
 
@@ -447,6 +544,12 @@ test_dry_run_changes_nothing
 test_apply_writes_noaudit_rows
 test_apply_writes_container_value
 test_apply_skips_unmatched_condition
+test_accept_updates_a_drifting_value
+test_accept_preserves_comments_and_blanks
+test_accept_leaves_matching_rows_alone
+test_accept_promotes_a_readable_unset_row
+test_accept_updates_the_type_when_it_drifts
+test_accept_honors_the_filter
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

@@ -316,6 +316,69 @@ apply_row() {
     write_row "$domain" "$key" "$type" "$value"
 }
 
+run_accept() {
+    local i n idx live live_type new_status tmp line trimmed
+    local new_row=()
+
+    n="${#t_domain[@]}"
+    i=0
+    while [ "$i" -lt "$n" ]; do
+        new_row[$i]=""
+        if row_selected "$i" && condition_matches "${t_status[$i]}"; then
+            if live="$(defaults_read "${t_domain[$i]}" "${t_key[$i]}")"; then
+                new_status="${t_status[$i]}"
+                # The marker only recorded that the key was unreadable at seed
+                # time; it just read, so it no longer describes anything.
+                if [ "$new_status" = "noaudit=unset" ]; then
+                    new_status=""
+                fi
+                live_type="${t_type[$i]}"
+                if [ "$live_type" != raw ] && [ "$new_status" = "" ]; then
+                    if live_type="$(defaults_read_type "${t_domain[$i]}" "${t_key[$i]}")"; then
+                        live_type="$(table_type_of "$live_type")"
+                    else
+                        live_type="${t_type[$i]}"
+                    fi
+                fi
+                if [ "$live_type" != "${t_type[$i]}" ] \
+                    || [ "$(normalize "$live_type" "$live")" != "$(normalize "${t_type[$i]}" "${t_value[$i]}")" ] \
+                    || [ "$new_status" != "${t_status[$i]}" ]; then
+                    new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$live"
+                    if [ -n "$new_status" ]; then
+                        new_row[$i]="${new_row[$i]}$TAB$new_status"
+                    fi
+                    echo "accept: ${t_domain[$i]} ${t_key[$i]} = $live"
+                fi
+            fi
+        fi
+        i=$((i + 1))
+    done
+
+    tmp="$(mktemp "${TMPDIR:-/tmp}/macos-defaults.XXXXXX")"
+    idx=0
+    while IFS= read -r line || [ -n "$line" ]; do
+        trimmed="${line#"${line%%[![:space:]]*}"}"
+        case "$trimmed" in
+            "" | "#"*)
+                printf '%s\n' "$line" >>"$tmp"
+                continue
+                ;;
+        esac
+        if [ -n "${new_row[$idx]}" ]; then
+            printf '%s\n' "${new_row[$idx]}" >>"$tmp"
+        else
+            printf '%s\n' "$line" >>"$tmp"
+        fi
+        idx=$((idx + 1))
+    done <"$TABLE"
+
+    if [ "$dry_run" = 1 ]; then
+        rm -f "$tmp"
+        return 0
+    fi
+    mv "$tmp" "$TABLE"
+}
+
 main() {
     local i n
     parse_table
@@ -326,6 +389,10 @@ main() {
         else
             echo "ok: $n rows in $TABLE"
         fi
+        return 0
+    fi
+    if [ "$mode" = accept ]; then
+        run_accept
         return 0
     fi
     i=0
