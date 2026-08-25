@@ -1,7 +1,10 @@
 # sourced on new screens, non-login shells.
 
-host=`uname -n | sed -e 's/\.lan$//g' -e 's/\.local$//g'`;
-platform=`uname`;
+# $HOME/.bashrc is a symlink deploy.sh points straight at this file, so
+# readlink gives the repo path without needing it deployed anywhere else.
+source "$(dirname "$(dirname "$(readlink "$HOME/.bashrc")")")/scripts/host-id.sh"
+host="$(host_id)"
+platform="$(os_id)"
 
 export HISTIGNORE="[   ]*:&:bg:fg:exit"
 export HISTCONTROL=ignoredups:erasedups  # no duplicate entries

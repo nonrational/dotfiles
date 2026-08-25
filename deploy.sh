@@ -70,8 +70,9 @@ parse_manifest() {
     fi
 }
 
-os="$(uname)"
-host="$(uname -n | sed -e 's/\.lan$//g' -e 's/\.local$//g')"
+source "$DOTS/scripts/host-id.sh"
+os="$(os_id)"
+host="$(host_id)"
 failures=0
 
 condition_matches() {

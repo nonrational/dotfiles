@@ -13,18 +13,22 @@ jobs:
         os: [ ubuntu-latest, macos-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
+      
       - name: Set up editorconfig-checker
         uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c
         with:
           version: v3.11.1
-      - uses: actions/setup-python@v6
+      - run: make check-editorconfig
+      
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - run: python3 -m pip install PyYAML==6.0.2
       - run: make preflight
+      
       - run: |
           export HOME="$(mktemp -d)"
           ./deploy.sh apply
