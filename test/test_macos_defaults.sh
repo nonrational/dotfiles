@@ -329,6 +329,95 @@ test_audit_filters_by_domain_and_key() {
     fi
 }
 
+test_apply_writes_missing_key() {
+    darwin_only "apply writes a key that is absent" || return 0
+    sandbox
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults apply
+    if [ "$status" = 0 ] && [ "$(defaults read "$DOMAIN" Count)" = 7 ] \
+        && grep -q "^write: " <<<"$out"; then
+        ok "apply writes a key that is absent"
+    else
+        bad "apply writes a key that is absent (status=$status, out=$out)"
+    fi
+}
+
+test_apply_is_idempotent() {
+    darwin_only "a second apply is a no-op reported as ok" || return 0
+    sandbox
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults apply
+    mdefaults apply
+    if [ "$status" = 0 ] && grep -q "^ok: " <<<"$out" && ! grep -q "^write: " <<<"$out"; then
+        ok "a second apply is a no-op reported as ok"
+    else
+        bad "a second apply is a no-op reported as ok (status=$status, out=$out)"
+    fi
+}
+
+test_dry_run_reports_would_write() {
+    darwin_only "dry-run prefixes its decisions with would:" || return 0
+    sandbox
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults --dry-run apply
+    if [ "$status" = 0 ] && grep -q "^would: write: " <<<"$out"; then
+        ok "dry-run prefixes its decisions with would:"
+    else
+        bad "dry-run prefixes its decisions with would: (status=$status, out=$out)"
+    fi
+}
+
+test_dry_run_changes_nothing() {
+    darwin_only "dry-run creates no plist" || return 0
+    sandbox
+    row "$DOMAIN" Count int 7 > "$TABLE"
+    mdefaults --dry-run apply
+    if [ "$status" = 0 ] && [ ! -e "$DOMAIN.plist" ]; then
+        ok "dry-run creates no plist"
+    else
+        bad "dry-run creates no plist (status=$status, out=$out)"
+    fi
+}
+
+# audit cannot tell whether a noaudit row needs writing, so apply always writes
+# one. Without this, the 40 TCC rows would never be applied on a fresh Mac.
+test_apply_writes_noaudit_rows() {
+    darwin_only "apply writes noaudit rows unconditionally" || return 0
+    sandbox
+    row "$DOMAIN" Count int 7 noaudit=unset > "$TABLE"
+    mdefaults apply
+    if [ "$status" = 0 ] && [ "$(defaults read "$DOMAIN" Count)" = 7 ]; then
+        ok "apply writes noaudit rows unconditionally"
+    else
+        bad "apply writes noaudit rows unconditionally (status=$status, out=$out)"
+    fi
+}
+
+# An array value cannot be expressed as a type/value pair, so container rows
+# carry a literal argument tail and are the only rows that get eval'd.
+test_apply_writes_container_value() {
+    darwin_only "apply writes an array row through its literal argument tail" || return 0
+    sandbox
+    row "$DOMAIN" Langs array '"en" "fr"' noaudit=complex > "$TABLE"
+    mdefaults apply
+    if [ "$status" = 0 ] && [ "$(defaults read "$DOMAIN" Langs | tr -d '\n ')" = "(en,fr)" ]; then
+        ok "apply writes an array row through its literal argument tail"
+    else
+        bad "apply writes an array row through its literal argument tail (status=$status, out=$out)"
+    fi
+}
+
+test_apply_skips_unmatched_condition() {
+    sandbox
+    row NSGlobalDomain SomeKey bool true os=NoSuchOS > "$TABLE"
+    mdefaults apply
+    if [ "$status" = 0 ] && grep -q "^skip: " <<<"$out"; then
+        ok "apply skips an unmatched condition"
+    else
+        bad "apply skips an unmatched condition (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -351,6 +440,13 @@ test_audit_reports_missing
 test_audit_reports_type_drift
 test_audit_skips_noaudit_rows_without_failing
 test_audit_filters_by_domain_and_key
+test_apply_writes_missing_key
+test_apply_is_idempotent
+test_dry_run_reports_would_write
+test_dry_run_changes_nothing
+test_apply_writes_noaudit_rows
+test_apply_writes_container_value
+test_apply_skips_unmatched_condition
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

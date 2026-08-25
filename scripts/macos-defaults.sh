@@ -246,6 +246,76 @@ audit_row() {
     fi
 }
 
+# Decided from the plist's writability rather than the path prefix: the test
+# suite uses absolute-path domains under mktemp, which are writable and must
+# not reach for sudo.
+needs_sudo() {
+    local domain="$1"
+    case "$domain" in
+        /*) ;;
+        *) return 1 ;;
+    esac
+    [ -e "$domain.plist" ] && [ ! -w "$domain.plist" ]
+}
+
+write_row() {
+    local domain="$1" key="$2" type="$3" value="$4"
+    local host_flag="" target="$domain" sudo_cmd=""
+
+    case "$domain" in
+        currentHost:*)
+            host_flag="-currentHost"
+            target="${domain#currentHost:}"
+            ;;
+    esac
+    if needs_sudo "$target"; then
+        sudo_cmd="sudo"
+    fi
+
+    case "$type" in
+        array | dict | dict-add | date | data)
+            # Container values carry their own quoted argument tail, which only
+            # the shell can re-split. Scalar rows never take this branch.
+            eval "$sudo_cmd defaults $host_flag write \"\$target\" \"\$key\" -$type $value"
+            ;;
+        raw)
+            $sudo_cmd defaults $host_flag write "$target" "$key" "$value"
+            ;;
+        *)
+            $sudo_cmd defaults $host_flag write "$target" "$key" "-$type" "$value"
+            ;;
+    esac
+}
+
+apply_row() {
+    local i="$1"
+    local domain="${t_domain[$i]}" key="${t_key[$i]}" type="${t_type[$i]}"
+    local value="${t_value[$i]}" status="${t_status[$i]}"
+    local prefix="" live
+
+    if [ "$dry_run" = 1 ]; then
+        prefix="would: "
+    fi
+
+    case "$status" in
+        noaudit=*) ;;
+        *)
+            if live="$(defaults_read "$domain" "$key")"; then
+                if [ "$(normalize "$type" "$live")" = "$(normalize "$type" "$value")" ]; then
+                    echo "ok: $domain $key"
+                    return 0
+                fi
+            fi
+            ;;
+    esac
+
+    echo "${prefix}write: $domain $key = $value"
+    if [ "$dry_run" = 1 ]; then
+        return 0
+    fi
+    write_row "$domain" "$key" "$type" "$value"
+}
+
 main() {
     local i n
     parse_table
