@@ -1,1 +1,11 @@
-/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl
+#!/usr/bin/env bash
+# Canonical target per Sublime Text's own docs
+# (https://www.sublimetext.com/docs/command_line.html), normally installed by
+# hand-symlinking it onto PATH. This wrapper covers machines where that
+# hasn't been done yet.
+app="/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl"
+if [ ! -x "$app" ]; then
+  echo "subl: Sublime Text.app not found in /Applications" >&2
+  exit 1
+fi
+exec "$app" "$@"
