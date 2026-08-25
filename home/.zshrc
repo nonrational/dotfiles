@@ -63,7 +63,10 @@ alias ls='ls -F'
 alias ll='ls -l'
 alias l='ls'
 
-host=$(uname -n | sed -e 's/\.local//g')
+# $HOME/.zshrc is a symlink deploy.sh points straight at this file, so
+# readlink gives the repo path without needing it deployed anywhere else.
+source "$(dirname "$(dirname "$(readlink "$HOME/.zshrc")")")/scripts/host-id.sh"
+host="$(host_id)"
 
 # autojump — only when brew and the script are present
 if command -v brew >/dev/null 2>&1; then
