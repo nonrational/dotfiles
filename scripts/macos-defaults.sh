@@ -366,7 +366,7 @@ run_accept() {
                     fi
                 fi
                 if [ "$live_type" != "${t_type[$i]}" ] \
-                    || [ "$(normalize "$live_type" "$live")" != "$(normalize "${t_type[$i]}" "${t_value[$i]}")" ] \
+                    || [ "$(normalize "$live_type" "$live")" != "$(normalize "${t_type[$i]}" "$(expand_value "${t_value[$i]}")")" ] \
                     || [ "$new_status" != "${t_status[$i]}" ]; then
                     new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$(tokenize_value "$live")"
                     if [ -n "$new_status" ]; then

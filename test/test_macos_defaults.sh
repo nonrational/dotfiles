@@ -591,6 +591,24 @@ test_accept_tokenizes_the_home_path() {
     fi
 }
 
+# The token rows are the ones most likely to be accepted spuriously: the table
+# holds ${HOME} and the machine holds the expanded path, so an unexpanded
+# comparison always reports a change even when nothing drifted.
+test_accept_leaves_a_tokenized_matching_row_alone() {
+    darwin_only "accept leaves a matching \${HOME} row alone and says nothing" || return 0
+    sandbox
+    defaults write "$DOMAIN" Where -string "$HOME/Desktop"
+    row "$DOMAIN" Where string '${HOME}/Desktop' > "$TABLE"
+    before="$(cksum < "$TABLE")"
+    mdefaults accept
+    if [ "$status" = 0 ] && [ "$(cksum < "$TABLE")" = "$before" ] \
+        && ! grep -q "^accept: " <<<"$out"; then
+        ok "accept leaves a matching \${HOME} row alone and says nothing"
+    else
+        bad "accept leaves a matching \${HOME} row alone and says nothing (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -631,6 +649,7 @@ test_accept_never_rewrites_a_tcc_row
 test_audit_expands_the_home_token
 test_apply_expands_the_home_token
 test_accept_tokenizes_the_home_path
+test_accept_leaves_a_tokenized_matching_row_alone
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"
