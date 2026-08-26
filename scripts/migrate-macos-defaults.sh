@@ -79,6 +79,13 @@ emit() {
     # eval expanded ${HOME} while parsing, which would bake this machine's home
     # directory into a table meant to describe desired state rather than one Mac.
     value="${value//$HOME/$HOME_TOKEN}"
+    # .macos writes at least one bool as YES; the table's convention is true/false.
+    if [ "$type" = bool ]; then
+        case "$value" in
+            true | TRUE | True | YES | Yes | yes | 1) value=true ;;
+            false | FALSE | False | NO | No | no | 0) value=false ;;
+        esac
+    fi
     case "$type" in
         array | dict | dict-add | date | data) status="noaudit=complex" ;;
         *) status="$(classify "$domain" "$key")" ;;

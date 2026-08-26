@@ -90,10 +90,10 @@ com.apple.AppleMultitouchTrackpad	AppleEnableSwipeNavigateWithScrolls	bool	false
 com.apple.AppleMultitouchTrackpad	Clicking	bool	true
 com.apple.AppleMultitouchTrackpad	DragLock	bool	false
 com.apple.AppleMultitouchTrackpad	Dragging	bool	false
-com.apple.AppleMultitouchTrackpad	FirstClickThreshold	bool	1
+com.apple.AppleMultitouchTrackpad	FirstClickThreshold	bool	true
 com.apple.AppleMultitouchTrackpad	ForceSuppressed	bool	true
 com.apple.AppleMultitouchTrackpad	HIDScrollZoomModifierMask	bool	false
-com.apple.AppleMultitouchTrackpad	SecondClickThreshold	bool	1
+com.apple.AppleMultitouchTrackpad	SecondClickThreshold	bool	true
 com.apple.AppleMultitouchTrackpad	TrackpadCornerSecondaryClick	bool	false
 com.apple.AppleMultitouchTrackpad	TrackpadFiveFingerPinchGesture	int	2
 com.apple.AppleMultitouchTrackpad	TrackpadFourFingerHorizSwipeGesture	int	2
@@ -439,7 +439,7 @@ com.apple.Safari	WebAutomaticSpellingCorrectionEnabled	bool	false	noaudit=tcc
 
 # Disable AutoFill
 com.apple.Safari	AutoFillFromAddressBook	bool	false	noaudit=tcc
-com.apple.Safari	AutoFillPasswords	bool	1	noaudit=tcc
+com.apple.Safari	AutoFillPasswords	bool	true	noaudit=tcc
 com.apple.Safari	AutoFillCreditCardData	bool	false	noaudit=tcc
 com.apple.Safari	AutoFillMiscellaneousForms	bool	false	noaudit=tcc
 
@@ -560,7 +560,7 @@ com.apple.TimeMachine	DoNotOfferNewDisksForBackup	bool	true
 ###############################################################################
 
 # Show the main window when launching Activity Monitor
-com.apple.ActivityMonitor	OpenMainWindow	bool	0
+com.apple.ActivityMonitor	OpenMainWindow	bool	false
 
 # Visualize CPU usage in the Activity Monitor Dock icon
 com.apple.ActivityMonitor	IconType	int	5
@@ -679,7 +679,7 @@ com.google.Chrome.canary	PMPrintingExpandedStateForPrint2	bool	true
 -g	com.apple.keyboard.fnState	bool	true
 
 # Stop the "Try Safari!" nagification
-com.apple.coreservices.uiagent	CSUIHasSafariBeenLaunched	bool	YES
+com.apple.coreservices.uiagent	CSUIHasSafariBeenLaunched	bool	true
 com.apple.coreservices.uiagent	CSUIRecommendSafariNextNotificationDate	date	2050-01-01T00:00:00Z	noaudit=complex
 com.apple.coreservices.uiagent	CSUILastOSVersionWhereSafariRecommendationWasMade	float	10.99
 

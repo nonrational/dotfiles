@@ -205,6 +205,22 @@ normalize() {
     esac
 }
 
+# The table's booleans read true/false so the file stays reviewable, but
+# `defaults read` returns 0/1. Canonicalize on the way in, since accept is
+# what writes rows back.
+canonical_value() {
+    local type="$1" v="$2"
+    if [ "$type" != bool ]; then
+        printf '%s\n' "$v"
+        return 0
+    fi
+    case "$(normalize bool "$v")" in
+        1) printf 'true\n' ;;
+        0) printf 'false\n' ;;
+        *) printf '%s\n' "$v" ;;
+    esac
+}
+
 # The table stores ${HOME} literally so a row describes desired state rather
 # than one machine's paths. Every comparison and every write expands it.
 expand_value() {
@@ -398,7 +414,7 @@ run_accept() {
                 if [ "$live_type" != "${t_type[$i]}" ] \
                     || [ "$(normalize "$live_type" "$live")" != "$(normalize "${t_type[$i]}" "$(expand_value "${t_value[$i]}")")" ] \
                     || [ "$new_status" != "${t_status[$i]}" ]; then
-                    new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$(tokenize_value "$live")"
+                    new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$(canonical_value "$live_type" "$(tokenize_value "$live")")"
                     if [ -n "$new_status" ]; then
                         new_row[$i]="${new_row[$i]}$TAB$new_status"
                     fi

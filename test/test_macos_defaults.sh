@@ -687,6 +687,23 @@ test_audit_always_skips_a_readable_complex_row() {
     fi
 }
 
+# The table's booleans read true/false so the file stays reviewable, but
+# `defaults read` returns 0/1. Without canonicalizing, every accept of a bool
+# row leaves the table a little less consistent than it was.
+test_accept_writes_booleans_in_human_form() {
+    darwin_only "accept writes a bool as true/false, not 1/0" || return 0
+    sandbox
+    defaults write "$DOMAIN" Flag -bool true
+    row "$DOMAIN" Flag bool false > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && grep -q "	bool	true$" "$TABLE" \
+        && ! grep -q "	bool	1$" "$TABLE"; then
+        ok "accept writes a bool as true/false, not 1/0"
+    else
+        bad "accept writes a bool as true/false, not 1/0 (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -733,6 +750,7 @@ test_apply_rewrites_a_type_drifted_row
 test_audit_checks_a_readable_tcc_row
 test_audit_skips_an_unreadable_tcc_row
 test_audit_always_skips_a_readable_complex_row
+test_accept_writes_booleans_in_human_form
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"
