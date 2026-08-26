@@ -422,7 +422,7 @@ com.apple.Safari	IncludeInternalDebugMenu	bool	true	noaudit=tcc
 com.apple.Safari	FindOnPageMatchesWordStartsOnly	bool	false	noaudit=tcc
 
 # Remove useless icons from Safari’s bookmarks bar
-com.apple.Safari	ProxiesInBookmarksBar	raw	()	noaudit=tcc
+com.apple.Safari	ProxiesInBookmarksBar	raw	()	noaudit=complex
 
 # Enable the Develop menu and the Web Inspector in Safari
 com.apple.Safari	IncludeDevelopMenu	bool	true	noaudit=tcc
@@ -577,16 +577,16 @@ com.apple.ActivityMonitor	SortDirection	int	0
 ###############################################################################
 
 # Enable the debug menu in Address Book
-com.apple.addressbook	ABShowDebugMenu	bool	true	noaudit=tcc
+com.apple.addressbook	ABShowDebugMenu	bool	true	noaudit=unset
 
 # Enable the debug menu in Calendar (pre-10.8)
 com.apple.iCal	IncludeDebugMenu	bool	true
 
 # Use plain text mode for new TextEdit documents
-com.apple.TextEdit	RichText	int	0	noaudit=tcc
+com.apple.TextEdit	RichText	int	0	noaudit=unset
 # Open and save files as UTF-8 in TextEdit
-com.apple.TextEdit	PlainTextEncoding	int	4	noaudit=tcc
-com.apple.TextEdit	PlainTextEncodingForWrite	int	4	noaudit=tcc
+com.apple.TextEdit	PlainTextEncoding	int	4	noaudit=unset
+com.apple.TextEdit	PlainTextEncodingForWrite	int	4	noaudit=unset
 
 # Enable the debug menu in Disk Utility
 com.apple.DiskUtility	DUDebugMenuEnabled	bool	true
