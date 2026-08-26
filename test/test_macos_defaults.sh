@@ -609,6 +609,23 @@ test_accept_leaves_a_tokenized_matching_row_alone() {
     fi
 }
 
+# audit reports type drift, so apply must be able to resolve one. Before this,
+# audit reported drift, apply reported ok and wrote nothing, and audit reported
+# the same drift again — a loop with no exit but accept.
+test_apply_rewrites_a_type_drifted_row() {
+    darwin_only "apply rewrites a row whose stored type drifted" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -bool true
+    row "$DOMAIN" Count int 1 > "$TABLE"
+    mdefaults apply
+    if [ "$status" = 0 ] && grep -q "^write: " <<<"$out" \
+        && [ "$(defaults read-type "$DOMAIN" Count)" = "Type is integer" ]; then
+        ok "apply rewrites a row whose stored type drifted"
+    else
+        bad "apply rewrites a row whose stored type drifted (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -650,6 +667,7 @@ test_audit_expands_the_home_token
 test_apply_expands_the_home_token
 test_accept_tokenizes_the_home_path
 test_accept_leaves_a_tokenized_matching_row_alone
+test_apply_rewrites_a_type_drifted_row
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

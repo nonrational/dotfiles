@@ -216,6 +216,20 @@ tokenize_value() {
     printf '%s\n' "${v//$HOME/$token}"
 }
 
+# audit reports a type drift, so apply has to be able to resolve one. Without
+# this the two commands disagree about whether a row has changed and apply
+# silently leaves a drift that audit keeps reporting.
+type_matches() {
+    local domain="$1" key="$2" type="$3" live_type
+    if [ "$type" = raw ]; then
+        return 0
+    fi
+    if ! live_type="$(defaults_read_type "$domain" "$key")"; then
+        return 0
+    fi
+    [ "$(table_type_of "$live_type")" = "$type" ]
+}
+
 audit_row() {
     local i="$1"
     local domain="${t_domain[$i]}" key="${t_key[$i]}" type="${t_type[$i]}"
@@ -314,7 +328,8 @@ apply_row() {
         noaudit=*) ;;
         *)
             if live="$(defaults_read "$domain" "$key")"; then
-                if [ "$(normalize "$type" "$live")" = "$(normalize "$type" "$(expand_value "$value")")" ]; then
+                if [ "$(normalize "$type" "$live")" = "$(normalize "$type" "$(expand_value "$value")")" ] \
+                    && type_matches "$domain" "$key" "$type"; then
                     echo "ok: $domain $key"
                     return 0
                 fi
