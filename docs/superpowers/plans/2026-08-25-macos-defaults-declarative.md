@@ -1656,9 +1656,9 @@ Expected: roughly 45 lines. Read it before moving it into place; it should conta
 cp /tmp/macos.remainder .macos
 ```
 
-- [ ] **Step 2: Restore the shebang and add a pointer**
+- [ ] **Step 2: Add a pointer to the table**
 
-`--remainder` drops the shebang along with the leading comments. Put it back and say where the settings went, since the next reader will look here first:
+`--remainder` already preserves the shebang and the file's leading comments, verified by reading all 65 lines of its output. Only the pointer is missing. Add it under the existing shebang, since the next reader will look here first:
 
 ```bash
 #!/usr/bin/env bash
@@ -1669,9 +1669,9 @@ cp /tmp/macos.remainder .macos
 # nvram, systemsetup, PlistBuddy, chflags, and the app restarts.
 ```
 
-- [ ] **Step 3: Tidy the remainder by hand**
+- [ ] **Step 3: Read the remainder end to end**
 
-Remove any section banner whose settings all moved to the table, and any comment left without a statement under it. This is a ~45 line file; read the whole thing.
+`--remainder` already drops the banners whose settings all moved and keeps the two whose sections still have content, and every surviving comment sits with its own statement. Read all 65 lines anyway and confirm that holds; fix anything it got wrong rather than assuming a tidy-up is needed.
 
 - [ ] **Step 4: Verify `.macos` is still valid shell**
 
@@ -1687,6 +1687,9 @@ Expected: `syntax ok`, and `0` uncommented `defaults write` lines. Commented-out
 Replace the existing `macos:` target with:
 
 ```make
+macos-doctor:
+	@./scripts/macos-defaults.sh doctor
+
 macos-audit:
 	@./scripts/macos-defaults.sh audit
 
@@ -1699,12 +1702,14 @@ macos-accept:
 check-macos-defaults:
 	@./scripts/macos-defaults.sh check
 
-macos: macos-apply
+macos: macos-doctor macos-apply
 	sh .macos
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 ```
 
-Add `./test/test_macos_defaults.sh` to the `test:` target, append `check-macos-defaults` to `preflight:`, and add the four new target names to `.PHONY`.
+`macos` depends on `macos-doctor` so a fresh Mac fails fast with the remediation path rather than applying settings and silently skipping 39 rows it could not read. `check-macos-defaults` runs in CI on Linux, so it must stay free of `defaults` calls; `macos-doctor` must NOT join `preflight` for the same reason — it is a Darwin-only setup gate, not a committed-content check.
+
+Add `./test/test_macos_defaults.sh` to the `test:` target, append `check-macos-defaults` to `preflight:`, and add the five new target names to `.PHONY`.
 
 - [ ] **Step 6: Add the `.editorconfig` stanza**
 
@@ -1719,13 +1724,13 @@ indent_style = unset
 Under Commands, after the `deploy.sh` line:
 
 ```markdown
-- `./scripts/macos-defaults.sh check|audit|apply|accept [--dry-run] [domain [key]]` — the `macos-defaults` table. `make macos-audit` reports drift and needs no sudo; `make macos-apply` writes; `make macos-accept` rewrites rows to match the machine. `make macos` = apply plus the imperative remainder in `.macos` plus a restart.
+- `./scripts/macos-defaults.sh doctor|check|audit|apply|accept [--dry-run] [domain [key]]` — the `macos-defaults` table. **`make macos-doctor` first on any new Mac**: this tooling needs Full Disk Access granted to your terminal, or Safari's and Mail's rows cannot be read and silently skip. `make macos-audit` reports drift and needs no sudo; `make macos-apply` writes; `make macos-accept` rewrites rows to match the machine. `make macos` = doctor, then apply, then the imperative remainder in `.macos`, then a restart.
 ```
 
 Under Architecture, after the `manifest` + `deploy.sh` bullet:
 
 ```markdown
-- **`macos-defaults` + `scripts/macos-defaults.sh`** — tab-delimited (keys contain spaces, so this one is not whitespace-columned like `manifest`): domain, key, type, value, optional status. A `noaudit=tcc|unset|complex` status means apply writes the row but audit cannot check it — Safari and Mail live in TCC-protected containers no shell can read, and `array`/`dict` values have no comparable form. `.macos` keeps only what has no domain/key/value shape. Design and probe numbers: `docs/superpowers/specs/2026-08-25-macos-defaults-declarative-design.md`.
+- **`macos-defaults` + `scripts/macos-defaults.sh`** — tab-delimited (keys contain spaces, so this one is not whitespace-columned like `manifest`): domain, key, type, value, optional status. `apply` writes every row; `audit` skips a `noaudit=complex` row always (a container value has no comparable scalar form) and skips a `noaudit=tcc` or `noaudit=unset` row only when it will not read. Those two markers record *why* a row might be unreadable, not a decision to ignore it: TCC visibility depends on whether the terminal has Full Disk Access, and an unset key appears once its app first writes preferences. **Grant Full Disk Access to your terminal** (`make macos-doctor` checks) or 39 Safari and Mail rows skip instead of being audited. `.macos` keeps only what has no domain/key/value shape. Design and probe numbers: `docs/superpowers/specs/2026-08-25-macos-defaults-declarative-design.md`.
 ```
 
 - [ ] **Step 8: Run the full gate**
