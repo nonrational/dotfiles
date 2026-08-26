@@ -626,6 +626,52 @@ test_apply_rewrites_a_type_drifted_row() {
     fi
 }
 
+# The tcc marker records why a row may be unreadable, not a decision to ignore
+# it. A readable tcc row must be audited, or on a Mac with Full Disk Access the
+# table silently skips 40 rows it could check.
+test_audit_checks_a_readable_tcc_row() {
+    darwin_only "audit checks a noaudit=tcc row that reads" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -int 3
+    row "$DOMAIN" Count int 7 noaudit=tcc > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 1 ] && grep -q "^drift: " <<<"$out" && ! grep -q "^skip: " <<<"$out"; then
+        ok "audit checks a noaudit=tcc row that reads"
+    else
+        bad "audit checks a noaudit=tcc row that reads (status=$status, out=$out)"
+    fi
+}
+
+# The same row must still skip cleanly, not fail, when the key cannot be read —
+# that is the case the marker exists for.
+test_audit_skips_an_unreadable_tcc_row() {
+    darwin_only "audit skips a noaudit=tcc row that does not read" || return 0
+    sandbox
+    row "$DOMAIN" Absent int 7 noaudit=tcc > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "^skip: .*(tcc)" <<<"$out" \
+        && ! grep -q "^missing: " <<<"$out"; then
+        ok "audit skips a noaudit=tcc row that does not read"
+    else
+        bad "audit skips a noaudit=tcc row that does not read (status=$status, out=$out)"
+    fi
+}
+
+# complex is unconditional: no amount of access makes a container value
+# comparable against a scalar column.
+test_audit_always_skips_a_readable_complex_row() {
+    darwin_only "audit skips a readable noaudit=complex row" || return 0
+    sandbox
+    defaults write "$DOMAIN" Langs -array en fr
+    row "$DOMAIN" Langs array '"en" "fr"' noaudit=complex > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "^skip: .*(complex)" <<<"$out"; then
+        ok "audit skips a readable noaudit=complex row"
+    else
+        bad "audit skips a readable noaudit=complex row (status=$status, out=$out)"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -668,6 +714,9 @@ test_apply_expands_the_home_token
 test_accept_tokenizes_the_home_path
 test_accept_leaves_a_tokenized_matching_row_alone
 test_apply_rewrites_a_type_drifted_row
+test_audit_checks_a_readable_tcc_row
+test_audit_skips_an_unreadable_tcc_row
+test_audit_always_skips_a_readable_complex_row
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

@@ -13,9 +13,10 @@ mode=audit
 filter_domain=""
 filter_key=""
 failures=0
+tcc_skipped=0
 
 usage() {
-    echo "usage: $0 [--dry-run] [check|audit|apply|accept] [domain [key]]" >&2
+    echo "usage: $0 [--dry-run] [check|audit|apply|accept|doctor] [domain [key]]" >&2
 }
 
 while [ $# -gt 0 ]; do
@@ -24,7 +25,7 @@ while [ $# -gt 0 ]; do
             dry_run=1
             shift
             ;;
-        check | audit | apply | accept)
+        check | audit | apply | accept | doctor)
             mode="$1"
             shift
             filter_domain="${1:-}"
@@ -237,13 +238,26 @@ audit_row() {
     local live want live_type
 
     case "$status" in
-        noaudit=*)
-            echo "skip: $domain $key (${status#noaudit=})"
+        noaudit=complex)
+            echo "skip: $domain $key (complex)"
             return 0
             ;;
     esac
 
     if ! live="$(defaults_read "$domain" "$key")"; then
+        case "$status" in
+            noaudit=*)
+                # tcc and unset both record why a row may be unreadable, not a
+                # decision to ignore it: TCC visibility depends on whether this
+                # terminal has Full Disk Access, and an unset key appears once
+                # its app first writes preferences. Audit them when they read.
+                if [ "$status" = "noaudit=tcc" ]; then
+                    tcc_skipped=$((tcc_skipped + 1))
+                fi
+                echo "skip: $domain $key (${status#noaudit=})"
+                return 0
+                ;;
+        esac
         echo "missing: $domain $key"
         failures=$((failures + 1))
         return 0
@@ -419,6 +433,14 @@ run_accept() {
     mv "$tmp" "$TABLE"
 }
 
+# Full Disk Access is a prerequisite for auditing app-container preferences:
+# without it the shell cannot read Safari's or Mail's domains and those rows
+# skip instead of being checked. This directory is readable only by a process
+# that has been granted it.
+has_full_disk_access() {
+    ls "$HOME/Library/Application Support/com.apple.TCC" >/dev/null 2>&1
+}
+
 main() {
     local i n
     parse_table
@@ -428,6 +450,22 @@ main() {
             echo "ok: 1 row in $TABLE"
         else
             echo "ok: $n rows in $TABLE"
+        fi
+        return 0
+    fi
+    if [ "$mode" = doctor ]; then
+        if has_full_disk_access; then
+            echo "ok: Full Disk Access granted"
+        else
+            echo "error: Full Disk Access not granted to this terminal" >&2
+            echo "  App-container rows (Safari, Mail) cannot be audited without it." >&2
+            echo "  Grant it in System Settings > Privacy & Security > Full Disk Access," >&2
+            echo "  add your terminal, then restart the terminal." >&2
+            failures=$((failures + 1))
+        fi
+        echo "ok: $n rows in $TABLE"
+        if [ "$failures" -gt 0 ]; then
+            exit 1
         fi
         return 0
     fi
@@ -449,6 +487,9 @@ main() {
         fi
         i=$((i + 1))
     done
+    if [ "$mode" = audit ] && [ "$tcc_skipped" -gt 0 ] && ! has_full_disk_access; then
+        echo "hint: $tcc_skipped rows skipped for tcc. Grant Full Disk Access to this terminal to audit them (./scripts/macos-defaults.sh doctor)." >&2
+    fi
     if [ "$failures" -gt 0 ]; then
         exit 1
     fi
