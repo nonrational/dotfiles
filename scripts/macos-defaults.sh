@@ -204,6 +204,18 @@ normalize() {
     esac
 }
 
+# The table stores ${HOME} literally so a row describes desired state rather
+# than one machine's paths. Every comparison and every write expands it.
+expand_value() {
+    local v="$1"
+    printf '%s\n' "${v//\$\{HOME\}/$HOME}"
+}
+
+tokenize_value() {
+    local v="$1" token='${HOME}'
+    printf '%s\n' "${v//$HOME/$token}"
+}
+
 audit_row() {
     local i="$1"
     local domain="${t_domain[$i]}" key="${t_key[$i]}" type="${t_type[$i]}"
@@ -236,7 +248,7 @@ audit_row() {
         fi
     fi
 
-    want="$(normalize "$type" "$value")"
+    want="$(normalize "$type" "$(expand_value "$value")")"
     live="$(normalize "$type" "$live")"
     if [ "$want" = "$live" ]; then
         echo "ok: $domain $key"
@@ -261,6 +273,7 @@ needs_sudo() {
 write_row() {
     local domain="$1" key="$2" type="$3" value="$4"
     local host_flag="" target="$domain" sudo_cmd=""
+    value="$(expand_value "$value")"
 
     case "$domain" in
         currentHost:*)
@@ -301,7 +314,7 @@ apply_row() {
         noaudit=*) ;;
         *)
             if live="$(defaults_read "$domain" "$key")"; then
-                if [ "$(normalize "$type" "$live")" = "$(normalize "$type" "$value")" ]; then
+                if [ "$(normalize "$type" "$live")" = "$(normalize "$type" "$(expand_value "$value")")" ]; then
                     echo "ok: $domain $key"
                     return 0
                 fi
@@ -355,7 +368,7 @@ run_accept() {
                 if [ "$live_type" != "${t_type[$i]}" ] \
                     || [ "$(normalize "$live_type" "$live")" != "$(normalize "${t_type[$i]}" "${t_value[$i]}")" ] \
                     || [ "$new_status" != "${t_status[$i]}" ]; then
-                    new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$live"
+                    new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$(tokenize_value "$live")"
                     if [ -n "$new_status" ]; then
                         new_row[$i]="${new_row[$i]}$TAB$new_status"
                     fi

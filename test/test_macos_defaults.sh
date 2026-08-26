@@ -549,6 +549,48 @@ test_accept_never_rewrites_a_tcc_row() {
     fi
 }
 
+# The table keeps ${HOME} literal so a row is portable; audit has to expand it
+# or these two rows report drift on every machine, including the one that wrote them.
+test_audit_expands_the_home_token() {
+    darwin_only "audit expands \${HOME} before comparing" || return 0
+    sandbox
+    defaults write "$DOMAIN" Where -string "$HOME/Desktop"
+    row "$DOMAIN" Where string '${HOME}/Desktop' > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "^ok: " <<<"$out"; then
+        ok "audit expands \${HOME} before comparing"
+    else
+        bad "audit expands \${HOME} before comparing (status=$status, out=$out)"
+    fi
+}
+
+test_apply_expands_the_home_token() {
+    darwin_only "apply writes the expanded \${HOME} path" || return 0
+    sandbox
+    row "$DOMAIN" Where string '${HOME}/Desktop' > "$TABLE"
+    mdefaults apply
+    if [ "$status" = 0 ] && [ "$(defaults read "$DOMAIN" Where)" = "$HOME/Desktop" ]; then
+        ok "apply writes the expanded \${HOME} path"
+    else
+        bad "apply writes the expanded \${HOME} path (status=$status, out=$out)"
+    fi
+}
+
+# Without this, accepting one of these rows would bake the literal home
+# directory back into the table and undo the whole point.
+test_accept_tokenizes_the_home_path() {
+    darwin_only "accept stores \${HOME} rather than the literal path" || return 0
+    sandbox
+    defaults write "$DOMAIN" Where -string "$HOME/Downloads"
+    row "$DOMAIN" Where string '${HOME}/Desktop' > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && grep -q 'Downloads$' "$TABLE" && ! grep -q "$HOME" "$TABLE"; then
+        ok "accept stores \${HOME} rather than the literal path"
+    else
+        bad "accept stores \${HOME} rather than the literal path (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -586,6 +628,9 @@ test_accept_updates_the_type_when_it_drifts
 test_accept_honors_the_filter
 test_accept_never_rewrites_a_readable_complex_row
 test_accept_never_rewrites_a_tcc_row
+test_audit_expands_the_home_token
+test_apply_expands_the_home_token
+test_accept_tokenizes_the_home_path
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

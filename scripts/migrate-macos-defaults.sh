@@ -7,6 +7,7 @@ set -euf -o pipefail
 DOTS="$(cd "$(dirname "$0")/.." && pwd)"
 SOURCE="$DOTS/.macos"
 TAB=$'\t'
+HOME_TOKEN='${HOME}'
 mode=table
 
 if [ $# -gt 0 ]; then
@@ -75,6 +76,9 @@ emit() {
     # Continuation lines in .macos are tab-indented; a surviving tab would add a
     # phantom column.
     value="${value//$TAB/ }"
+    # eval expanded ${HOME} while parsing, which would bake this machine's home
+    # directory into a table meant to describe desired state rather than one Mac.
+    value="${value//$HOME/$HOME_TOKEN}"
     case "$type" in
         array | dict | dict-add | date | data) status="noaudit=complex" ;;
         *) status="$(classify "$domain" "$key")" ;;

@@ -193,7 +193,7 @@ com.apple.screensaver	askForPassword	int	1
 com.apple.screensaver	askForPasswordDelay	int	0
 
 # Save screenshots to the desktop
-com.apple.screencapture	location	string	/Users/norton/Desktop
+com.apple.screencapture	location	string	${HOME}/Desktop
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
 com.apple.screencapture	type	string	png
@@ -221,7 +221,7 @@ com.apple.finder	DisableAllAnimations	bool	true
 # Set Desktop as the default location for new Finder windows
 # For other paths, use `PfLo` and `file:///full/path/here/`
 com.apple.finder	NewWindowTarget	string	PfDe
-com.apple.finder	NewWindowTargetPath	string	file:///Users/norton/Desktop/
+com.apple.finder	NewWindowTargetPath	string	file://${HOME}/Desktop/
 
 # Show icons for hard drives, servers, and removable media on the desktop
 com.apple.finder	ShowExternalHardDrivesOnDesktop	bool	true
