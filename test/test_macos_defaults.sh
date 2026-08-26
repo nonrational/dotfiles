@@ -149,6 +149,50 @@ test_rejects_container_type_without_noaudit() {
     fi
 }
 
+# A container row marked anything but complex drifts forever and accept then
+# rewrites it as a multi-line plist dump, corrupting the file after mv.
+test_rejects_container_type_with_wrong_noaudit() {
+    sandbox
+    row com.example.d MyDict dict "a 1" noaudit=tcc > "$TABLE"
+    mdefaults check
+    if [ "$status" = 1 ] && grep -q "noaudit=complex" <<<"$out"; then
+        ok "container type with a non-complex marker exits 1"
+    else
+        bad "container type with a non-complex marker exits 1 (status=$status, out=$out)"
+    fi
+}
+
+# Two rows for the same domain+key fight over the same write, so apply can
+# never converge once they carry different values. dict-add is exempt: it
+# legitimately repeats a domain+key, one row per dict entry.
+test_rejects_duplicate_domain_and_key() {
+    sandbox
+    {
+        row com.example.d Count int 1
+        row com.example.d Count int 2
+    } > "$TABLE"
+    mdefaults check
+    if [ "$status" = 1 ] && grep -q "duplicate" <<<"$out"; then
+        ok "duplicate domain+key exits 1"
+    else
+        bad "duplicate domain+key exits 1 (status=$status, out=$out)"
+    fi
+}
+
+test_allows_repeated_dict_add_domain_and_key() {
+    sandbox
+    {
+        row com.example.d Prefs dict-add "a 1" noaudit=complex
+        row com.example.d Prefs dict-add "b 2" noaudit=complex
+    } > "$TABLE"
+    mdefaults check
+    if [ "$status" = 0 ]; then
+        ok "repeated dict-add domain+key is allowed"
+    else
+        bad "repeated dict-add domain+key is allowed (status=$status, out=$out)"
+    fi
+}
+
 test_rejects_empty_table() {
     sandbox
     printf '# comments only\n\n' > "$TABLE"
@@ -549,6 +593,21 @@ test_accept_updates_a_readable_tcc_row() {
     fi
 }
 
+# audit reports a type drift on a marked row, so accept must be able to settle
+# one. A tcc row keeps its marker, and the type column used to freeze with it.
+test_accept_updates_the_type_on_a_marked_row() {
+    darwin_only "accept refreshes the type on a noaudit=tcc row" || return 0
+    sandbox
+    defaults write "$DOMAIN" Count -bool true
+    row "$DOMAIN" Count int 1 noaudit=tcc > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && grep -q "	bool	true	noaudit=tcc$" "$TABLE"; then
+        ok "accept refreshes the type on a noaudit=tcc row"
+    else
+        bad "accept refreshes the type on a noaudit=tcc row (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
 # The unreadable case is what the marker exists for: no value to take, so the
 # row must be left exactly as it is rather than emptied.
 test_accept_leaves_an_unreadable_tcc_row_alone() {
@@ -704,6 +763,23 @@ test_accept_writes_booleans_in_human_form() {
     fi
 }
 
+# accept replaces the table by mv, so a value it cannot represent must be
+# refused before the write rather than corrupting the file after it.
+test_accept_refuses_a_value_containing_a_tab() {
+    darwin_only "accept refuses a live value containing a tab" || return 0
+    sandbox
+    defaults write "$DOMAIN" Weird -string "a	b"
+    row "$DOMAIN" Weird string placeholder > "$TABLE"
+    before="$(cksum < "$TABLE")"
+    mdefaults accept
+    if [ "$(cksum < "$TABLE")" = "$before" ] && MACOS_DEFAULTS_TABLE="$TABLE" \
+        "$ROOT/scripts/macos-defaults.sh" check >/dev/null 2>&1; then
+        ok "accept refuses a live value containing a tab"
+    else
+        bad "accept refuses a live value containing a tab (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
 # --- runner -----------------------------------------------------------------
 test_rejects_unknown_flag
 test_rejects_missing_table
@@ -713,6 +789,9 @@ test_rejects_empty_status_column
 test_rejects_unknown_type
 test_rejects_unknown_status
 test_rejects_container_type_without_noaudit
+test_rejects_container_type_with_wrong_noaudit
+test_rejects_duplicate_domain_and_key
+test_allows_repeated_dict_add_domain_and_key
 test_rejects_empty_table
 test_hash_inside_value_is_not_a_comment
 test_indented_comment_is_a_comment
@@ -741,6 +820,7 @@ test_accept_updates_the_type_when_it_drifts
 test_accept_honors_the_filter
 test_accept_never_rewrites_a_readable_complex_row
 test_accept_updates_a_readable_tcc_row
+test_accept_updates_the_type_on_a_marked_row
 test_accept_leaves_an_unreadable_tcc_row_alone
 test_audit_expands_the_home_token
 test_apply_expands_the_home_token
@@ -751,6 +831,7 @@ test_audit_checks_a_readable_tcc_row
 test_audit_skips_an_unreadable_tcc_row
 test_audit_always_skips_a_readable_complex_row
 test_accept_writes_booleans_in_human_form
+test_accept_refuses_a_value_containing_a_tab
 
 echo
 echo "$pass passed, $fail failed, $skipped skipped"

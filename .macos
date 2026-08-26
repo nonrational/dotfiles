@@ -3,7 +3,7 @@
 # ~/.macos — the imperative remainder. Every `defaults write` that used to live
 # here is now a row in ./macos-defaults; run `make macos-audit` to compare them
 # against the machine. What is left cannot be expressed as a domain/key/value:
-# nvram, systemsetup, PlistBuddy, chflags, and the app restarts.
+# nvram, systemsetup, PlistBuddy, chflags, lsregister, tmutil, and the app restarts.
 
 # ~/.macos — https://mths.be/macos
 

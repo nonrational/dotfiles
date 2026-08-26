@@ -398,7 +398,7 @@ com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2TabsToLinks	
 com.apple.Safari	ShowFullURLInSmartSearchField	bool	true	noaudit=tcc
 
 # Set Safari’s home page to `about:blank` for faster loading
-com.apple.Safari	HomePage	string	https://www.apple.com/startpage/	noaudit=tcc
+com.apple.Safari	HomePage	string	about:blank	noaudit=tcc
 
 # Prevent Safari from opening ‘safe’ files automatically after downloading
 com.apple.Safari	AutoOpenSafeDownloads	bool	false	noaudit=tcc
@@ -439,7 +439,7 @@ com.apple.Safari	WebAutomaticSpellingCorrectionEnabled	bool	false	noaudit=tcc
 
 # Disable AutoFill
 com.apple.Safari	AutoFillFromAddressBook	bool	false	noaudit=tcc
-com.apple.Safari	AutoFillPasswords	bool	true	noaudit=tcc
+com.apple.Safari	AutoFillPasswords	bool	false	noaudit=tcc
 com.apple.Safari	AutoFillCreditCardData	bool	false	noaudit=tcc
 com.apple.Safari	AutoFillMiscellaneousForms	bool	false	noaudit=tcc
 
@@ -520,7 +520,29 @@ com.apple.mail	SpellCheckingBehavior	string	NoSpellCheckingEnabled	noaudit=tcc
 #   nonrational: SOURCE enables calculator?
 
 # nonrational: Disabled 2023-07-21. Buggy as of Ventura.
-# defaults write com.apple.spotlight orderedItems -array # 	'{"enabled" = 1;"name" = "APPLICATIONS";}' # 	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' # 	'{"enabled" = 1;"name" = "DIRECTORIES";}' # 	'{"enabled" = 1;"name" = "PDF";}' # 	'{"enabled" = 1;"name" = "FONTS";}' # 	'{"enabled" = 1;"name" = "SOURCE";}' # 	'{"enabled" = 0;"name" = "DOCUMENTS";}' # 	'{"enabled" = 0;"name" = "MESSAGES";}' # 	'{"enabled" = 0;"name" = "CONTACT";}' # 	'{"enabled" = 0;"name" = "EVENT_TODO";}' # 	'{"enabled" = 0;"name" = "IMAGES";}' # 	'{"enabled" = 0;"name" = "BOOKMARKS";}' # 	'{"enabled" = 0;"name" = "MUSIC";}' # 	'{"enabled" = 0;"name" = "MOVIES";}' # 	'{"enabled" = 0;"name" = "PRESENTATIONS";}' # 	'{"enabled" = 0;"name" = "SPREADSHEETS";}' # 	'{"enabled" = 0;"name" = "MENU_DEFINITION";}' # 	'{"enabled" = 0;"name" = "MENU_OTHER";}' # 	'{"enabled" = 0;"name" = "MENU_CONVERSION";}' # 	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' # 	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' # 	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
+# defaults write com.apple.spotlight orderedItems -array \
+# 	'{"enabled" = 1;"name" = "APPLICATIONS";}' \
+# 	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
+# 	'{"enabled" = 1;"name" = "DIRECTORIES";}' \
+# 	'{"enabled" = 1;"name" = "PDF";}' \
+# 	'{"enabled" = 1;"name" = "FONTS";}' \
+# 	'{"enabled" = 1;"name" = "SOURCE";}' \
+# 	'{"enabled" = 0;"name" = "DOCUMENTS";}' \
+# 	'{"enabled" = 0;"name" = "MESSAGES";}' \
+# 	'{"enabled" = 0;"name" = "CONTACT";}' \
+# 	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
+# 	'{"enabled" = 0;"name" = "IMAGES";}' \
+# 	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
+# 	'{"enabled" = 0;"name" = "MUSIC";}' \
+# 	'{"enabled" = 0;"name" = "MOVIES";}' \
+# 	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
+# 	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
+# 	'{"enabled" = 0;"name" = "MENU_DEFINITION";}' \
+# 	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
+# 	'{"enabled" = 0;"name" = "MENU_CONVERSION";}' \
+# 	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
+# 	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
+# 	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
 
 # # Load new settings before rebuilding the index
 # killall mds > /dev/null 2>&1
@@ -560,7 +582,7 @@ com.apple.TimeMachine	DoNotOfferNewDisksForBackup	bool	true
 ###############################################################################
 
 # Show the main window when launching Activity Monitor
-com.apple.ActivityMonitor	OpenMainWindow	bool	false
+com.apple.ActivityMonitor	OpenMainWindow	bool	true
 
 # Visualize CPU usage in the Activity Monitor Dock icon
 com.apple.ActivityMonitor	IconType	int	5
@@ -700,7 +722,6 @@ com.apple.screencapture	show-thumbnail	bool	false
 ###############################################################
 
 com.apple.dock	showAppExposeGestureEnabled	int	1
-com.apple.dock	showLaunchpadGestureEnabled	int	0
 com.apple.dock	showMissionControlGestureEnabled	int	1
 com.apple.driver.AppleBluetoothMultitouch.trackpad	TrackpadTwoFingerFromRightEdgeSwipeGesture	int	0
 

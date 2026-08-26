@@ -35,19 +35,19 @@ Every `defaults write` in `.macos`, parsed with a shell shim and compared agains
 |---|---|---|
 | Auditable, matches live | 152 | The healthy core |
 | Genuine drift | 6 | The four above, plus two trackpad keys the pane restored as booleans |
-| TCC-blocked | 44 | Safari 35, Mail 5, TextEdit 3, addressbook 1 |
-| Actually unset | 5 | Key absent from a domain that reads fine |
-| Genuinely complex | 11 | `array` / `dict` / `dict-add` / `date` |
+| TCC-blocked | 39 | Safari 34, Mail 5 |
+| Actually unset | 9 | Key absent from a domain that reads fine |
+| Genuinely complex | 12 | `array` / `dict` / `dict-add` / `date` |
 
 Four of the complex rows (`com.apple.mail NSUserKeyEquivalents`, `DraftsViewerAttributes` ×3) are blocked by TCC *and* by their container types. They are marked `noaudit=complex`, because that is the binding constraint: granting Full Disk Access would still leave them uncomparable.
 
 ### TCC is a hard constraint
 
-`~/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist` exists and is written regularly, but `ls` on that directory returns `Operation not permitted` and `defaults read com.apple.Safari` reports the domain does not exist. That is TCC, not a missing key. Those 44 rows cannot be audited from a shell without granting Full Disk Access to the terminal, and CI can never have it.
+`~/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist` exists and is written regularly, but `ls` on that directory returns `Operation not permitted` and `defaults read com.apple.Safari` reports the domain does not exist. That is TCC, not a missing key. Those 39 rows cannot be audited from a shell without granting Full Disk Access to the terminal, and CI can never have it.
 
 The test that separates the two cases is whether the *domain* reads, not whether the key does: `defaults read com.apple.Safari` fails, while `defaults read com.apple.GameCenter` succeeds and only the key is absent. `com.apple.TextEdit` and `com.apple.addressbook` look unset but fail the domain read and own TCC container directories, so they belong with Safari and Mail. An earlier draft of this spec put them in the unset bucket by checking `defaults domains`, which lists `com.apple.TextEdit` even though reading it fails.
 
-Granting FDA was considered and rejected: it makes audit results depend on a machine-configuration step this repo cannot enforce or verify.
+Granting Full Disk Access is a checked prerequisite, not a rejected idea: 39 Safari and Mail rows cannot be audited without it, which is a bigger loss than the cost of one one-time setup step. `scripts/macos-defaults.sh doctor` checks for it and exits 1 with instructions when it is missing; `make macos` depends on `macos-doctor`, so a fresh Mac is stopped before `apply` rather than silently skipping the app-container rows forever. `audit` still degrades gracefully without it — the 39 rows report `skip: ... (tcc)` instead of failing — so a machine that has not yet granted access, and CI, still get a usable (if partial) audit.
 
 ### Root-owned domains need no sudo to read
 
@@ -152,7 +152,7 @@ Seeding fills values from live. The four drifting rows are held back as a decisi
 | `com.apple.AppleMultitouchTrackpad FirstClickThreshold` | accept. Same value, different storage: the trackpad pane rewrote both keys as booleans. Writing `-int` back invites the pane to rewrite it again and turns the row into recurring noise |
 | `com.apple.AppleMultitouchTrackpad SecondClickThreshold` | accept, same reason |
 
-The 5 unset rows enter as `noaudit=unset` so the baseline is green: `helpviewer DevMode`, `QuickTimePlayerX MGPlayMovieOnOpen`, `Siri` ×2, `GameCenter GKInviteAlertEnabled`.
+The 9 unset rows enter as `noaudit=unset` so the baseline is green: `helpviewer DevMode`, `QuickTimePlayerX MGPlayMovieOnOpen`, `Siri` ×2, `GameCenter GKInviteAlertEnabled`, `TextEdit` ×3, `addressbook ABShowDebugMenu`.
 
 ## What `.macos` keeps
 
@@ -185,16 +185,16 @@ macos          ->  apply the table, then sh .macos, then the restart osascript
 
 `.editorconfig` gains a `[macos-defaults]` stanza documenting that the tabs are data separators rather than indentation.
 
-## Open risk
+## TCC and writes, resolved
 
-**Whether `defaults write` to a TCC-blocked container domain still succeeds is unverified.** Reads definitely fail. If writes fail too, those 35 Safari settings have not been applied on a fresh Mac in years and `.macos` has been quietly lying about them.
+**Writes were never blocked.** `defaults write com.apple.Safari AutoFillPasswords -bool false; echo $?` exits 0 whether or not the terminal has Full Disk Access — TCC gates reading a container domain's preferences, not writing them. `.macos` has been landing its Safari and Mail settings correctly the whole time; only auditing them was blocked.
 
-Finding out requires a real write to a real Safari preference. It belongs in the implementation plan as an explicit, owner-approved step.
+Reads fail only for the reason above. Without Full Disk Access, `defaults read com.apple.Safari AutoFillPasswords` reports the domain does not exist. With it granted, `./scripts/macos-defaults.sh audit` checks all 39 Safari and Mail rows instead of skipping them — its summary line reports `tcc 0` in the skip breakdown, not 39.
 
 ## Out of scope
 
 - Comparing `array` and `dict` values. Normalizing plist container output is a larger job than drift detection warrants; those rows stay `noaudit=complex`.
-- Granting the terminal Full Disk Access to recover the Safari and Mail rows.
 - Per-host rows. The `os=` and `host=` vocabulary parses but no row uses it.
 - Moving the imperative tail (`PlistBuddy`, `nvram`, `chflags`, `systemsetup`) into any declarative form.
 - Renaming `.macos`.
+- Detecting settings the machine has that the table does not declare. Audit is one-directional: it only checks declared rows against the machine, never the reverse. A green audit means "everything declared is true," not "the machine is fully described."

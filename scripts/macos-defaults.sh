@@ -14,6 +14,11 @@ filter_domain=""
 filter_key=""
 failures=0
 tcc_skipped=0
+unset_skipped=0
+complex_skipped=0
+ok_count=0
+drift_count=0
+missing_count=0
 
 usage() {
     echo "usage: $0 [--dry-run] [check|audit|apply|accept|doctor] [domain [key]]" >&2
@@ -71,7 +76,7 @@ split_row() {
 }
 
 parse_table() {
-    local lineno=0 line trimmed status i
+    local lineno=0 line trimmed status i j
     if [ ! -f "$TABLE" ]; then
         echo "error: table not found at $TABLE" >&2
         exit 1
@@ -107,9 +112,9 @@ parse_table() {
             bool | int | float | string | raw) ;;
             array | dict | dict-add | date | data)
                 case "$status" in
-                    noaudit=*) ;;
+                    noaudit=complex) ;;
                     *)
-                        echo "error: $TABLE line $lineno: type '${ROW[2]}' cannot be compared; it needs a noaudit= status" >&2
+                        echo "error: $TABLE line $lineno: type '${ROW[2]}' cannot be compared; it needs noaudit=complex" >&2
                         exit 1
                         ;;
                 esac
@@ -126,6 +131,21 @@ parse_table() {
                 exit 1
                 ;;
         esac
+        # dict-add legitimately repeats a domain+key across rows, one per
+        # dict entry; every other type must own its domain+key uniquely or
+        # apply can never converge (each row would fight the other's write).
+        if [ "${ROW[2]}" != dict-add ]; then
+            j=0
+            while [ "$j" -lt "${#t_domain[@]}" ]; do
+                if [ "${t_type[$j]}" != dict-add ] \
+                    && [ "${t_domain[$j]}" = "${ROW[0]}" ] \
+                    && [ "${t_key[$j]}" = "${ROW[1]}" ]; then
+                    echo "error: $TABLE line $lineno: duplicate domain+key '${ROW[0]} ${ROW[1]}'" >&2
+                    exit 1
+                fi
+                j=$((j + 1))
+            done
+        fi
         t_domain+=("${ROW[0]}")
         t_key+=("${ROW[1]}")
         t_type+=("${ROW[2]}")
@@ -256,6 +276,7 @@ audit_row() {
     case "$status" in
         noaudit=complex)
             echo "skip: $domain $key (complex)"
+            complex_skipped=$((complex_skipped + 1))
             return 0
             ;;
     esac
@@ -269,6 +290,8 @@ audit_row() {
                 # its app first writes preferences. Audit them when they read.
                 if [ "$status" = "noaudit=tcc" ]; then
                     tcc_skipped=$((tcc_skipped + 1))
+                else
+                    unset_skipped=$((unset_skipped + 1))
                 fi
                 echo "skip: $domain $key (${status#noaudit=})"
                 return 0
@@ -276,6 +299,7 @@ audit_row() {
         esac
         echo "missing: $domain $key"
         failures=$((failures + 1))
+        missing_count=$((missing_count + 1))
         return 0
     fi
 
@@ -287,6 +311,7 @@ audit_row() {
             if [ "$live_type" != "$type" ]; then
                 echo "drift: $domain $key type want=$type live=$live_type"
                 failures=$((failures + 1))
+                drift_count=$((drift_count + 1))
                 return 0
             fi
         fi
@@ -296,9 +321,11 @@ audit_row() {
     live="$(normalize "$type" "$live")"
     if [ "$want" = "$live" ]; then
         echo "ok: $domain $key"
+        ok_count=$((ok_count + 1))
     else
         echo "drift: $domain $key want=$want live=$live"
         failures=$((failures + 1))
+        drift_count=$((drift_count + 1))
     fi
 }
 
@@ -388,37 +415,50 @@ accept_candidate() {
 }
 
 run_accept() {
-    local i n idx live live_type new_status tmp line trimmed
+    local i n idx live live_type new_status skip_reason tmp line trimmed prefix=""
     local new_row=()
 
+    if [ "$dry_run" = 1 ]; then
+        prefix="would: "
+    fi
     n="${#t_domain[@]}"
     i=0
     while [ "$i" -lt "$n" ]; do
         new_row[$i]=""
         if accept_candidate "$i"; then
             if live="$(defaults_read "${t_domain[$i]}" "${t_key[$i]}")"; then
-                new_status="${t_status[$i]}"
-                # The marker only recorded that the key was unreadable at seed
-                # time; it just read, so it no longer describes anything.
-                if [ "$new_status" = "noaudit=unset" ]; then
-                    new_status=""
-                fi
-                live_type="${t_type[$i]}"
-                if [ "$live_type" != raw ] && [ "$new_status" = "" ]; then
-                    if live_type="$(defaults_read_type "${t_domain[$i]}" "${t_key[$i]}")"; then
-                        live_type="$(table_type_of "$live_type")"
-                    else
-                        live_type="${t_type[$i]}"
+                skip_reason=""
+                case "$live" in
+                    "") skip_reason="value is empty" ;;
+                    *"$TAB"*) skip_reason="value contains a tab" ;;
+                    *$'\n'*) skip_reason="value contains a newline" ;;
+                esac
+                if [ -n "$skip_reason" ]; then
+                    echo "accept: ${t_domain[$i]} ${t_key[$i]}: skipped, live $skip_reason" >&2
+                else
+                    new_status="${t_status[$i]}"
+                    # The marker only recorded that the key was unreadable at seed
+                    # time; it just read, so it no longer describes anything.
+                    if [ "$new_status" = "noaudit=unset" ]; then
+                        new_status=""
                     fi
-                fi
-                if [ "$live_type" != "${t_type[$i]}" ] \
-                    || [ "$(normalize "$live_type" "$live")" != "$(normalize "${t_type[$i]}" "$(expand_value "${t_value[$i]}")")" ] \
-                    || [ "$new_status" != "${t_status[$i]}" ]; then
-                    new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$(canonical_value "$live_type" "$(tokenize_value "$live")")"
-                    if [ -n "$new_status" ]; then
-                        new_row[$i]="${new_row[$i]}$TAB$new_status"
+                    live_type="${t_type[$i]}"
+                    if [ "$live_type" != raw ]; then
+                        if live_type="$(defaults_read_type "${t_domain[$i]}" "${t_key[$i]}")"; then
+                            live_type="$(table_type_of "$live_type")"
+                        else
+                            live_type="${t_type[$i]}"
+                        fi
                     fi
-                    echo "accept: ${t_domain[$i]} ${t_key[$i]} = $live"
+                    if [ "$live_type" != "${t_type[$i]}" ] \
+                        || [ "$(normalize "$live_type" "$live")" != "$(normalize "${t_type[$i]}" "$(expand_value "${t_value[$i]}")")" ] \
+                        || [ "$new_status" != "${t_status[$i]}" ]; then
+                        new_row[$i]="${t_domain[$i]}$TAB${t_key[$i]}$TAB$live_type$TAB$(canonical_value "$live_type" "$(tokenize_value "$live")")"
+                        if [ -n "$new_status" ]; then
+                            new_row[$i]="${new_row[$i]}$TAB$new_status"
+                        fi
+                        echo "${prefix}accept: ${t_domain[$i]} ${t_key[$i]} = $live"
+                    fi
                 fi
             fi
         fi
@@ -506,6 +546,10 @@ main() {
     done
     if [ "$mode" = audit ] && [ "$tcc_skipped" -gt 0 ] && ! has_full_disk_access; then
         echo "hint: $tcc_skipped rows skipped for tcc. Grant Full Disk Access to this terminal to audit them (./scripts/macos-defaults.sh doctor)." >&2
+    fi
+    if [ "$mode" = audit ]; then
+        local skipped=$((tcc_skipped + unset_skipped + complex_skipped))
+        echo "summary: $ok_count ok, $drift_count drift, $missing_count missing, $skipped skipped (tcc $tcc_skipped, unset $unset_skipped, complex $complex_skipped)"
     fi
     if [ "$failures" -gt 0 ]; then
         exit 1

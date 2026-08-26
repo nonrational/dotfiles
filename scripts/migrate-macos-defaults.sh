@@ -2,6 +2,14 @@
 # One-shot: split .macos into the macos-defaults table (default) and the
 # imperative lines that stay behind (--remainder). Committed so the 218-row
 # transcription can be reviewed rather than trusted.
+#
+# Do not re-run this over the now-seeded table: .macos was retired down to its
+# imperative remainder, so a fresh run has nothing left to parse into rows and
+# would blank the table instead of regenerating it. It would also discard the
+# seeding: four rows (AppleLocale, ActivityMonitor ShowCategory, and the two
+# AppleMultitouchTrackpad click-threshold rows) were deliberately accepted
+# with live values that differ from what .macos originally declared, and a
+# fresh migration knows nothing of that decision.
 set -euf -o pipefail
 
 DOTS="$(cd "$(dirname "$0")/.." && pwd)"
