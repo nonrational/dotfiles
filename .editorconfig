@@ -21,6 +21,10 @@ indent_style = tab
 # Shell continuations in this inherited macOS settings script use tabs.
 indent_style = tab
 
+[macos-defaults]
+# Columns are tab-separated data, not indentation.
+indent_style = unset
+
 [*.md]
 # Markdown indentation and trailing spaces are structural.
 indent_style = unset
