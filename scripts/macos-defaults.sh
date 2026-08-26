@@ -358,14 +358,15 @@ apply_row() {
     write_row "$domain" "$key" "$type" "$value"
 }
 
-# A tcc row's key does not read at all, and a complex row's value column is an
-# eval argument tail rather than a serialization `defaults read` could match, so
-# the compare would always differ and rewrite the row with a multi-line plist
-# dump — splicing newlines into a one-row-per-line file.
+# A complex row's value column is an eval argument tail, not a serialization
+# `defaults read` could ever match, so accepting one would rewrite it with a
+# multi-line plist dump and break the one-row-per-line format. A tcc row is an
+# ordinary scalar whenever it reads at all, so it is accepted like any other;
+# when it does not read, the inner `defaults_read` below skips it anyway.
 accept_candidate() {
     local i="$1"
     case "${t_status[$i]}" in
-        noaudit=tcc | noaudit=complex) return 1 ;;
+        noaudit=complex) return 1 ;;
     esac
     row_selected "$i" && condition_matches "${t_status[$i]}"
 }

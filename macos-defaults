@@ -398,7 +398,7 @@ com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2TabsToLinks	
 com.apple.Safari	ShowFullURLInSmartSearchField	bool	true	noaudit=tcc
 
 # Set Safari’s home page to `about:blank` for faster loading
-com.apple.Safari	HomePage	string	about:blank	noaudit=tcc
+com.apple.Safari	HomePage	string	https://www.apple.com/startpage/	noaudit=tcc
 
 # Prevent Safari from opening ‘safe’ files automatically after downloading
 com.apple.Safari	AutoOpenSafeDownloads	bool	false	noaudit=tcc
@@ -439,7 +439,7 @@ com.apple.Safari	WebAutomaticSpellingCorrectionEnabled	bool	false	noaudit=tcc
 
 # Disable AutoFill
 com.apple.Safari	AutoFillFromAddressBook	bool	false	noaudit=tcc
-com.apple.Safari	AutoFillPasswords	bool	false	noaudit=tcc
+com.apple.Safari	AutoFillPasswords	bool	1	noaudit=tcc
 com.apple.Safari	AutoFillCreditCardData	bool	false	noaudit=tcc
 com.apple.Safari	AutoFillMiscellaneousForms	bool	false	noaudit=tcc
 

@@ -533,19 +533,34 @@ test_accept_never_rewrites_a_readable_complex_row() {
     fi
 }
 
-# The tcc marker records that a domain is unreadable under TCC, which a sandbox
-# cannot simulate. A readable key with the marker set is the same code path.
-test_accept_never_rewrites_a_tcc_row() {
-    darwin_only "accept leaves a noaudit=tcc row untouched even when the key reads" || return 0
+# A readable tcc row is an ordinary scalar, so accept resolves it like any other
+# row — otherwise audit reports a drift that no command can fix. The marker is
+# kept: it records why the row may be unreadable on a different Mac.
+test_accept_updates_a_readable_tcc_row() {
+    darwin_only "accept updates a readable noaudit=tcc row and keeps its marker" || return 0
     sandbox
     defaults write "$DOMAIN" Count -int 3
     row "$DOMAIN" Count int 7 noaudit=tcc > "$TABLE"
+    mdefaults accept
+    if [ "$status" = 0 ] && grep -q "	int	3	noaudit=tcc$" "$TABLE"; then
+        ok "accept updates a readable noaudit=tcc row and keeps its marker"
+    else
+        bad "accept updates a readable noaudit=tcc row and keeps its marker (status=$status, table=$(cat "$TABLE"))"
+    fi
+}
+
+# The unreadable case is what the marker exists for: no value to take, so the
+# row must be left exactly as it is rather than emptied.
+test_accept_leaves_an_unreadable_tcc_row_alone() {
+    darwin_only "accept leaves an unreadable noaudit=tcc row alone" || return 0
+    sandbox
+    row "$DOMAIN" Absent int 7 noaudit=tcc > "$TABLE"
     before="$(cksum < "$TABLE")"
     mdefaults accept
     if [ "$status" = 0 ] && [ "$(cksum < "$TABLE")" = "$before" ]; then
-        ok "accept leaves a noaudit=tcc row untouched even when the key reads"
+        ok "accept leaves an unreadable noaudit=tcc row alone"
     else
-        bad "accept leaves a noaudit=tcc row untouched even when the key reads (status=$status, table=$(cat "$TABLE"))"
+        bad "accept leaves an unreadable noaudit=tcc row alone (status=$status, table=$(cat "$TABLE"))"
     fi
 }
 
@@ -708,7 +723,8 @@ test_accept_promotes_a_readable_unset_row
 test_accept_updates_the_type_when_it_drifts
 test_accept_honors_the_filter
 test_accept_never_rewrites_a_readable_complex_row
-test_accept_never_rewrites_a_tcc_row
+test_accept_updates_a_readable_tcc_row
+test_accept_leaves_an_unreadable_tcc_row_alone
 test_audit_expands_the_home_token
 test_apply_expands_the_home_token
 test_accept_tokenizes_the_home_path
