@@ -8,7 +8,7 @@
 
 `.macos` is a one-way imperative script. It writes 218 `defaults write` lines and keeps no record of desired state, so nothing detects when macOS or an application rewrites a setting after an OS update, a manual change in System Settings, or an app's own housekeeping.
 
-A read-only probe of all 218 lines against this machine (macOS 26) found four settings already untrue:
+A read-only probe of all 218 lines against this machine (macOS 26) found four settings already untrue. The probe compared values only; the finished tool also compares storage types, which later surfaced two more:
 
 | Row | `.macos` declares | Live |
 |---|---|---|
@@ -16,6 +16,8 @@ A read-only probe of all 218 lines against this machine (macOS 26) found four se
 | `com.apple.ActivityMonitor ShowCategory` | `0` | `100` |
 | `com.apple.ActivityMonitor OpenMainWindow` | `true` | `0` |
 | `.GlobalPreferences com.apple.mouse.scaling` | `-1` | `3` |
+| `com.apple.AppleMultitouchTrackpad FirstClickThreshold` | `int 1` | `bool 1` |
+| `com.apple.AppleMultitouchTrackpad SecondClickThreshold` | `int 1` | `bool 1` |
 
 The last one matters: `.macos` disables mouse acceleration and the machine has it on. Nothing would ever have reported that.
 
@@ -31,8 +33,8 @@ Every `defaults write` in `.macos`, parsed with a shell shim and compared agains
 
 | Bucket | Count | Meaning |
 |---|---|---|
-| Auditable, matches live | 154 | The healthy core |
-| Genuine drift | 4 | Listed above |
+| Auditable, matches live | 152 | The healthy core |
+| Genuine drift | 6 | The four above, plus two trackpad keys the pane restored as booleans |
 | TCC-blocked | 44 | Safari 35, Mail 5, TextEdit 3, addressbook 1 |
 | Actually unset | 5 | Key absent from a domain that reads fine |
 | Genuinely complex | 11 | `array` / `dict` / `dict-add` / `date` |
@@ -147,6 +149,8 @@ Seeding fills values from live. The four drifting rows are held back as a decisi
 | `com.apple.ActivityMonitor ShowCategory` | accept — `100` is what a current Activity Monitor writes for the "all processes" view the comment asks for; confirm against the app |
 | `com.apple.ActivityMonitor OpenMainWindow` | accept. If it drifts back, the app rewrites it on quit and the row wants a `noaudit=` marker |
 | `.GlobalPreferences com.apple.mouse.scaling` | **reapply** — the table wins; mouse acceleration should be off |
+| `com.apple.AppleMultitouchTrackpad FirstClickThreshold` | accept. Same value, different storage: the trackpad pane rewrote both keys as booleans. Writing `-int` back invites the pane to rewrite it again and turns the row into recurring noise |
+| `com.apple.AppleMultitouchTrackpad SecondClickThreshold` | accept, same reason |
 
 The 5 unset rows enter as `noaudit=unset` so the baseline is green: `helpviewer DevMode`, `QuickTimePlayerX MGPlayMovieOnOpen`, `Siri` ×2, `GameCenter GKInviteAlertEnabled`.
 

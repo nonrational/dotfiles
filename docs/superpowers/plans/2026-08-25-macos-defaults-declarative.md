@@ -1536,7 +1536,7 @@ Machine-specific and run once. Its test is `audit` exiting 0.
 for label in ok drift missing skip; do printf '%-8s %s\n' "$label" "$(grep -c "^$label:" /tmp/audit-before.txt)"; done
 ```
 
-Expected: `ok 154`, `drift 4`, `missing 0`, `skip 60`. `missing` should be zero because Task 5 already marked every unreadable key.
+Expected: `ok 152`, `drift 6`, `missing 0`, `skip 60`. `missing` should be zero because Task 5 already marked every unreadable key.
 
 - [ ] **Step 2: Confirm the four drifts are the ones the spec predicted**
 
@@ -1547,24 +1547,28 @@ grep '^drift:' /tmp/audit-before.txt
 Expected, in some order:
 
 ```
+drift: com.apple.AppleMultitouchTrackpad FirstClickThreshold type want=int live=bool
+drift: com.apple.AppleMultitouchTrackpad SecondClickThreshold type want=int live=bool
 drift: NSGlobalDomain AppleLocale want=en_US@currency=USD live=en_US@currency=usd
 drift: com.apple.ActivityMonitor ShowCategory want=0 live=100
 drift: com.apple.ActivityMonitor OpenMainWindow want=1 live=0
 drift: .GlobalPreferences com.apple.mouse.scaling want=-1 live=3
 ```
 
-A fifth drift is new information, not a bug. Read it and decide before continuing.
+A seventh drift is new information, not a bug. Read it and decide before continuing.
 
-- [ ] **Step 3: Accept the three the machine wins**
+- [ ] **Step 3: Accept the five the machine wins**
 
 ```bash
 ./scripts/macos-defaults.sh accept NSGlobalDomain AppleLocale
 ./scripts/macos-defaults.sh accept com.apple.ActivityMonitor ShowCategory
 ./scripts/macos-defaults.sh accept com.apple.ActivityMonitor OpenMainWindow
+./scripts/macos-defaults.sh accept com.apple.AppleMultitouchTrackpad FirstClickThreshold
+./scripts/macos-defaults.sh accept com.apple.AppleMultitouchTrackpad SecondClickThreshold
 git diff macos-defaults
 ```
 
-Expected: exactly three changed rows, each taking the live value.
+Expected: exactly five changed rows, each taking the live value. The two trackpad rows change only in the `type` column, `int` -> `bool`.
 
 - [ ] **Step 4: Reapply the one the table wins**
 
