@@ -90,10 +90,10 @@ com.apple.AppleMultitouchTrackpad	AppleEnableSwipeNavigateWithScrolls	bool	false
 com.apple.AppleMultitouchTrackpad	Clicking	bool	true
 com.apple.AppleMultitouchTrackpad	DragLock	bool	false
 com.apple.AppleMultitouchTrackpad	Dragging	bool	false
-com.apple.AppleMultitouchTrackpad	FirstClickThreshold	int	1
+com.apple.AppleMultitouchTrackpad	FirstClickThreshold	bool	1
 com.apple.AppleMultitouchTrackpad	ForceSuppressed	bool	true
 com.apple.AppleMultitouchTrackpad	HIDScrollZoomModifierMask	bool	false
-com.apple.AppleMultitouchTrackpad	SecondClickThreshold	int	1
+com.apple.AppleMultitouchTrackpad	SecondClickThreshold	bool	1
 com.apple.AppleMultitouchTrackpad	TrackpadCornerSecondaryClick	bool	false
 com.apple.AppleMultitouchTrackpad	TrackpadFiveFingerPinchGesture	int	2
 com.apple.AppleMultitouchTrackpad	TrackpadFourFingerHorizSwipeGesture	int	2
@@ -131,7 +131,7 @@ NSGlobalDomain	InitialKeyRepeat	int	20
 # Note: if you’re in the US, replace `EUR` with `USD`, `Centimeters` with
 # `Inches`, `en_GB` with `en_US`, and `true` with `false`.
 NSGlobalDomain	AppleLanguages	array	en	noaudit=complex
-NSGlobalDomain	AppleLocale	string	en_US@currency=USD
+NSGlobalDomain	AppleLocale	string	en_US@currency=usd
 NSGlobalDomain	AppleMeasurementUnits	string	Inches
 NSGlobalDomain	AppleMetricUnits	bool	false
 
@@ -560,13 +560,13 @@ com.apple.TimeMachine	DoNotOfferNewDisksForBackup	bool	true
 ###############################################################################
 
 # Show the main window when launching Activity Monitor
-com.apple.ActivityMonitor	OpenMainWindow	bool	true
+com.apple.ActivityMonitor	OpenMainWindow	bool	0
 
 # Visualize CPU usage in the Activity Monitor Dock icon
 com.apple.ActivityMonitor	IconType	int	5
 
 # Show all processes in Activity Monitor
-com.apple.ActivityMonitor	ShowCategory	int	0
+com.apple.ActivityMonitor	ShowCategory	int	100
 
 # Sort Activity Monitor results by CPU usage
 com.apple.ActivityMonitor	SortColumn	string	CPUUsage
@@ -710,7 +710,7 @@ org.macosforge.xquartz.X11	enable_iglx	bool	true
 org.x.X11	enable_test_extensions	bool	true
 
 # disable mouse acceleration
-.GlobalPreferences	com.apple.mouse.scaling	raw	-1
+.GlobalPreferences	com.apple.mouse.scaling	float	-1
 
 ###############################################################################
 # Siri                                                                        #
