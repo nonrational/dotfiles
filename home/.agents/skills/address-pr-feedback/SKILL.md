@@ -48,7 +48,7 @@ Filter out bots — `author.__typename == "Bot"` on the inline stream, `"type": 
 
 ### 2. Triage each comment
 
-Before deciding, verify against the codebase. Grep for the relevant code, read the surrounding context, check for prior usage patterns elsewhere. Don't triage from the comment alone.
+Before deciding, verify against the codebase. Grep for the relevant code, read the surrounding context, check for prior usage patterns elsewhere. Don't triage from the comment alone. For each comment you expect to accept, also identify the **owning commit** — the commit in the PR's series the comment is really about (`git log --oneline <base>..HEAD`, `git blame` on the touched lines).
 
 Every comment gets one of three outcomes:
 
@@ -95,6 +95,8 @@ Show the full triage before doing anything. Format each comment as:
 >
 > _One sentence explaining the proposed action and why._
 
+For accepts, the explanation names the destination: "lands in `<sha7> <subject>`" — or "new commit: `<subject>`" when no existing commit owns the change (genuinely new scope accepted into the PR becomes its own atomic commit, positioned sensibly in the series). Mistriaged ownership gets caught at this gate alongside mistriaged buckets.
+
 Then ask: "Does this look right? Any calls you'd flip before I proceed?"
 
 Do not move to step 4 until the user confirms. If they redirect any item — change the bucket, adjust the framing — update your plan and re-present the affected items before proceeding.
@@ -105,7 +107,7 @@ While making accepted changes, grep for related terminology and patterns. If you
 
 ### 5. Commit and push
 
-Make all accepted changes in one commit (or logically grouped commits if the changes are unrelated). Push before replying, so the replies can reference what's already live.
+Land each accepted change in the commit that owns it — invoke the `atomic-commits` skill for the fixup + autosquash mechanics and ripple-conflict handling; feedback no commit owns becomes a new atomic commit in the series. Never append an "address review feedback" commit. After the rewrite, prove the series (`git rebase -x '<cheap check>' <base>`), then push with `--force-with-lease` before replying, so the replies can reference what's already live.
 
 ### 6. Reply to every comment
 
@@ -121,8 +123,8 @@ gh api repos/{owner}/{repo}/issues/{pr_number}/comments \
   --method POST --field body="..."
 ```
 
-**Accepted:** describe what changed, one sentence. No "thanks," no "great catch" — just the fix. A compliment costs a peer something; from an agent, it is filler. Spend the words in service of the reviewer: acknowledgement, what changed, and where.
-> Fixed — [what changed].
+**Accepted:** describe what changed, one sentence. No "thanks," no "great catch" — just the fix. A compliment costs a peer something; from an agent, it is filler. Spend the words in service of the reviewer: acknowledgement, what changed, and where. Cite the post-rewrite SHA — the force-push renumbered the series.
+> Fixed in `<sha7>` — [what changed].
 
 **Rebutted:** factual, not defensive. Cite the specific evidence.
 > Checked [X] — [what you found]. [Why the original is correct or why the suggestion causes problem Y]. Happy to revisit if I'm missing context.
