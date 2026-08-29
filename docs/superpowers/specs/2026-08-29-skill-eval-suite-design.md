@@ -35,10 +35,15 @@ A new top-level `evals/` directory — not under `home/`, since nothing here dep
 ```
 evals/
   package.json           # promptfoo pinned as the only dependency
-  promptfooconfig.yaml   # runner entry point: provider defs + tests pointer (no test cases)
+  promptfooconfig.yaml   # runner entry point: provider + tests pointer (no test cases)
+  promptfooconfig.compare.yaml  # skill-vs-baseline comparison runs
   tests.mjs              # generator: reads home/.agents/skills/*/evals.json,
                          # emits one promptfoo test per case with per-type asserts
-  providers/subject.sh   # exec provider: spawns `claude -p` (the model under test)
+  lib/                   # evals.json loader/validation, subject prompt builders
+  providers/subject.mjs  # custom JS provider spawning `claude -p` (JS rather than
+                         # an exec script: JSON envelope parsing and error surfacing)
+  asserts/               # deterministic graders ported from the retired runners
+  bin/                   # validate (offline) and check-gate (pass criteria)
 ```
 
 The schema validation currently embedded in each runner moves into the generator.
