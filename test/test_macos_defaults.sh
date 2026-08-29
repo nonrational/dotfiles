@@ -193,6 +193,38 @@ test_allows_repeated_dict_add_domain_and_key() {
     fi
 }
 
+# Two rows for one setting under different conditions is the point of the
+# condition vocabulary — the same key wanting different values per machine.
+test_accepts_same_key_under_different_conditions() {
+    sandbox
+    {
+        row com.apple.dock tilesize int 36 host=other
+        row com.apple.dock tilesize int 48 host=another
+    } > "$TABLE"
+    mdefaults check
+    if [ "$status" = 0 ] && grep -q "2 rows" <<<"$out"; then
+        ok "same key under different conditions parses"
+    else
+        bad "same key under different conditions parses (status=$status, out=$out)"
+    fi
+}
+
+# Same condition means both rows apply on the same machine, so apply writes
+# both and whichever loses drifts forever with no way to converge.
+test_rejects_same_key_under_the_same_condition() {
+    sandbox
+    {
+        row com.apple.dock tilesize int 36 host=other
+        row com.apple.dock tilesize int 48 host=other
+    } > "$TABLE"
+    mdefaults check
+    if [ "$status" = 1 ] && grep -q "duplicate" <<<"$out"; then
+        ok "same key under the same condition exits 1"
+    else
+        bad "same key under the same condition exits 1 (status=$status, out=$out)"
+    fi
+}
+
 test_rejects_empty_table() {
     sandbox
     printf '# comments only\n\n' > "$TABLE"
@@ -270,6 +302,23 @@ test_audit_skips_unmatched_condition() {
         ok "unmatched os condition is skipped"
     else
         bad "unmatched os condition is skipped (status=$status, out=$out)"
+    fi
+}
+
+# A summary whose numbers do not add up to the row count is worse than none,
+# and skipped-by-condition is the common case on a machine the row excludes.
+test_audit_summary_counts_condition_skips() {
+    sandbox
+    {
+        row NSGlobalDomain FirstKey bool true os=NoSuchOS
+        row NSGlobalDomain SecondKey bool true os=NoSuchOS
+    } > "$TABLE"
+    mdefaults audit
+    if [ "$status" = 0 ] && grep -q "2 skipped" <<<"$out" \
+        && grep -q "condition 2" <<<"$out"; then
+        ok "audit summary counts condition-mismatched skips"
+    else
+        bad "audit summary counts condition-mismatched skips (status=$status, out=$out)"
     fi
 }
 
@@ -792,12 +841,15 @@ test_rejects_container_type_without_noaudit
 test_rejects_container_type_with_wrong_noaudit
 test_rejects_duplicate_domain_and_key
 test_allows_repeated_dict_add_domain_and_key
+test_accepts_same_key_under_different_conditions
+test_rejects_same_key_under_the_same_condition
 test_rejects_empty_table
 test_hash_inside_value_is_not_a_comment
 test_indented_comment_is_a_comment
 test_key_with_spaces_parses
 test_check_counts_rows
 test_audit_skips_unmatched_condition
+test_audit_summary_counts_condition_skips
 test_audit_ok_when_value_matches
 test_audit_normalizes_bools
 test_audit_reports_drift

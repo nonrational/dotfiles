@@ -16,6 +16,7 @@ failures=0
 tcc_skipped=0
 unset_skipped=0
 complex_skipped=0
+condition_skipped=0
 ok_count=0
 drift_count=0
 missing_count=0
@@ -73,6 +74,17 @@ split_row() {
                 ;;
         esac
     done
+}
+
+# Maps a row's status to the condition that scopes which machine it applies
+# to. `os=`/`host=` pass through verbatim; an empty status and any `noaudit=`
+# status both collapse to "no condition", because noaudit records why a row
+# might be unreadable, not a decision about which machine it targets.
+status_condition() {
+    case "$1" in
+        os=* | host=*) printf '%s' "$1" ;;
+        *) printf '%s' "" ;;
+    esac
 }
 
 parse_table() {
@@ -139,7 +151,8 @@ parse_table() {
             while [ "$j" -lt "${#t_domain[@]}" ]; do
                 if [ "${t_type[$j]}" != dict-add ] \
                     && [ "${t_domain[$j]}" = "${ROW[0]}" ] \
-                    && [ "${t_key[$j]}" = "${ROW[1]}" ]; then
+                    && [ "${t_key[$j]}" = "${ROW[1]}" ] \
+                    && [ "$(status_condition "${t_status[$j]}")" = "$(status_condition "$status")" ]; then
                     echo "error: $TABLE line $lineno: duplicate domain+key '${ROW[0]} ${ROW[1]}'" >&2
                     exit 1
                 fi
@@ -535,6 +548,7 @@ main() {
         if row_selected "$i"; then
             if ! condition_matches "${t_status[$i]}"; then
                 echo "skip: ${t_domain[$i]} ${t_key[$i]} (${t_status[$i]})"
+                condition_skipped=$((condition_skipped + 1))
             else
                 case "$mode" in
                     audit) audit_row "$i" ;;
@@ -548,8 +562,8 @@ main() {
         echo "hint: $tcc_skipped rows skipped for tcc. Grant Full Disk Access to this terminal to audit them (./scripts/macos-defaults.sh doctor)." >&2
     fi
     if [ "$mode" = audit ]; then
-        local skipped=$((tcc_skipped + unset_skipped + complex_skipped))
-        echo "summary: $ok_count ok, $drift_count drift, $missing_count missing, $skipped skipped (tcc $tcc_skipped, unset $unset_skipped, complex $complex_skipped)"
+        local skipped=$((condition_skipped + tcc_skipped + unset_skipped + complex_skipped))
+        echo "summary: $ok_count ok, $drift_count drift, $missing_count missing, $skipped skipped (condition $condition_skipped, tcc $tcc_skipped, unset $unset_skipped, complex $complex_skipped)"
     fi
     if [ "$failures" -gt 0 ]; then
         exit 1
