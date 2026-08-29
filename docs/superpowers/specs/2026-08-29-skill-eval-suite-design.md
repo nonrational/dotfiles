@@ -50,7 +50,7 @@ The schema validation currently embedded in each runner moves into the generator
 
 ### Subject provider
 
-The model under test must run inside Claude Code — a direct API call never sees skills or the Skill tool. The provider is an exec script around `claude -p --output-format json`, cwd at the repo root, so skills resolve as project skills from the checkout. This is the same discovery mechanism the current runners use, and it means CI needs no `$HOME` deploy and no manifest step.
+The model under test must run inside Claude Code — a direct API call never sees skills or the Skill tool. The provider is a custom JS provider (`providers/subject.mjs`) spawning `claude -p --output-format json`, cwd at the repo root, so skills resolve as project skills from the checkout. This is the same discovery mechanism the current runners use, and it means CI needs no `$HOME` deploy and no manifest step.
 
 The baseline condition (skill hidden) is a second provider entry passing `--disable-slash-commands`, giving promptfoo's side-by-side view as the skill-on/skill-off compare — the successor to the old `--compare` flag.
 
