@@ -19,7 +19,6 @@
 # Tracked top-level config files.
 !.gitignore
 !settings.json
-!trustedFolders.json
 !*.md
 
 # Tracked antigravity-cli config files.
