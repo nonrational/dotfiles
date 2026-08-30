@@ -11,7 +11,22 @@ brew-bundle:
 	/opt/homebrew/bin/brew shellenv > /tmp/brew-shell.env
 	source /tmp/brew-shell.env && which brew && brew update && brew bundle
 
-macos:
+macos-doctor:
+	@./scripts/macos-defaults.sh doctor
+
+macos-audit:
+	@./scripts/macos-defaults.sh audit
+
+macos-apply:
+	./scripts/macos-defaults.sh apply
+
+macos-accept:
+	./scripts/macos-defaults.sh accept
+
+check-macos-defaults:
+	@./scripts/macos-defaults.sh check
+
+macos: macos-doctor macos-apply
 	sh .macos
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
@@ -65,6 +80,7 @@ check-editorconfig:
 test:
 	./test/test_deploy.sh
 	./test/test_shell.sh
+	./test/test_macos_defaults.sh
 
 deploy:
 	./deploy.sh apply
@@ -127,7 +143,7 @@ check-copilot-instructions:
 
 # The one definition of "safe to commit" -- CI runs this same target, so a
 # new check-* target is covered by both the moment it's added here.
-preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions
+preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults
 
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
@@ -165,4 +181,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
