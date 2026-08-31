@@ -28,6 +28,14 @@ cache="${HOME}/.claude/cache/usage.json"
 # shellcheck disable=SC1090
 source "$config"
 
+if [[ -r "$cache" ]]; then
+  fetched_at=$(jq -r '.fetched_at // empty' "$cache" 2>/dev/null)
+  if [[ "$fetched_at" =~ ^[0-9]+$ ]] && (( $(date +%s) - fetched_at < 900 )); then
+    "$verbose" && printf 'Claude usage sync: cache is less than 15 minutes old\n'
+    exit 0
+  fi
+fi
+
 command -v op >/dev/null 2>&1 || fail "1Password CLI (op) is not installed"
 
 # 1Password supplies both endpoint values, so neither persists under ~/.claude.
@@ -56,4 +64,7 @@ usage_percent=$(jq -r '.spend.percent // empty' <<<"$response" 2>/dev/null)
 jq -nc --argjson fetched_at "$(date +%s)" --argjson usage_percent "$usage_percent" --argjson usage "$response" \
   '{fetched_at:$fetched_at, usage_percent:$usage_percent, usage:$usage}' > "$tmp" || fail "cannot write cache"
 mv "$tmp" "$cache" || fail "cannot replace cache"
-"$verbose" && printf 'Claude usage sync: cached plan usage at %.0f%%\n' "$usage_percent"
+if "$verbose"; then
+  printf 'Claude usage sync: cached plan usage at %.0f%%\n' "$usage_percent"
+fi
+exit 0
