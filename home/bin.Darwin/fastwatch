@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+# Continuous Fast.com speed monitor. The corporate TLS inspection CA is
+# applied only to the Node process that talks to Fast.com.
+
+set -euo pipefail
+
+DEFAULT_INTERVAL=300
+CA_CERT=/Users/Shared/Certs/cert_SSL-Decrypt-Cert-Trusted.pem
+
+usage() {
+  printf 'Usage: fastwatch [--interval SECONDS]\n'
+}
+
+interval=$DEFAULT_INTERVAL
+while (($#)); do
+  case $1 in
+    -i|--interval)
+      (($# >= 2)) || { usage >&2; exit 1; }
+      interval=$2
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -v|--version)
+      printf 'fastwatch 1.0.0\n'
+      exit 0
+      ;;
+    *)
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+[[ $interval =~ ^[1-9][0-9]*$ ]] || { printf 'Interval must be a positive number of seconds.\n' >&2; exit 1; }
+
+downloads=()
+uploads=()
+latencies=()
+durations=()
+measure_pid=
+measure_output=
+
+summary() {
+  ((${#downloads[@]})) || return
+
+  printf '\nSummary (%d samples)\n' "${#downloads[@]}"
+  printf '  Download: avg %s Mbps, min %s, max %s\n' \
+    "$(printf '%s\n' "${downloads[@]}" | awk '{ sum += $1 } END { printf "%.1f", sum / NR }')" \
+    "$(printf '%s\n' "${downloads[@]}" | sort -n | awk 'NR == 1 { printf "%.1f", $1 }')" \
+    "$(printf '%s\n' "${downloads[@]}" | sort -n | awk 'END { printf "%.1f", $1 }')"
+  printf '  Upload:   avg %s Mbps, min %s, max %s\n' \
+    "$(printf '%s\n' "${uploads[@]}" | awk '{ sum += $1 } END { printf "%.1f", sum / NR }')" \
+    "$(printf '%s\n' "${uploads[@]}" | sort -n | awk 'NR == 1 { printf "%.1f", $1 }')" \
+    "$(printf '%s\n' "${uploads[@]}" | sort -n | awk 'END { printf "%.1f", $1 }')"
+  printf '  Latency:  avg %s ms, min %s, max %s\n' \
+    "$(printf '%s\n' "${latencies[@]}" | awk '{ sum += $1 } END { printf "%.0f", sum / NR }')" \
+    "$(printf '%s\n' "${latencies[@]}" | sort -n | awk 'NR == 1 { printf "%.0f", $1 }')" \
+    "$(printf '%s\n' "${latencies[@]}" | sort -n | awk 'END { printf "%.0f", $1 }')"
+}
+
+cleanup() {
+  [[ -n $measure_pid ]] && kill "$measure_pid" 2>/dev/null || true
+  [[ -n $measure_output ]] && rm -f "$measure_output"
+}
+
+trap 'cleanup; summary; exit 0' INT TERM
+trap cleanup EXIT
+
+measure() {
+  NODE_EXTRA_CA_CERTS=$CA_CERT npx --yes fast-cli --upload --json
+}
+
+printf 'fastwatch: testing every %ss. Press Ctrl-C for a summary.\n' "$interval"
+
+while true; do
+  measure_output=$(mktemp)
+  started=$SECONDS
+  measure >"$measure_output" 2>&1 &
+  measure_pid=$!
+  spinner=(🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘)
+  spinner_index=0
+  expected=45
+  ((${#durations[@]})) && expected=$(printf '%s\n' "${durations[@]}" | awk '{ sum += $1 } END { printf "%d", sum / NR + 0.5 }')
+  while kill -0 "$measure_pid" 2>/dev/null; do
+    elapsed=$((SECONDS - started))
+    width=20
+    filled=$((elapsed * width / expected))
+    ((filled > width)) && filled=$width
+    complete=$(printf '%*s' "$filled" '' | tr ' ' '█')
+    remaining=$(printf '%*s' "$((width - filled))" '')
+    printf '\r%s [%s%s] %2ss / ~%2ss  measuring download, upload, and latency...' \
+      "${spinner[spinner_index++ % ${#spinner[@]}]}" "$complete" "$remaining" "$elapsed" "$expected"
+    sleep 0.15
+  done
+  printf '\r\033[K'
+
+  if wait "$measure_pid"; then
+    result=$(<"$measure_output")
+    read -r down up ping < <(node -e 'const data = JSON.parse(process.argv[1]); console.log(data.downloadSpeed, data.uploadSpeed, data.latency)' "$result")
+    downloads+=("$down")
+    uploads+=("$up")
+    latencies+=("$ping")
+    durations+=("$((SECONDS - started))")
+    printf '%s  ↓ %7.1f Mbps  ↑ %7.1f Mbps  latency %4.0f ms\n' "$(date '+%H:%M:%S')" "$down" "$up" "$ping"
+  else
+    result=$(<"$measure_output")
+    printf '%s  test failed: %s\n' "$(date '+%H:%M:%S')" "$result" >&2
+  fi
+  rm -f "$measure_output"
+  measure_output=
+  measure_pid=
+
+  sleep "$interval" &
+  wait $!
+done
