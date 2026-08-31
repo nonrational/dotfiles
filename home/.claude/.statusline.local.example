@@ -1,13 +1,8 @@
 # Copy to .statusline.local and fill in your values.
 # This file is gitignored; the example is tracked.
 
-# Monthly spend budget in USD. When set, MTD cost displays as a % of this limit.
-MONTHLY_BUDGET=
-
-# To seed mid-month spend (e.g. before you installed the hook), append one or
-# more entries to ~/.claude/session-costs.jsonl manually:
-#
-#   echo '{"date":"2026-08-01","session":"seed","cost":42.00}' >> ~/.claude/session-costs.jsonl
-#
-# The month resets automatically: the statusline filters by YYYY-MM prefix, so
-# entries from prior months fall out of the total on the first of each month.
+# Claude web-session usage is configured entirely in 1Password. Create a Login
+# item named `claude.ai_statusline`: put the organization ID in username and the
+# complete browser Cookie value (the value after `-b` in a working curl request)
+# in password. The hook reads both at request time, so they never persist under
+# ~/.claude. The response is cached; it is never fetched while rendering.

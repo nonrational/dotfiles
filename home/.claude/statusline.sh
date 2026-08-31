@@ -46,17 +46,13 @@ IFS=$'\037' read -r model effort pct cache cost dir session_id dur_ms < <(
 [[ $cost =~ ^[0-9.]+$ ]] || cost=0
 [[ $dur_ms =~ ^[0-9]+$ ]] || dur_ms=0
 
-# Month-to-date cost: sum of completed sessions from the log + current session.
-monthly_total=""
-monthly_log="${HOME}/.claude/session-costs.jsonl"
-if [[ -s "$monthly_log" ]]; then
-  month_prefix=$(date +%Y-%m)
-  prev=$(jq -rs --arg m "$month_prefix" \
-    '[.[] | select(.date | startswith($m)) | .cost] | add // 0' \
-    "$monthly_log" 2>/dev/null)
-  if [[ "$prev" =~ ^[0-9.]+$ ]]; then
-    monthly_total=$(awk "BEGIN { printf \"%.2f\", $prev + $cost }")
-  fi
+# The plan allowance comes directly from Claude's usage endpoint. Its cache is
+# refreshed by the Stop hook, never while this line is rendering.
+plan_usage=""
+usage_cache="${HOME}/.claude/cache/usage.json"
+if [[ -r "$usage_cache" ]]; then
+  plan_usage=$(jq -r '.usage_percent // empty' "$usage_cache" 2>/dev/null)
+  [[ $plan_usage =~ ^[0-9]+([.][0-9]+)?$ ]] || plan_usage=""
 fi
 
 DIM=$'\033[2m' CYAN=$'\033[36m' GREEN=$'\033[32m' YELLOW=$'\033[33m' RED=$'\033[31m' ORANGE=$'\033[38;2;255;183;102m' RESET=$'\033[0m'
@@ -64,6 +60,7 @@ DIM=$'\033[2m' CYAN=$'\033[36m' GREEN=$'\033[32m' YELLOW=$'\033[33m' RED=$'\033[
 # Thresholds run opposite ways: high context is bad, high cache hit is good.
 ramp_up() { if [ "$1" -ge 90 ]; then echo "$RED"; elif [ "$1" -ge 70 ]; then echo "$YELLOW"; else echo "$GREEN"; fi; }
 ramp_down() { if [ "$1" -ge 80 ]; then echo "$GREEN"; elif [ "$1" -ge 50 ]; then echo "$YELLOW"; else echo "$RED"; fi; }
+ramp_plan() { if [ "$1" -ge 90 ]; then echo "$RED"; elif [ "$1" -ge 70 ]; then echo "$ORANGE"; elif [ "$1" -ge 50 ]; then echo "$YELLOW"; else echo "$GREEN"; fi; }
 
 # Compact durations: 45s, 12m, 2h14m. Assigns into $FMT_DUR rather than echoing
 # because the statusline repaints every 10-45s even while idle, so a command
@@ -95,15 +92,9 @@ segments=("${CYAN}${model}${RESET}")
 segments+=("$(ramp_up "$pct")ctx ${pct}%${RESET}")
 [ -n "$cache" ] && segments+=("$(ramp_down "$cache")cache ${cache}%${RESET}")
 segments+=("${YELLOW}$(printf '$%.2f' "$cost")${RESET}")
-if [ -n "$monthly_total" ]; then
-  budget_file="${HOME}/.claude/.statusline.local"
-  budget=$(grep -E '^MONTHLY_BUDGET=' "$budget_file" 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
-  if [[ "$budget" =~ ^[0-9.]+$ ]]; then
-    mtd_pct=$(awk "BEGIN { printf \"%d\", ($monthly_total / $budget) * 100 + 0.5 }")
-    segments+=("${ORANGE}MTD ${mtd_pct}%${RESET}")
-  else
-    segments+=("${ORANGE}MTD $(printf '$%.2f' "$monthly_total")${RESET}")
-  fi
+if [ -n "$plan_usage" ]; then
+  plan_usage=$(awk "BEGIN { printf \"%.0f\", $plan_usage }")
+  segments+=("$(ramp_plan "$plan_usage")MTD ${plan_usage}%${RESET}")
 fi
 fmt_dur $(( dur_ms / 1000 ))
 segments+=("${DIM}${FMT_DUR}${RESET}")

@@ -21,6 +21,10 @@
           },
           {
             "type": "command",
+            "command": "~/.claude/hooks/op-sync-usage.sh"
+          },
+          {
+            "type": "command",
             "command": "~/.claude/hooks/ring-tmux-bell.sh"
           }
         ]
