@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 AUDIO=1
-PARAMS=""
+POSITIONAL=()
 while (( "$#" )); do
   case "$1" in
     -s|--no-audio)
@@ -9,13 +9,12 @@ while (( "$#" )); do
       shift
       ;;
     *) # preserve positional arguments
-      PARAMS="$PARAMS $1"
+      POSITIONAL+=("$1")
       shift
       ;;
   esac
 done
-# set positional arguments in their proper place
-eval set -- "$PARAMS"
+set -- "${POSITIONAL[@]}"
 
 if [ -z "$1" ]; then
   echo "Usage: speed-up <input-file>"
@@ -23,6 +22,14 @@ if [ -z "$1" ]; then
 fi
 
 input_file="$1"
+
+if [[ $AUDIO -eq 1 ]]; then
+  if ! audio_stream=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of default=noprint_wrappers=1:nokey=1 "$input_file"); then
+    exit 1
+  fi
+
+  [[ -n "$audio_stream" ]] || AUDIO=0
+fi
 
 if [[ $AUDIO -eq 1 ]]; then
   output_file="${input_file%.*}.faster.${input_file##*.}"
