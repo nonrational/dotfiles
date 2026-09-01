@@ -88,6 +88,29 @@ padding it with a generic tradeoff:
 @chunk_size 192_000
 ~~~
 
+## Durability: comments must outlive the PR
+
+An inline comment is part of the source, not the diff. It must make sense after the PR merges — when the branch comparison is gone and the context is just "code that exists."
+
+Cut any comment that:
+- Compares the current behavior to `master` or a prior version ("previously this returned…", "unlike the old path…", "until this PR…")
+- References the PR, commit, or branch ("this change adds…", "as of this commit…")
+- Explains what was *removed* or *replaced* rather than why what *remains* is correct
+
+That context belongs in the PR body or a review comment. The inline comment should explain why *this code, as it stands*, makes the choices it makes.
+
+~~~elixir
+# Bad: describes the diff; stale after merge
+# Overlay flows don't get app chrome — master's PageRoot skipped Header/SecondaryNav
+# entirely for this mode.
+
+# Good: explains why the current code is correct; survives the merge
+# Overlay flows own the full viewport; nav and header must not render.
+# `hideChrome` covers modal screens without a layout, which share this null return.
+~~~
+
+Diagnostic: if the comment uses "previously", "this PR", "before this change", or a branch name, it belongs in the review thread, not the source file.
+
 ## What-then-why trap
 
 A comment that opens with what the code does before landing on a constraint is still a what-comment. Drop the mechanical lead-in and open with the constraint.
@@ -184,6 +207,7 @@ no stronger than the code:
 - A TODO/FIXME with no ticket reference and no condition that resolves it.
 - A generic tradeoff offered without evidence for the chosen value.
 - A test comment that repeats the test name.
+- PR-diff context: comparisons to master, references to what this PR changed or removed.
 
 ## What to keep
 
@@ -243,3 +267,4 @@ Fail a comment if any is true:
 - Sits above a whole function when it explains one pipe stage or branch.
 - Claims a broader guarantee than the code enforces.
 - Repeats a test name instead of explaining why the case or fixture exists.
+- References the PR, a branch, or a prior version of the code ("previously", "this PR", "before this change", a branch name).
