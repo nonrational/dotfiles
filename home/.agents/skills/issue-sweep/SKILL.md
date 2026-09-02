@@ -16,6 +16,7 @@ The output is not a pile of branches. It is a set of PRs, each carrying a posted
 ## Reference
 
 - [references/stage-prompts.md](references/stage-prompts.md) — the harness contract, what each stage's dispatch prompt must contain, and the structured output it returns.
+- [scripts/workflow.js](scripts/workflow.js) — a ready-to-run implementation of the pipeline for a Workflow-style harness: a worker pool holding recon's concurrency cap, each item chained plan → build → review → fix → verify with no barrier between items. Recon still happens first, in the orchestrator; its findings are the script's `args` (repo, default branch, shared context block, disclaimer, worker count, build model name, and the items with their hints, dependencies, and any committed plan). Run this rather than re-deriving a script from the prose, and fold any fix it needs back into the file so it survives the machine. Close of run (CI judged once, promotion, cleanup check, report) stays with the orchestrator.
 
 ## The pipeline
 
