@@ -1,0 +1,22 @@
+{
+  "results": {
+    "results": [
+      { "success": false, "testCase": { "metadata": { "case_id": "disc-01", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-02", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-03", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-04", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-05", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-06", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-07", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-08", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-09", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "disc-10", "case_type": "discrimination" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "trans-01", "case_type": "transformation" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "trans-02", "case_type": "transformation" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "trans-03", "case_type": "transformation" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "trans-04", "case_type": "transformation" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "det-01", "case_type": "detection" } } },
+      { "success": true, "testCase": { "metadata": { "case_id": "det-02", "case_type": "detection" } } }
+    ]
+  }
+}

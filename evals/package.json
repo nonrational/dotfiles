@@ -1,0 +1,12 @@
+{
+  "name": "skill-evals",
+  "private": true,
+  "type": "module",
+  "description": "Promptfoo-based eval suite for skills in home/.agents/skills",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "promptfoo": "0.122.2"
+  }
+}

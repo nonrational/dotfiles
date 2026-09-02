@@ -129,6 +129,25 @@ check-copilot-instructions:
 # new check-* target is covered by both the moment it's added here.
 preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions
 
+# Skill eval suite (evals/). eval-validate is offline and free; eval and
+# eval-compare spend real API tokens (a headless claude session per case,
+# plus judge calls for transformation cases). Phase 2 wires eval-validate
+# into preflight and CI; until then all three are manual entry points.
+evals/node_modules: evals/package.json evals/package-lock.json
+	cd evals && npm ci
+
+eval-validate: evals/node_modules
+	cd evals && node bin/validate.mjs
+
+eval: evals/node_modules
+	@test -n "$(SKILL)" || { echo "usage: make eval SKILL=<skill-name>"; exit 1; }
+	cd evals && mkdir -p results && EVAL_SKILL=$(SKILL) npx promptfoo eval --no-cache -o results/latest.json
+	cd evals && node bin/check-gate.mjs results/latest.json
+
+eval-compare: evals/node_modules
+	@test -n "$(SKILL)" || { echo "usage: make eval-compare SKILL=<skill-name>"; exit 1; }
+	cd evals && EVAL_SKILL=$(SKILL) npx promptfoo eval --no-cache -c promptfooconfig.compare.yaml
+
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
 	mkdir -p $$HOME/.config
@@ -165,4 +184,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval eval-compare link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
