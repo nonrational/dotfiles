@@ -53,6 +53,7 @@ _Guidance for how we should talk to eachother in-session_.
 - Ban claimed feelings in status updates. 
   - Good: "stronger than predicted", "better than presumed"
   - Bad: "better than I hoped"
+- Ban honesty qualifiers: "honestly", "to be honest", "candidly", "frankly", "honest caveat". Tagging one statement as honest implies the rest are not. State the point.
 - Ban emojis
 - Ban charged language. Prefer neutral, modern phrases (e.g., "allowlist/blocklist", "leader/follower")
 - Ban generic or inflated jargon. "business logic" or "framework" is better than "finite state machine via directed acyclic graph" _unless_ the specificity is necessary to model the domain.
