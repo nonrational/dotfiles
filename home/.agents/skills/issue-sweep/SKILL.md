@@ -60,6 +60,7 @@ The pattern needs three things from the harness: spawn agents concurrently, name
 - **If the harness has no structured output** (plain parallel `Task` dispatches, for instance), have each stage agent write its JSON to `<scratch>/<issue>/<stage>.json` as its last action and tell the orchestrator to read the file. Prose returned in a chat message is not a contract.
 - **Pass forward, don't re-derive.** Each stage gets the previous stage's output in its prompt. No build agent should re-read the issue thread to learn its own scope.
 - **One shared context block** in every prompt: repo path, default branch, stack, recon's hazard commands and verify commands, attribution facts, and the read-only rule for the main checkout.
+- **Never resume a completed run to bolt on a stage.** Cache replay is keyed on the recorded call prefix, and a later-session resume can miss entirely: every "cached" agent re-runs live, and stages with external side effects (tracker comments, labels, review posts) repeat them. For an incremental follow-up, pull the state the new stage needs out of the run's journal and launch a fresh, minimal workflow containing only the new agents. If a resume is unavoidable, audit every external surface the applied stages touch for duplicates immediately afterward.
 
 ## The disciplines
 
@@ -100,6 +101,7 @@ Before declaring the run done, apply `superpowers:verification-before-completion
 - A reviewer requested by a stage agent, or sitting on a PR that never got promoted.
 - A PR body with the issue link buried in a section, or with sections the four-part shape doesn't name.
 - Every issue in the queue produced a PR. (Possible — but check that no planner forced one.)
+- Resuming a finished run whose agents post to the tracker.
 
 ## Rationalizations
 
