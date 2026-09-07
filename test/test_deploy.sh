@@ -339,14 +339,16 @@ test_audit_skips_unmatched_condition() {
 test_manifest_covers_link_dotfiles() {
     # Mirror link-dotfiles.sh's find + exclude list, against the real repo
     # (not a sandbox fixture) so this proves coverage of the actual manifest.
-    # .agents is an in-repo root (source of truth for rules/skills/ext), and
-    # .config contains individually deployed app configs. Neither is a deploy
-    # target, so both are excluded like .gitmodules and .macos.
+    # .agents is an in-repo root (source of truth for rules/skills/ext);
+    # .config and .ssh contain individually deployed files (and ~/.ssh also
+    # holds keys and an unmanaged config, so it must never become a link).
+    # None is a deploy target, so all are excluded like .gitmodules and .macos.
     local linked
     linked="$(cd "$ROOT/home" && find . -maxdepth 1 -name '.*' \
         ! -name '.' ! -name '.AppleDouble' ! -name '.DS_Store' \
         ! -name '.git' ! -name '.github' ! -name '.gitignore' \
-        ! -name '.gitmodules' ! -name '.macos' ! -name '.agents' ! -name '.config' -exec basename {} \; | sort)"
+        ! -name '.gitmodules' ! -name '.macos' ! -name '.agents' \
+        ! -name '.config' ! -name '.ssh' -exec basename {} \; | sort)"
     local sources
     sources="$(grep -v '^[[:space:]]*#' "$ROOT/manifest" | awk 'NF{print $1}' | sort -u)"
     local missing="" f
