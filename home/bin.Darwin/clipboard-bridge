@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# clipboard-bridge: hand the mac clipboard IMAGE to one connection, then exit.
+#
+# launchd runs this per connection (org.nonrational.clipboard-bridge.plist,
+# inetd-style) with the accepted socket on stdin, stdout and stderr. The peer
+# is an exe.dev VM: its wl-paste shim reaches 127.0.0.1:2224 through the
+# RemoteForward in ~/.ssh/config.d/exe.conf, turning Claude Code's ctrl+v into
+# the two requests below. Design and trust model live in nonreagent/dotfiles,
+# docs/superpowers/specs/2026-09-07-clipboard-bridge-design.md.
+#
+# Protocol: the client sends one line.
+#   types -> "image/png\n" when the pasteboard holds image data, else nothing (exit 0)
+#   png   -> raw PNG bytes (no image: nothing, exit 1)
+# Anything else: nothing, exit 1. There is deliberately no write path and no
+# text path: a VM process can read an image the user just copied, nothing else.
+#
+# Runs under /bin/bash 3.2: launchd's PATH is /usr/bin:/bin:/usr/sbin:/sbin.
+set -u
+
+# In inetd mode stderr IS the socket; a stray diagnostic would land inside the
+# PNG stream. Diagnostics go to syslog instead: `log stream --info --predicate
+# 'process == "logger"'`, or Console.app, tag clipboard-bridge.
+exec 2>/dev/null
+log() { logger -t clipboard-bridge -- "$*"; }
+
+# `clipboard info` lists every flavour on the pasteboard, e.g.
+# {{«class PNGf», 12345}, {«class TIFF», 67890}}. Screenshots carry both;
+# copies from Preview carry TIFF (and PDF). Either is enough for write_png.
+# A failed read (a permission denial, say) is logged rather than passed off
+# as "no image", so the troubleshooting steps can tell the two apart.
+has_image() {
+  local info
+  info="$(osascript -e 'clipboard info' 2>&1)" \
+    || { log "clipboard info failed: ${info:0:200}"; return 1; }
+  grep -qE 'PNGf|TIFF' <<<"$info"
+}
+
+# Write the pasteboard image to $1 as PNG. Same coercion Claude Code uses on
+# macOS; the TIFF fallback covers Preview-style copies, converted by sips.
+# stdout is the wire, so every helper's stdout is discarded.
+write_png() {
+  if osascript -e 'set d to (the clipboard as «class PNGf»)' \
+      -e "set f to open for access POSIX file \"$1\" with write permission" \
+      -e 'write d to f' -e 'close access f' >/dev/null; then
+    return 0
+  fi
+  osascript -e 'set d to (the clipboard as «class TIFF»)' \
+    -e "set f to open for access POSIX file \"$1\" with write permission" \
+    -e 'write d to f' -e 'close access f' >/dev/null \
+    && sips -s format png "$1" --out "$1.png" >/dev/null \
+    && mv -f "$1.png" "$1"
+}
+
+verb=""
+IFS= read -r -t "${CLIPBOARD_BRIDGE_READ_TIMEOUT:-5}" verb || { log "no request received"; exit 1; }
+verb="${verb%$'\r'}"
+
+case "$verb" in
+  types)
+    has_image && printf 'image/png\n'
+    exit 0
+    ;;
+  png)
+    tmp="$(mktemp "${TMPDIR:-/tmp}/clipboard-bridge.XXXXXX")" || exit 1
+    trap 'rm -f "$tmp" "$tmp.png"' EXIT
+    if write_png "$tmp" && [ -s "$tmp" ]; then
+      cat "$tmp"
+      exit 0
+    fi
+    log "png requested but the pasteboard holds no image"
+    exit 1
+    ;;
+  *)
+    log "unknown request: ${verb:0:40}"
+    exit 1
+    ;;
+esac

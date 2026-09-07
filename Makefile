@@ -65,6 +65,7 @@ check-editorconfig:
 test:
 	./test/test_deploy.sh
 	./test/test_shell.sh
+	./test/test_clipboard_bridge.sh
 
 deploy:
 	./deploy.sh apply
