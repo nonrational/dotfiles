@@ -33,3 +33,4 @@ home/.zshrc              ~/.zshrc
 home/bin.Darwin          ~/bin                 os=Darwin
 home/bin.Linux           ~/bin                 os=Linux
 fonts                    ~/Library/Fonts/dotfiles          os=Darwin
+home/Library/LaunchAgents/org.nonrational.clipboard-bridge.plist  ~/Library/LaunchAgents/org.nonrational.clipboard-bridge.plist  os=Darwin
