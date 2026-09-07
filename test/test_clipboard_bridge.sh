@@ -201,6 +201,35 @@ test_no_temp_file_left_behind() {
   fi
 }
 
+test_plist_declares_socket_activation() {
+  local plist="$ROOT/home/Library/LaunchAgents/org.nonrational.clipboard-bridge.plist"
+  if [ -f "$plist" ] && python3 - "$plist" <<'EOF'
+import plistlib, sys
+d = plistlib.load(open(sys.argv[1], 'rb'))
+l = d['Sockets']['Listener']
+assert d['Label'] == 'org.nonrational.clipboard-bridge', d['Label']
+assert d['ProgramArguments'][:2] == ['/bin/sh', '-c'], d['ProgramArguments']
+assert 'clipboard-bridge' in d['ProgramArguments'][2], d['ProgramArguments']
+assert l['SockNodeName'] == '127.0.0.1' and l['SockServiceName'] == '2224', l
+assert l['SockType'] == 'stream' and l['SockFamily'] == 'IPv4', l
+assert d['inetdCompatibility']['Wait'] is False, d['inetdCompatibility']
+assert 'RunAtLoad' not in d and 'KeepAlive' not in d, sorted(d)
+EOF
+  then
+    ok "plist declares loopback socket activation, inetd-style, no idle process"
+  else
+    bad "plist declares loopback socket activation, inetd-style, no idle process"
+  fi
+}
+
+test_manifest_deploys_the_plist_on_darwin() {
+  if grep -qE '^home/Library/LaunchAgents/org\.nonrational\.clipboard-bridge\.plist[[:space:]]+~/Library/LaunchAgents/org\.nonrational\.clipboard-bridge\.plist[[:space:]]+os=Darwin[[:space:]]*$' "$ROOT/manifest"; then
+    ok "manifest deploys the plist on Darwin only"
+  else
+    bad "manifest deploys the plist on Darwin only"
+  fi
+}
+
 test_script_is_executable
 test_types_reports_png_when_image_present
 test_types_reports_png_for_tiff_only
@@ -213,6 +242,8 @@ test_unknown_request_is_refused_and_logged
 test_crlf_request_is_accepted
 test_no_request_times_out
 test_no_temp_file_left_behind
+test_plist_declares_socket_activation
+test_manifest_deploys_the_plist_on_darwin
 
 echo "----"
 echo "$pass passed, $fail failed"
