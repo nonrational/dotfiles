@@ -230,6 +230,31 @@ test_manifest_deploys_the_plist_on_darwin() {
   fi
 }
 
+test_ssh_include_forwards_the_bridge_port() {
+  local conf="$ROOT/home/.ssh/config.d/exe.conf" got
+  if ! command -v ssh >/dev/null 2>&1; then skip "ssh include (ssh not installed)"; return; fi
+  if [ ! -f "$conf" ]; then bad "ssh include forwards 2224 and shares connections for *.exe.xyz only"; return; fi
+  got="$(ssh -G -F "$conf" example.exe.xyz 2>/dev/null)" || got=""
+  if grep -qE '^remoteforward \[?127\.0\.0\.1\]?:2224 \[?127\.0\.0\.1\]?:2224$' <<<"$got" \
+      && grep -qx 'controlmaster auto' <<<"$got" \
+      && grep -qx 'controlpersist 14400' <<<"$got" \
+      && grep -qx 'serveraliveinterval 30' <<<"$got" \
+      && grep -qx 'exitonforwardfailure no' <<<"$got" \
+      && ! ssh -G -F "$conf" example.com 2>/dev/null | grep -q '^remoteforward'; then
+    ok "ssh include forwards 2224 and shares connections for *.exe.xyz only"
+  else
+    bad "ssh include forwards 2224 and shares connections for *.exe.xyz only"
+  fi
+}
+
+test_manifest_deploys_the_ssh_include_on_darwin() {
+  if grep -qE '^home/\.ssh/config\.d/exe\.conf[[:space:]]+~/\.ssh/config\.d/exe\.conf[[:space:]]+os=Darwin[[:space:]]*$' "$ROOT/manifest"; then
+    ok "manifest deploys the ssh include on Darwin only"
+  else
+    bad "manifest deploys the ssh include on Darwin only"
+  fi
+}
+
 test_script_is_executable
 test_types_reports_png_when_image_present
 test_types_reports_png_for_tiff_only
@@ -244,6 +269,8 @@ test_no_request_times_out
 test_no_temp_file_left_behind
 test_plist_declares_socket_activation
 test_manifest_deploys_the_plist_on_darwin
+test_ssh_include_forwards_the_bridge_port
+test_manifest_deploys_the_ssh_include_on_darwin
 
 echo "----"
 echo "$pass passed, $fail failed"
