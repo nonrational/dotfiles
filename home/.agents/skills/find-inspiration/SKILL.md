@@ -172,3 +172,8 @@ documented rollback. Otherwise stop — the issues are the durable handoff.
 Summarize filed / piloted / rejected / untriaged. Commit the updated `decisions.jsonl` (and any
 new `runs/` file) — the log is the skill's memory and must survive a fresh clone. Delete any temp
 clone. Confirm the source was never modified.
+
+Credit is owed when an adopted or spiked item lands, not when it is filed, and landing usually happens in a
+later session that never loads this skill. So each filed issue carries an **On landing** section
+telling whoever closes it to add the source's author under **Credits** in `README.md` if they
+aren't listed yet.
