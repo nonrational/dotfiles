@@ -65,6 +65,8 @@ check-editorconfig:
 test:
 	./test/test_deploy.sh
 	./test/test_shell.sh
+	./test/test_clipboard_bridge.sh
+	./test/test_tmux.sh
 
 deploy:
 	./deploy.sh apply
@@ -139,6 +141,15 @@ link-sublime:
 	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text
 	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text
 
+# (Re)load the clipboard bridge launch agent: a socket-activated responder on
+# 127.0.0.1:2224 that hands the pasteboard image to exe.dev VMs (see
+# home/bin.Darwin/clipboard-bridge). deploy symlinks the plist, but launchd
+# only reads it at bootstrap: run this once after deploy and again after edits.
+clipboard-bridge:
+	-launchctl bootout gui/$$(id -u)/org.nonrational.clipboard-bridge 2>/dev/null
+	launchctl bootstrap gui/$$(id -u) $$HOME/Library/LaunchAgents/org.nonrational.clipboard-bridge.plist
+	@launchctl list | grep -q org.nonrational.clipboard-bridge && echo "org.nonrational.clipboard-bridge loaded; it spawns on connect to 127.0.0.1:2224"
+
 backup-preferences:
 	cp $$HOME/Library/Preferences/com.googlecode.iterm2.plist $$PWD/etc/com.googlecode.iterm2.plist
 	cp $$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist $$PWD/etc/com.if.Amphetamine.plist
@@ -165,4 +176,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy link-karabiner link-sublime clipboard-bridge backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
