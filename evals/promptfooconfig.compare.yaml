@@ -1,0 +1,13 @@
+# Skill-on vs skill-off, side by side — the successor to the old runner's
+# --compare flag. Costs double the default config; not part of any gate.
+description: Per-skill eval suite, skill vs baseline comparison
+prompts:
+  - '{{subject_prompt}}'
+providers:
+  - id: file://providers/subject.mjs
+    label: skill
+  - id: file://providers/subject.mjs
+    label: baseline
+    config:
+      baseline: true
+tests: file://tests.mjs
