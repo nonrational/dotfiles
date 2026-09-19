@@ -141,9 +141,11 @@ evals/node_modules: evals/package.json evals/package-lock.json
 eval-validate: evals/node_modules
 	cd evals && node bin/validate.mjs
 
+# promptfoo exits 100 on any failed test; let soft failures (judged rule, detection)
+# through so check-gate.mjs -- not promptfoo's exit code -- decides pass/fail.
 eval: evals/node_modules
 	@test -n "$(SKILL)" || { echo "usage: make eval SKILL=<skill-name>"; exit 1; }
-	cd evals && mkdir -p results && EVAL_SKILL=$(SKILL) npx promptfoo eval --no-cache -o results/latest.json
+	cd evals && mkdir -p results && EVAL_SKILL=$(SKILL) PROMPTFOO_FAILED_TEST_EXIT_CODE=0 npx promptfoo eval --no-cache -o results/latest.json
 	cd evals && node bin/check-gate.mjs results/latest.json
 
 eval-compare: evals/node_modules

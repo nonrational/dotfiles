@@ -32,9 +32,14 @@ test('generates all 16 code-comment-register tests with per-type asserts', async
   assert.equal(byType.detection.length, 2);
 
   for (const t of byType.discrimination) {
-    assert.equal(t.assert[0].type, 'javascript');
-    assert.equal(t.assert[0].value, 'file://asserts/discrimination.mjs');
-    assert.ok(t.vars.letter_to_key && t.vars.correct && t.vars.expected_rule);
+    assert.deepEqual(t.assert[0], {
+      type: 'javascript', value: 'file://asserts/discrimination.mjs', metric: 'choice',
+    });
+    assert.equal(t.assert[1].type, 'llm-rubric');
+    assert.equal(t.assert[1].metric, 'rule');
+    assert.equal(t.assert[1].provider, 'file://providers/judge.mjs');
+    assert.ok(t.vars.letter_to_key && t.vars.correct);
+    assert.equal(t.vars.expected_rule, undefined, 'the rule reaches only the judge');
   }
   for (const t of byType.detection) {
     assert.equal(t.assert[0].value, 'file://asserts/detection.mjs');
@@ -42,6 +47,7 @@ test('generates all 16 code-comment-register tests with per-type asserts', async
   }
   for (const t of byType.transformation) {
     assert.equal(t.assert[0].type, 'llm-rubric');
+    assert.equal(t.assert[0].metric, 'rubric');
     assert.equal(t.assert[0].threshold, 0.75);
     assert.equal(t.assert[0].provider, 'file://providers/judge.mjs');
     assert.match(t.assert[0].value, /ALL THREE/);

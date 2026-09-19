@@ -6,29 +6,20 @@ import assertDetection from '../asserts/detection.mjs';
 const discVars = {
   letter_to_key: { A: 'generic_comment', B: 'no_comment' },
   correct: 'no_comment',
-  expected_rule: 'No comment is a valid result; delete generic tradeoffs that do not explain the chosen value.',
 };
 
-test('discrimination passes on correct letter and overlapping rule', () => {
-  const output = 'ANSWER: B\nRULE: Delete the generic tradeoff; no comment is a valid result.';
+test('discrimination passes on the correct letter whatever the rule says', () => {
+  const output = 'ANSWER: B\nRULE: Brevity wins everywhere.';
   const result = assertDiscrimination(output, { vars: discVars });
   assert.equal(result.pass, true);
   assert.equal(result.score, 1);
 });
 
 test('discrimination fails on the wrong letter', () => {
-  const output = 'ANSWER: A\nRULE: Delete generic tradeoffs; no comment is a valid result.';
-  const result = assertDiscrimination(output, { vars: discVars });
+  const result = assertDiscrimination('ANSWER: A\nRULE: whatever', { vars: discVars });
   assert.equal(result.pass, false);
   assert.equal(result.score, 0);
-});
-
-test('discrimination half-scores a correct letter with an unrelated rule', () => {
-  const output = 'ANSWER: B\nRULE: Brevity wins everywhere.';
-  const result = assertDiscrimination(output, { vars: discVars });
-  assert.equal(result.pass, false);
-  assert.equal(result.score, 0.5);
-  assert.match(result.reason, /weak rule match/);
+  assert.match(result.reason, /expected no_comment/);
 });
 
 test('discrimination fails cleanly when no ANSWER line is present', () => {

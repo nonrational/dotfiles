@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSubjectPrompt, buildTransformationRubric } from '../lib/prompts.mjs';
+import { buildSubjectPrompt, buildTransformationRubric, buildRuleRubric } from '../lib/prompts.mjs';
 
 const SKILL = 'code-comment-register';
 
@@ -55,4 +55,24 @@ test('transformation rubric embeds task, reference, and all three criteria', () 
   for (const needle of ['Do the thing.', 'The rule.', 'AFTER', 'VF?', 'PL?', 'NV?', 'Note.', 'ALL THREE']) {
     assert.ok(rubric.includes(needle), `missing: ${needle}`);
   }
+});
+
+test('rule rubric grades only the RULE line against the reference rule', () => {
+  const item = {
+    id: 'd', type: 'discrimination', expected_rule: 'Explain why, not what.', rule_quote: 'Quote.',
+    grading_note: 'Also accept X.',
+  };
+  const rubric = buildRuleRubric(item);
+  assert.match(rubric, /RULE:/);
+  assert.ok(rubric.includes('Explain why, not what.'));
+  assert.ok(rubric.includes('Quote.'));
+  assert.match(rubric, /Ignore which option was chosen/);
+  assert.match(rubric, /part of a compound reference rule/);
+  assert.ok(rubric.includes('Also accept X.'));
+});
+
+test('rule rubric defaults the author notes to None when a case sets no grading_note', () => {
+  const item = { id: 'd', type: 'discrimination', expected_rule: 'Explain why, not what.', rule_quote: 'Quote.' };
+  const rubric = buildRuleRubric(item);
+  assert.ok(rubric.includes('Author\'s notes (may list accepted alternative rules):\nNone.'));
 });

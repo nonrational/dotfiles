@@ -93,3 +93,18 @@ The output passes ONLY if ALL THREE criteria hold:
 Notes:
 ${item.grading_note || 'None.'}`;
 }
+
+export function buildRuleRubric(item) {
+  return `Grade only the line in the output that begins with "RULE:". Ignore which option was chosen and anything else in the output.
+
+The RULE line passes if it names the same principle as the reference rule in any wording, names the part of a compound reference rule that decides this case, or names an alternative the author's notes accept. It fails if it names a different principle, is missing, or is too vague to tell this rule apart from the skill's other rules.
+
+Reference rule:
+${item.expected_rule}
+
+Rule text from the skill:
+${item.rule_quote || 'None.'}
+
+Author's notes (may list accepted alternative rules):
+${item.grading_note || 'None.'}`;
+}

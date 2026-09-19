@@ -1,11 +1,19 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { findEvalFiles, loadEvals, validateData, SUPPORTED_TYPES } from './lib/load-evals.mjs';
-import { buildSubjectPrompt, buildTransformationRubric } from './lib/prompts.mjs';
+import { buildSubjectPrompt, buildTransformationRubric, buildRuleRubric } from './lib/prompts.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const JUDGE_PROVIDER = 'file://providers/judge.mjs';
 const RUBRIC_THRESHOLD = 0.75;
+
+const judged = (value, metric) => ({
+  type: 'llm-rubric',
+  value,
+  metric,
+  threshold: RUBRIC_THRESHOLD,
+  provider: JUDGE_PROVIDER,
+});
 
 function csvEnv(name) {
   const raw = process.env[name];
@@ -52,21 +60,16 @@ export default async function generateTests() {
     if (item.type === 'discrimination') {
       base.vars.letter_to_key = letterToKey;
       base.vars.correct = item.correct;
-      base.vars.expected_rule = item.expected_rule;
-      base.assert = [{ type: 'javascript', value: 'file://asserts/discrimination.mjs' }];
+      base.assert = [
+        { type: 'javascript', value: 'file://asserts/discrimination.mjs', metric: 'choice' },
+        judged(buildRuleRubric(item), 'rule'),
+      ];
     } else if (item.type === 'detection') {
       base.vars.violations = item.violations;
       base.vars.traps = item.traps;
       base.assert = [{ type: 'javascript', value: 'file://asserts/detection.mjs' }];
     } else {
-      base.assert = [
-        {
-          type: 'llm-rubric',
-          value: buildTransformationRubric(item),
-          threshold: RUBRIC_THRESHOLD,
-          provider: JUDGE_PROVIDER,
-        },
-      ];
+      base.assert = [judged(buildTransformationRubric(item), 'rubric')];
     }
 
     return base;
