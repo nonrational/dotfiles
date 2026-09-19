@@ -43,7 +43,7 @@ test('generates all 16 code-comment-register tests with per-type asserts', async
   for (const t of byType.transformation) {
     assert.equal(t.assert[0].type, 'llm-rubric');
     assert.equal(t.assert[0].threshold, 0.75);
-    assert.equal(t.assert[0].provider, 'anthropic:messages:claude-sonnet-5');
+    assert.equal(t.assert[0].provider, 'file://providers/judge.mjs');
     assert.match(t.assert[0].value, /ALL THREE/);
   }
 

@@ -4,7 +4,7 @@ import { findEvalFiles, loadEvals, validateData, SUPPORTED_TYPES } from './lib/l
 import { buildSubjectPrompt, buildTransformationRubric } from './lib/prompts.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const JUDGE_PROVIDER = 'anthropic:messages:claude-sonnet-5';
+const JUDGE_PROVIDER = 'file://providers/judge.mjs';
 const RUBRIC_THRESHOLD = 0.75;
 
 function csvEnv(name) {
