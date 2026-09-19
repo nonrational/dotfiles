@@ -14,9 +14,9 @@ const GATE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../bin/
 const choice = (pass) => ({ pass, assertion: { type: 'javascript', metric: 'choice' } });
 const rule = (pass) => ({ pass, assertion: { type: 'llm-rubric', metric: 'rule' } });
 const detect = (pass) => ({ pass, assertion: { type: 'javascript' } });
-const row = (id, components) => ({
+const row = (id, components, metadata = {}) => ({
   success: components.length > 0 && components.every((c) => c.pass),
-  testCase: { metadata: { case_id: id } },
+  testCase: { metadata: { case_id: id, ...metadata } },
   gradingResult: components.length ? { componentResults: components } : null,
 });
 const passing = (n) => Array.from({ length: n }, (_, i) => row(`ok-${i}`, [choice(true), rule(true)]));
@@ -43,6 +43,26 @@ test('a wrong choice gates even above the floor', () => {
   const result = runGate([...passing(19), row('disc-01', [choice(false), rule(true)])]);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /disc-01/);
+});
+
+test('a wrong choice on an arguable case is soft: passes at the floor', () => {
+  const arguable = row('disc-11', [choice(false), rule(true)], { arguable: true });
+  const result = runGate([...passing(9), arguable]);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+});
+
+test('an arguable case still counts against the floor when it fails', () => {
+  const arguable = [1, 2].map((i) => row(`disc-0${i}`, [choice(false), rule(true)], { arguable: true }));
+  const result = runGate([...passing(8), ...arguable]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /pass rate/i);
+  assert.doesNotMatch(result.stderr, /hard failures/);
+});
+
+test('a subject error on an arguable case still gates because no assert ran', () => {
+  const result = runGate([...passing(19), row('disc-11', [], { arguable: true })]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /disc-11/);
 });
 
 test('a subject error gates because no assert ran', () => {

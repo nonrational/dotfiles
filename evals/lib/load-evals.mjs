@@ -53,6 +53,17 @@ export function validateData(data) {
       continue;
     }
 
+    // The flag softens the hard choice gate, so the case must say why.
+    if (item.arguable !== undefined) {
+      if (typeof item.arguable !== 'boolean') throw new Error(`${item.id}.arguable must be a boolean`);
+      if (item.arguable && !item.type.startsWith('discrimination')) {
+        throw new Error(`${item.id}.arguable applies only to discrimination cases`);
+      }
+      if (item.arguable && !item.grading_note) {
+        throw new Error(`${item.id}.arguable needs a grading_note saying why`);
+      }
+    }
+
     if (item.type === 'discrimination' || item.type === 'discrimination-structural') {
       requireField(item.prompt, `${item.id}.prompt`);
       requireField(item.expected_rule, `${item.id}.expected_rule`);

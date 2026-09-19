@@ -35,11 +35,14 @@ const meta = (row) => row.testCase?.metadata ?? row.metadata ?? {};
 const components = (row) => row.gradingResult?.componentResults ?? [];
 
 // A subject error leaves no components; a judge error still leaves the
-// choice component, so it stays soft.
+// choice component, so it stays soft. A case whose author flagged the answer
+// key arguable never gates on the choice (the miss still counts against the
+// floor), but a subject that gave no answer gates regardless.
 const isHardFailure = (row) =>
   !row.success &&
   (components(row).length === 0 ||
-    components(row).some((c) => !c.pass && c.assertion?.metric === 'choice'));
+    (meta(row).arguable !== true &&
+      components(row).some((c) => !c.pass && c.assertion?.metric === 'choice')));
 
 const hardFailures = rows.filter(isHardFailure);
 const passed = rows.filter((row) => row.success).length;

@@ -65,3 +65,28 @@ test('SUPPORTED_TYPES covers both skills\' case types', () => {
     'detection', 'discrimination', 'discrimination-rank', 'discrimination-structural', 'transformation',
   ]);
 });
+
+const arguableCase = (extra) => ({
+  skill: 'x',
+  cases: [{ id: 'd1', type: 'discrimination', prompt: 'p', expected_rule: 'r',
+    variants: { a: '1', b: '2' }, correct: 'a', ...extra }],
+});
+
+test('validateData rejects arguable on a case type with no choice to soften', () => {
+  const bad = { skill: 'x', cases: [{ id: 'x1', type: 'detection', arguable: true, grading_note: 'n' }] };
+  assert.throws(() => validateData(bad), /x1\.arguable applies only to discrimination cases/);
+});
+
+test('validateData accepts an arguable case that says why in its grading_note', () => {
+  const ok = arguableCase({ arguable: true, grading_note: 'Both answers are defensible.' });
+  assert.doesNotThrow(() => validateData(ok));
+});
+
+test('validateData rejects a non-boolean arguable flag', () => {
+  const bad = arguableCase({ arguable: 'yes', grading_note: 'n' });
+  assert.throws(() => validateData(bad), /d1\.arguable must be a boolean/);
+});
+
+test('validateData rejects an arguable case with no grading_note', () => {
+  assert.throws(() => validateData(arguableCase({ arguable: true })), /^Error: d1\.arguable needs a grading_note saying why$/);
+});
