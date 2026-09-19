@@ -87,6 +87,7 @@
       },
       "correct": "after",
       "expected_rule": "Connectives are joints, not filler.",
+      "arguable": true,
       "grading_note": "Same underlying sentence as disc-02, one revision cycle later: c8fa24c had already fixed the melodrama, then f98e637's over-tightening pass cut the connective back down to a bare question, then 3c2f396 restored it. Good for showing the rule isn't 'shorter is always better' -- the cut version isn't wrong on any other axis, it's wrong specifically for dropping the joint. KNOWN LIMITATION (found running sonnet against this case on 2026-07-18): this pair is shown with nothing preceding it, so 'Which raises the question:' has nothing textual to connect back to inside the case itself. A model judging it in isolation can reasonably call it 'decorative preamble' rather than recognize it as the connective-joint example -- sonnet did exactly this and picked 'before'. In the real essay the sentence follows two paragraphs of setup, so the joint has something to join. If reusing this case, consider prepending the prior paragraph (see e55f75c in the source repo) so the joint has something to connect to before grading a model's answer as wrong."
     },
     {
@@ -143,6 +144,7 @@
       },
       "correct": "headline_device",
       "expected_rule": "Open with substance. Close without summary.",
+      "arguable": true,
       "grading_note": "Both openings arguably 'open with substance' -- neither throat-clears. This is the doc's flagged coarse-grained case: every commit before e55f75c used the direct opening; e55f75c replaced it with the headline device and it shipped that way. Treat 'correct' as the author's actual final call, not a strict rule violation in the 'direct' version -- a model arguing 'direct' is also acceptable on baseline grounds is making a defensible case. Grade on whether the answer identifies the real tradeoff (immediate fact vs. rhetorical framing that still front-loads substance) rather than marking 'direct' wrong outright."
     },
     {
@@ -292,6 +294,7 @@
       },
       "correct_ranking": ["restored", "original", "over_tight"],
       "expected_rule_for_worst": "Concrete nouns over abstractions, strong verbs over adverbs -- 'plenty of us were sure Ruby had no business near money' and 'ran on Ruby for years without trouble' assert the outcome with no mechanism and a loose duration where the sibling versions both have one.",
+      "arguable": true,
       "grading_note": "Unlike disc-03, 'restored' is not a reconstruction of 'original' -- it's an independent rewrite with different concrete details (a decomposed monolith, distributed domain services, 'nearly a decade' instead of 'a few years later... for years anyway'). Both clearly beat 'over_tight', which strips out every proper noun, mechanism, and duration in favor of a generic claim. Ranking 'restored' first is defensible on precision grounds ('nearly a decade' is a tighter hedge than original's looser timeline) and because this essay's own editorial history (commit 7957f74, 'cut changed-my-mind-about essay by 25%') suggests 'original's five flowing sentences, however good the closing aphorism ('Ifs are ifs, logic is logic, and correct is correct'), may be too indulgent for this compressed format. A model that ranks 'original' first is not wrong -- it's defending the aphorism and the CTO narrative beat, both genuinely strong -- but should still place 'over_tight' last and name the same rule for why."
     },
     {
@@ -324,6 +327,7 @@
       },
       "correct": "after",
       "expected_rule": "No jargon without definition.",
+      "arguable": true,
       "grading_note": "'Underleveled' is HR/performance-review jargon the essay never defines anywhere, for a general readership that shouldn't need to already know it. Fills a documented coverage gap: the trust essay's mined history never caught a live jargon violation being fixed (see the coverage_gaps entry this closes). Note the fix here is CUT, not DEFINE -- 'underleveled' disappears rather than getting a gloss. Accept an answer that names 'No jargon without definition' even though the resolution technique differs from an in-text definition; also accept 'Concrete nouns over abstractions' for 'staying exactly where you are' being more vivid than the jargon term, since both readings are defensible. This term survived unchanged through the automated 'shorten everything' pass (ef020b0) -- only the hand-edit caught it, worth noting if this case is used to argue automated tightening alone isn't sufficient register QA."
     },
     {
@@ -340,7 +344,8 @@
       },
       "correct": "after",
       "expected_rule": "Open with substance. Close without summary.",
-      "grading_note": "'before' spells out the essay's own throughline in plain restatement ('I overvalued the artifact and undervalued the people in the room... Correctness over understanding, the code over the company...') -- a textbook summary-close, the exact move the baseline rule bans. 'after' cuts that sentence entirely and lands on the same closing image (the next version of me shaking his head) without re-explaining what the reader just read. This is a cleaner, essay-sourced example of 'close without summary' than anything in the trust-essay mining, which only had an open-with-substance example (disc-08)."
+      "arguable": true,
+      "grading_note": "'before' spells out the essay's own throughline in plain restatement ('I overvalued the artifact and undervalued the people in the room... Correctness over understanding, the code over the company...') -- a textbook summary-close, the exact move the baseline rule bans. 'after' cuts that sentence entirely and lands on the same closing image (the next version of me shaking his head) without re-explaining what the reader just read. This is a cleaner, essay-sourced example of 'close without summary' than anything in the trust-essay mining, which only had an open-with-substance example (disc-08). CI evidence (2026-09-19): the subject chose 'before' on all four runs on a bare CI runner, reading A's recap triplet as a hard line with a breath, against 6 of 6 correct in local bare-$HOME suite runs. The cause of that gap is open, so the key does not gate hard until it is understood."
     },
     {
       "id": "trans-06",
