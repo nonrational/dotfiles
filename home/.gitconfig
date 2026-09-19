@@ -65,7 +65,7 @@
   sww = "!. ~/.githelpers && switch_wildcard"
 
   # Switch to a branch, removing the worktree that has it checked out
-  take = "!. ~/.githelpers && take_branch"
+  take = "!: git switch ; . ~/.githelpers && take_branch"
 
   # List subcategories of unstaged files
   mod = "!git ls-files --modified ."
