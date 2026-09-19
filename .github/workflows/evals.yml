@@ -1,0 +1,75 @@
+name: evals
+
+# Advisory: keyed runs of the evaluated skills a PR touches. Not a required
+# check until repeated runs tune the gate thresholds; see
+# docs/superpowers/specs/2026-08-29-skill-eval-suite-design.md.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+# Each push re-spends subscription usage on a fresh matrix; a superseded
+# run should stop rather than keep billing sessions nobody will read.
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      skills: ${{ steps.affected.outputs.skills }}
+      has_token: ${{ steps.affected.outputs.has_token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - id: affected
+        env:
+          HAS_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+        run: |
+          skills=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" | node evals/bin/affected-skills.mjs)
+          echo "skills=$skills" >> "$GITHUB_OUTPUT"
+          echo "has_token=$HAS_TOKEN" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_TOKEN" != "true" ] && [ "$skills" != "[]" ]; then
+            echo "::notice::CLAUDE_CODE_OAUTH_TOKEN unavailable (fork PR or unset secret); skipping evals for $skills"
+          fi
+
+  run:
+    needs: plan
+    if: needs.plan.outputs.skills != '[]' && needs.plan.outputs.has_token == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        skill: ${{ fromJSON(needs.plan.outputs.skills) }}
+    env:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      SKILL: ${{ matrix.skill }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - run: npm install -g @anthropic-ai/claude-code@2.1.278
+      # The repo has no root .claude/, so link the skill under test where
+      # claude -p looks for user skills. Without it the subject silently runs
+      # as the baseline.
+      - run: |
+          mkdir -p "$HOME/.claude/skills"
+          ln -s "$GITHUB_WORKSPACE/home/.agents/skills/$SKILL" "$HOME/.claude/skills/$SKILL"
+      - run: make eval SKILL="$SKILL"
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: eval-results-${{ matrix.skill }}
+          path: evals/results/latest.json
+          if-no-files-found: ignore
