@@ -27,6 +27,10 @@ jobs:
         with:
           python-version: "3.13"
       - run: python3 -m pip install PyYAML==6.0.2
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
       - run: make preflight
 
       - run: |
