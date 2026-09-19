@@ -40,6 +40,10 @@ export async function runClaude({ args, prompt, cwd }) {
         prompt: promptTokens,
         completion: completionTokens,
       },
+      // A model alias such as "sonnet" can resolve differently by account or
+      // release; recording what actually answered lets a CI run be compared
+      // with a local one instead of guessed at.
+      metadata: { models: Object.keys(parsed.modelUsage || {}) },
     };
   } catch (error) {
     return { error: String(error.message || error) };
