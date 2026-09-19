@@ -90,3 +90,15 @@ test('validateData rejects a non-boolean arguable flag', () => {
 test('validateData rejects an arguable case with no grading_note', () => {
   assert.throws(() => validateData(arguableCase({ arguable: true })), /^Error: d1\.arguable needs a grading_note saying why$/);
 });
+
+test('validateData accepts a min_pass_rate in (0, 1]', () => {
+  const ok = { ...arguableCase({}), min_pass_rate: 0.5 };
+  assert.doesNotThrow(() => validateData(ok));
+});
+
+test('validateData rejects a min_pass_rate outside (0, 1]', () => {
+  for (const bad of [0, 1.5, '0.5', -1]) {
+    const data = { ...arguableCase({}), min_pass_rate: bad };
+    assert.throws(() => validateData(data), /min_pass_rate must be a number in \(0, 1\]/);
+  }
+});

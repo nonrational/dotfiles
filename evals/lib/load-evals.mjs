@@ -39,6 +39,13 @@ export function validateData(data) {
     throw new Error('cases must be a non-empty array');
   }
 
+  if (data.min_pass_rate !== undefined) {
+    const rate = data.min_pass_rate;
+    if (typeof rate !== 'number' || !(rate > 0 && rate <= 1)) {
+      throw new Error('min_pass_rate must be a number in (0, 1]');
+    }
+  }
+
   const ids = new Set();
   const unsupported = [];
 

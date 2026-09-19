@@ -4,9 +4,15 @@
 // outright. Judged asserts and detection only drag the suite toward a
 // pass-rate floor.
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { findEvalFiles, loadEvals } from '../lib/load-evals.mjs';
+
+// EVAL_REPO_ROOT lets the unit tests point the gate at a throwaway skills tree.
+const REPO_ROOT = process.env.EVAL_REPO_ROOT ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const DEFAULT_MIN_RATE = 0.9;
 
 const [, , resultsPath, minRateArg] = process.argv;
-const minRate = Number(minRateArg ?? '0.90');
 
 if (!resultsPath) {
   console.error('usage: check-gate.mjs <results.json> [minRate]');
@@ -43,6 +49,35 @@ const isHardFailure = (row) =>
   (components(row).length === 0 ||
     (meta(row).arguable !== true &&
       components(row).some((c) => !c.pass && c.assertion?.metric === 'choice')));
+
+// Precedence: argv, then the skill's own `min_pass_rate` in evals.json, then
+// the default. A skill whose cases are soft by design (prose-register's
+// detection cases fail by construction) can carry a lower floor than one
+// whose cases all have a single right answer.
+//
+// Only the named skill's file is parsed (the generator locates it the same
+// way), so a sibling's broken evals.json cannot fail this gate; an unreadable
+// one falls back to the stricter default and says so.
+function skillMinRate(skill) {
+  if (!skill) return undefined;
+  try {
+    const file = findEvalFiles(REPO_ROOT).find((candidate) => path.basename(path.dirname(candidate)) === skill);
+    return file ? loadEvals(file).min_pass_rate : undefined;
+  } catch (error) {
+    console.error(`cannot read ${skill}'s min_pass_rate, using the default: ${error.message}`);
+    return undefined;
+  }
+}
+
+// A results file that mixes skills has no single floor to apply.
+const skills = new Set(rows.map((row) => meta(row).skill));
+const skill = skills.size === 1 ? [...skills][0] : undefined;
+const minRate = Number(minRateArg ?? skillMinRate(skill) ?? DEFAULT_MIN_RATE);
+// Number('') is 0 and Number('abc') is NaN; either would let any run pass.
+if (!(minRate > 0 && minRate <= 1)) {
+  console.error('floor must be a number in (0, 1]');
+  process.exit(1);
+}
 
 const hardFailures = rows.filter(isHardFailure);
 const passed = rows.filter((row) => row.success).length;

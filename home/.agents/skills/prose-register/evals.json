@@ -1,6 +1,7 @@
 {
   "skill": "prose-register",
   "skill_path": "home/.claude/skills/prose-register/SKILL.md",
+  "min_pass_rate": 0.4,
   "description": "Discrimination, transformation, and detection eval cases for the prose-register skill, mined from the real revision history of the essay that produced several of SKILL.md's own verbatim examples.",
   "provenance": {
     "sources": [
