@@ -7,9 +7,13 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const JUDGE_PROVIDER = 'file://providers/judge.mjs';
 const RUBRIC_THRESHOLD = 0.75;
 
+// promptfoo renders every var value and every llm-rubric value as nunjucks; case text
+// (e.g. Hugo shortcodes in prose-register's documents) must pass through literally.
+const literal = (text) => `{% raw %}${text}{% endraw %}`;
+
 const judged = (value, metric) => ({
   type: 'llm-rubric',
-  value,
+  value: literal(value),
   metric,
   threshold: RUBRIC_THRESHOLD,
   provider: JUDGE_PROVIDER,
@@ -53,13 +57,15 @@ export default async function generateTests() {
     const { prompt, letterToKey } = buildSubjectPrompt(data.skill, item);
     const base = {
       description: `${item.id} (${item.type})`,
-      vars: { subject_prompt: prompt },
+      vars: { subject_prompt: literal(prompt) },
       metadata: { skill: data.skill, case_id: item.id, case_type: item.type },
     };
 
-    if (item.type === 'discrimination') {
+    if (item.type.startsWith('discrimination')) {
       base.vars.letter_to_key = letterToKey;
-      base.vars.correct = item.correct;
+      // promptfoo expands array vars into one test per element; join to a string to keep one row per case.
+      if (item.type === 'discrimination-rank') base.vars.correct_ranking = item.correct_ranking.join(',');
+      else base.vars.correct = item.correct;
       base.assert = [
         { type: 'javascript', value: 'file://asserts/discrimination.mjs', metric: 'choice' },
         judged(buildRuleRubric(item), 'rule'),

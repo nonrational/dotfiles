@@ -28,6 +28,33 @@ test('discrimination fails cleanly when no ANSWER line is present', () => {
   assert.match(result.reason, /No ANSWER line/);
 });
 
+const rankVars = {
+  letter_to_key: { A: 'original', B: 'over_tight', C: 'restored' },
+  correct_ranking: 'restored,original,over_tight',
+};
+
+test('rank passes on the exact best-first ordering', () => {
+  const result = assertDiscrimination('ANSWER: C, A, B\nRULE: r', { vars: rankVars });
+  assert.equal(result.pass, true);
+});
+
+test('rank fails on any other ordering', () => {
+  const result = assertDiscrimination('ANSWER: C, B, A\nRULE: r', { vars: rankVars });
+  assert.equal(result.pass, false);
+  assert.match(result.reason, /expected restored > original > over_tight/);
+});
+
+test('single choice ignores words on the ANSWER line', () => {
+  const result = assertDiscrimination('ANSWER: Version B\nRULE: r', { vars: discVars });
+  assert.equal(result.pass, true);
+});
+
+test('discrimination reads the last ANSWER line, not one echoed from the format template', () => {
+  const output = 'Format: ANSWER: <letter>\n...\nANSWER: B\nRULE: r';
+  const result = assertDiscrimination(output, { vars: discVars });
+  assert.equal(result.pass, true);
+});
+
 const detVars = {
   violations: [
     { quote: 'Larger chunks use more memory. Smaller chunks use more CPU.', rule: 'generic tradeoff' },

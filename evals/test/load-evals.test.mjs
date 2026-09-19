@@ -22,13 +22,20 @@ test('code-comment-register evals validate with zero unsupported cases', () => {
   assert.equal(unsupported.length, 0);
 });
 
-test('prose-register evals validate, with its two extra types reported as unsupported', () => {
-  const data = loadEvals(
-    path.join(REPO_ROOT, 'home/.agents/skills/prose-register/evals.json'),
-  );
-  const { unsupported } = validateData(data);
-  const types = new Set(unsupported.map((u) => u.type));
-  assert.deepEqual([...types].sort(), ['discrimination-rank', 'discrimination-structural']);
+test('prose-register evals validate with zero unsupported cases', () => {
+  const data = loadEvals(path.join(REPO_ROOT, 'home/.agents/skills/prose-register/evals.json'));
+  const { caseCount, unsupported } = validateData(data);
+  assert.equal(caseCount, 22);
+  assert.equal(unsupported.length, 0);
+});
+
+test('validateData throws when a rank omits or repeats a stage', () => {
+  const bad = {
+    skill: 'x',
+    cases: [{ id: 'r1', type: 'discrimination-rank', prompt: 'p', expected_rule_for_worst: 'w',
+      stages: { a: '1', b: '2', c: '3' }, correct_ranking: ['a', 'b', 'b'] }],
+  };
+  assert.throws(() => validateData(bad), /must order every stage exactly once/);
 });
 
 test('validateData throws on a duplicate case id', () => {
@@ -53,6 +60,8 @@ test('validateData throws on a discrimination case whose correct key names no va
   assert.throws(() => validateData(bad), /does not name a variant/);
 });
 
-test('SUPPORTED_TYPES is exactly the three Phase 1 types', () => {
-  assert.deepEqual([...SUPPORTED_TYPES].sort(), ['detection', 'discrimination', 'transformation']);
+test('SUPPORTED_TYPES covers both skills\' case types', () => {
+  assert.deepEqual([...SUPPORTED_TYPES].sort(), [
+    'detection', 'discrimination', 'discrimination-rank', 'discrimination-structural', 'transformation',
+  ]);
 });

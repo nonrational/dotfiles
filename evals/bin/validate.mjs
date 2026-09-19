@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Offline structural validation of every evals.json — zero model calls.
-// Unsupported case types warn rather than fail until Phase 2 grades them.
+// Unsupported case types warn rather than fail, so a new type can be
+// authored in evals.json before the generator grades it.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { findEvalFiles, loadEvals, validateData } from '../lib/load-evals.mjs';
