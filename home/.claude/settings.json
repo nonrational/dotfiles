@@ -46,10 +46,11 @@
     "frontend-design@claude-plugins-official": false,
     "rust-analyzer-lsp@claude-plugins-official": false
   },
-  "effortLevel": "xhigh",
-  "tui": "fullscreen",
-  "skipWorkflowUsageWarning": true,
-  "theme": "dark",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "effortLevel": "high",
+  "skipAutoPermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "syncClaudeAiSkills": false,
+  "theme": "dark",
+  "tui": "fullscreen"
 }
