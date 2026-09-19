@@ -47,6 +47,8 @@ ${listing}
 
 ${instruction}
 
+Compare the versions in a few sentences first.
+
 End with exactly these two lines and nothing after:
 ${answer}
 RULE: <one sentence>`;
