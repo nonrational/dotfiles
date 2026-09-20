@@ -28,10 +28,20 @@ function runGate(rows, ...args) {
   return spawnSync(process.execPath, [GATE, file, ...args], { encoding: 'utf8' });
 }
 
-test('a failed rule judgment is soft: passes at the floor', () => {
-  const result = runGate([...passing(9), row('disc-07', [choice(true), rule(false)])]);
+test('a failed rule judgment is informational: counts as passed for the floor and is reported', () => {
+  const result = runGate([...passing(6), ...[7, 8, 9, 10].map((i) => row(`disc-${i}`, [choice(true), rule(false)]))]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout, /9\/10/);
+  assert.match(result.stdout, /10\/10 passed/);
+  assert.match(result.stdout, /rule 6\/10 informational/);
+});
+
+test('a wrong arguable choice counts against the floor, and its rule verdict still reports', () => {
+  const arguable = [1, 2].map((i) => row(`disc-0${i}`, [choice(false), rule(false)], { arguable: true }));
+  const result = runGate([...passing(8), ...arguable]);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /8\/10 passed/);
+  assert.match(result.stdout, /rule 8\/10 informational/);
+  assert.match(result.stderr, /pass rate/i);
 });
 
 test('a failed detection is soft: passes at the floor', () => {
@@ -72,14 +82,14 @@ test('a subject error gates because no assert ran', () => {
 });
 
 test('soft failures below the floor fail the gate', () => {
-  const soft = [1, 2, 3].map((i) => row(`trans-0${i}`, [rule(false)]));
+  const soft = [1, 2, 3].map((i) => row(`det-0${i}`, [detect(false)]));
   const result = runGate([...passing(7), ...soft]);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /pass rate/i);
 });
 
 test('the floor is overridable via argv', () => {
-  const soft = [1, 2, 3].map((i) => row(`trans-0${i}`, [rule(false)]));
+  const soft = [1, 2, 3].map((i) => row(`det-0${i}`, [detect(false)]));
   const result = runGate([...passing(7), ...soft], '0.70');
   assert.equal(result.status, 0, result.stdout + result.stderr);
 });
