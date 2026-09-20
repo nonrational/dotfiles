@@ -27,12 +27,23 @@ export function overlap(keyQuote, subjectQuote) {
 
 export const quotesOverlap = (keyQuote, subjectQuote) => overlap(keyQuote, subjectQuote).length > 0;
 
+// A violation one character wide (det-03's em-dash) can be quoted from either
+// side, and a quote that stops at the dash shares too little with the key for
+// overlap to count. A target may name an anchor inside its quote that settles
+// the match on its own.
+function matches(target, quote) {
+  if (target.anchor && quote.includes(normalize(target.anchor))) {
+    return { length: normalize(target.quote).length, whole: true };
+  }
+  return overlap(target.quote, quote);
+}
+
 // One subject quote is one finding. It is credited to every target it holds
 // whole and, when it holds none, to the single target it overlaps most; a
 // quote that runs from one violation into the opening of the next is not a
 // find of both.
 function credited(targets, quote) {
-  const scored = targets.map((target) => ({ target, ...overlap(target.quote, quote) }));
+  const scored = targets.map((target) => ({ target, ...matches(target, quote) }));
   const whole = scored.filter((s) => s.whole).map((s) => s.target);
   if (whole.length) return whole;
   const best = scored.filter((s) => s.length > 0).sort((a, b) => b.length - a.length)[0];

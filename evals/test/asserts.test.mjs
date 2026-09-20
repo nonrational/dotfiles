@@ -121,6 +121,29 @@ test('detection counts a quote that starts inside the key and runs past it', () 
   assert.equal(result.score, 1);
 });
 
+// det-03's second miss: the subject quoted the text on the left of the dash,
+// 15 characters of overlap with the key, under the floor.
+const dashQuotedFromTheLeft = '- QUOTE: "Same company, same invoice, same artifact —" | RULE: em-dash';
+
+test('detection counts a quote from the far side of a one-character violation when the key names an anchor', () => {
+  const vars = {
+    violations: [{ quote: 'same artifact — one rewrite by strangers', anchor: 'artifact —', rule: 'No em-dashes.' }],
+    traps: [],
+  };
+  const result = assertDetection(dashQuotedFromTheLeft, { vars });
+  assert.equal(result.pass, true, result.reason);
+});
+
+test('detection without an anchor misses a quote that overlaps the key by less than the floor', () => {
+  const vars = {
+    violations: [{ quote: 'same artifact — one rewrite by strangers', rule: 'No em-dashes.' }],
+    traps: [],
+  };
+  const result = assertDetection(dashQuotedFromTheLeft, { vars });
+  assert.equal(result.pass, false);
+  assert.match(result.reason, /0\/1 violations/);
+});
+
 test('detection counts a quote that wraps the key in context on both sides', () => {
   const output = '- QUOTE: "Then: Larger chunks use more memory. Smaller chunks use more CPU. And so on." | RULE: generic';
   const result = assertDetection(output, { vars: { ...detVars, violations: detVars.violations.slice(0, 1) } });

@@ -151,9 +151,13 @@ export function validateData(data) {
       // contain verbatim (an ellipsis, a paraphrase) can never be found or
       // tripped.
       const document = normalize(item.input_document);
-      for (const { quote } of [...item.violations, ...item.traps]) {
+      for (const { quote, anchor } of [...item.violations, ...item.traps]) {
         if (!document.includes(normalize(quote))) {
           throw new Error(`${item.id} quote is not in input_document verbatim: "${quote.slice(0, 40)}"`);
+        }
+        // An anchor settles a match on its own, so it must be part of the quote it stands for.
+        if (anchor !== undefined && (typeof anchor !== 'string' || anchor === '' || !normalize(quote).includes(normalize(anchor)))) {
+          throw new Error(`${item.id} anchor must be a non-empty substring of its quote: "${String(anchor).slice(0, 40)}"`);
         }
       }
     }

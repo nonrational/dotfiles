@@ -133,6 +133,20 @@ test('validateData rejects a min_recall outside [0, 1]', () => {
   }
 });
 
+test('validateData accepts an anchor that sits inside its quote', () => {
+  const ok = detectionCase({});
+  ok.cases[0].violations = [{ quote: 'quoted line', anchor: 'ed li', rule: 'r' }];
+  assert.doesNotThrow(() => validateData(ok));
+});
+
+test('validateData rejects an anchor that is empty or not inside its quote', () => {
+  for (const bad of ['', 'the quoted', 7]) {
+    const data = detectionCase({});
+    data.cases[0].violations = [{ quote: 'quoted line', anchor: bad, rule: 'r' }];
+    assert.throws(() => validateData(data), /x1 anchor must be a non-empty substring of its quote/, `anchor ${JSON.stringify(bad)}`);
+  }
+});
+
 test('validateData rejects a detection quote the document does not contain verbatim', () => {
   const bad = detectionCase({ input_document: 'Therefore, trust the pilot.', traps: [{ quote: 'Therefore, trust...' }] });
   bad.cases[0].violations = [{ quote: 'trust the pilot', rule: 'r' }];
