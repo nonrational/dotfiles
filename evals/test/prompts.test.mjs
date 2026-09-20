@@ -72,10 +72,11 @@ test('transformation rubric embeds task, reference, and all three criteria', () 
   }
 });
 
-test('rule rubric grades only the RULE line against the reference rule', () => {
+test('rule rubric grades only the RULE line against the reference rule and the accepted alternatives', () => {
   const item = {
     id: 'd', type: 'discrimination', expected_rule: 'Explain why, not what.', rule_quote: 'Quote.',
-    grading_note: 'Also accept X.',
+    accepted_rules: ['Placement.', 'Brevity.'],
+    grading_note: 'A precise answer cites both rules.',
   };
   const rubric = buildRuleRubric(item);
   assert.match(rubric, /RULE:/);
@@ -83,13 +84,15 @@ test('rule rubric grades only the RULE line against the reference rule', () => {
   assert.ok(rubric.includes('Quote.'));
   assert.match(rubric, /Ignore which option was chosen/);
   assert.match(rubric, /part of a compound reference rule/);
-  assert.ok(rubric.includes('Also accept X.'));
+  assert.ok(rubric.includes('Accepted alternative rules (any one of these also passes):\n- Placement.\n- Brevity.'));
+  // The note is for humans; passed to the judge it was read as a requirement.
+  assert.ok(!rubric.includes('A precise answer cites both rules.'));
 });
 
-test('rule rubric defaults the author notes to None when a case sets no grading_note', () => {
+test('rule rubric lists None when a case accepts no alternative rule', () => {
   const item = { id: 'd', type: 'discrimination', expected_rule: 'Explain why, not what.', rule_quote: 'Quote.' };
   const rubric = buildRuleRubric(item);
-  assert.ok(rubric.includes('Author\'s notes (may list accepted alternative rules):\nNone.'));
+  assert.ok(rubric.includes('Accepted alternative rules (any one of these also passes):\nNone.'));
 });
 
 test('rank prompt letters stages and asks for a best-first ordering', () => {

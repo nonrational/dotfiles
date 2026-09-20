@@ -96,6 +96,25 @@ test('validateData accepts a min_pass_rate in (0, 1]', () => {
   assert.doesNotThrow(() => validateData(ok));
 });
 
+test('validateData accepts accepted_rules as a non-empty list of rule strings on a discrimination case', () => {
+  assert.doesNotThrow(() => validateData(arguableCase({ accepted_rules: ['Another rule.'] })));
+});
+
+test('validateData rejects an empty or non-string accepted_rules list', () => {
+  for (const bad of [[], 'Another rule.', ['ok', ''], [1]]) {
+    assert.throws(() => validateData(arguableCase({ accepted_rules: bad })), /d1\.accepted_rules must be a non-empty array of rule strings/);
+  }
+});
+
+test('validateData rejects accepted_rules on a case type with no stated rule to judge', () => {
+  const bad = {
+    skill: 'x',
+    cases: [{ id: 't1', type: 'transformation', input: 'i', task: 't', reference_after: 'r',
+      rubric: { violation_fixed: 'v' }, accepted_rules: ['x'] }],
+  };
+  assert.throws(() => validateData(bad), /t1\.accepted_rules applies only to discrimination cases/);
+});
+
 const detectionCase = (extra) => ({
   skill: 'x',
   cases: [{ id: 'x1', type: 'detection', prompt: 'p', input_document: 'the quoted line',

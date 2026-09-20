@@ -29,6 +29,7 @@ function answerKeyValues(item) {
   }
   if (item.rubric && typeof item.rubric === 'object') values.push(...Object.values(item.rubric));
   if (Array.isArray(item.correct_ranking)) values.push(item.correct_ranking.join(','));
+  if (Array.isArray(item.accepted_rules)) values.push(...item.accepted_rules);
   return values;
 }
 

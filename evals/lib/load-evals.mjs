@@ -108,6 +108,18 @@ export function validateData(data) {
       }
     }
 
+    // Alternatives the rule judge accepts besides expected_rule; only
+    // discrimination cases have a stated rule to judge.
+    if (item.accepted_rules !== undefined) {
+      if (!item.type.startsWith('discrimination')) {
+        throw new Error(`${item.id}.accepted_rules applies only to discrimination cases`);
+      }
+      const rules = item.accepted_rules;
+      if (!Array.isArray(rules) || rules.length === 0 || rules.some((rule) => typeof rule !== 'string' || rule === '')) {
+        throw new Error(`${item.id}.accepted_rules must be a non-empty array of rule strings`);
+      }
+    }
+
     // Below 1 the case records recall as its score instead of failing on a
     // non-exhaustive violation list; only detection has recall to floor.
     if (item.min_recall !== undefined) {
