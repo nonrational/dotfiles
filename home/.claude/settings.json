@@ -1,4 +1,5 @@
 {
+  "syncClaudeAiSkills": false,
   "attribution": {
     "pr": "",
     "sessionUrl": false
@@ -46,11 +47,10 @@
     "frontend-design@claude-plugins-official": false,
     "rust-analyzer-lsp@claude-plugins-official": false
   },
-  "agentPushNotifEnabled": true,
   "effortLevel": "high",
-  "skipAutoPermissionPrompt": true,
+  "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
-  "syncClaudeAiSkills": false,
   "theme": "dark",
-  "tui": "fullscreen"
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
