@@ -24,7 +24,7 @@ function subjectVisibleValues(item) {
 
 function answerKeyValues(item) {
   const values = [];
-  for (const key of ['expected_rule', 'expected_rule_for_worst', 'rule_quote', 'grading_note']) {
+  for (const key of ['expected_rule', 'expected_rule_for_worst', 'rule_quote', 'grading_note', 'reference_after']) {
     if (typeof item[key] === 'string' && item[key].length > 0) values.push(item[key]);
   }
   if (item.rubric && typeof item.rubric === 'object') values.push(...Object.values(item.rubric));
@@ -140,7 +140,7 @@ test('generates all 22 prose-register tests, rank and structural included', asyn
   );
   assert.equal(tests.length, 22);
   const byType = Object.groupBy(tests, (t) => t.metadata.case_type);
-  assert.equal(byType['discrimination-rank'].length, 2);
+  assert.equal(byType['discrimination-rank'].length, 1);
   assert.equal(byType['discrimination-structural'].length, 2);
 
   for (const t of [...byType.discrimination, ...byType['discrimination-structural'], ...byType['discrimination-rank']]) {
@@ -179,6 +179,11 @@ test('generates all 22 prose-register tests, rank and structural included', asyn
   }
   const det02 = tests.find((t) => t.metadata.case_id === 'det-02');
   assert.ok(det02.vars.subject_prompt.includes('{{<'));
+
+  // det-01 and det-02 record recall on a non-exhaustive list; det-03's single em-dash still gates.
+  for (const t of byType.detection) {
+    assert.equal(t.vars.min_recall, t.metadata.case_id === 'det-03' ? undefined : 0, t.metadata.case_id);
+  }
 });
 
 test('subject prompts never leak an answer-key value the subject cannot already see', async () => {
