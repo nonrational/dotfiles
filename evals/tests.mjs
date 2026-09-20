@@ -73,6 +73,7 @@ export default async function generateTests() {
     } else if (item.type === 'detection') {
       base.vars.violations = item.violations;
       base.vars.traps = item.traps;
+      if (item.min_recall !== undefined) base.vars.min_recall = item.min_recall;
       base.assert = [{ type: 'javascript', value: 'file://asserts/detection.mjs' }];
     } else {
       base.assert = [judged(buildTransformationRubric(item), 'rubric')];

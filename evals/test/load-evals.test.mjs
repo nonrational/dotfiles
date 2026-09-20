@@ -96,6 +96,34 @@ test('validateData accepts a min_pass_rate in (0, 1]', () => {
   assert.doesNotThrow(() => validateData(ok));
 });
 
+const detectionCase = (extra) => ({
+  skill: 'x',
+  cases: [{ id: 'x1', type: 'detection', prompt: 'p', input_document: 'the quoted line',
+    violations: [{ quote: 'quoted line', rule: 'r' }], traps: [], ...extra }],
+});
+
+test('validateData accepts a min_recall in [0, 1] on a detection case', () => {
+  for (const ok of [0, 0.5, 1]) {
+    assert.doesNotThrow(() => validateData(detectionCase({ min_recall: ok })));
+  }
+});
+
+test('validateData rejects a min_recall outside [0, 1]', () => {
+  for (const bad of [-0.1, 1.5, '0.5']) {
+    assert.throws(() => validateData(detectionCase({ min_recall: bad })), /x1\.min_recall must be a number in \[0, 1\]/);
+  }
+});
+
+test('validateData rejects a detection quote the document does not contain verbatim', () => {
+  const bad = detectionCase({ input_document: 'Therefore, trust the pilot.', traps: [{ quote: 'Therefore, trust...' }] });
+  bad.cases[0].violations = [{ quote: 'trust the pilot', rule: 'r' }];
+  assert.throws(() => validateData(bad), /x1 quote is not in input_document verbatim: "Therefore, trust\.\.\."/);
+});
+
+test('validateData rejects min_recall on a case type with no recall to floor', () => {
+  assert.throws(() => validateData(arguableCase({ min_recall: 0.5 })), /d1\.min_recall applies only to detection cases/);
+});
+
 test('validateData rejects a min_pass_rate outside (0, 1]', () => {
   for (const bad of [0, 1.5, '0.5', -1]) {
     const data = { ...arguableCase({}), min_pass_rate: bad };

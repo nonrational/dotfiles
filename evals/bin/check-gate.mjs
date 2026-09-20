@@ -51,9 +51,9 @@ const isHardFailure = (row) =>
       components(row).some((c) => !c.pass && c.assertion?.metric === 'choice')));
 
 // Precedence: argv, then the skill's own `min_pass_rate` in evals.json, then
-// the default. A skill whose cases are soft by design (prose-register's
-// detection cases fail by construction) can carry a lower floor than one
-// whose cases all have a single right answer.
+// the default. A skill whose keys are contested or whose detection cases
+// record recall instead of failing (prose-register) can carry a lower floor
+// than one whose cases all have a single right answer.
 //
 // Only the named skill's file is parsed (the generator locates it the same
 // way), so a sibling's broken evals.json cannot fail this gate; an unreadable

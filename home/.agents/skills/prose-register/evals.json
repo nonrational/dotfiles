@@ -240,7 +240,7 @@
       ],
       "traps": [
         {"quote": "the AI's Competence is usually sufficient", "why_not_a_violation": "SKILL.md lists 'usually sufficient' verbatim as a hedge of precision to KEEP."},
-        {"quote": "Therefore, if you are trusting an AI with a high-risk task...", "why_not_a_violation": "SKILL.md lists 'Therefore,' verbatim as a good connective/joint."},
+        {"quote": "Therefore, if you are trusting an AI with a high-risk task, the human pilot must entirely absorb the responsibility for those two traits.", "why_not_a_violation": "SKILL.md lists 'Therefore,' verbatim as a good connective/joint."},
         {"quote": "Recently, the creator of Bun burned through roughly $200,000 worth of tokens to rewrite their core runtime from Zig into Rust.", "why_not_a_violation": "The opening correctly leads with substance (no throat-clearing). The dollar figure itself is factually wrong ($200,000 vs. the real $165,000), but that is a fact-check issue, not a register violation -- don't let a model conflate the two when grading detection."}
       ],
       "grading_note": "12 violations, 3 traps. Grade recall (how many of the 12 were found) and precision (were any traps wrongly flagged, or was a genuinely fine sentence flagged for no stated reason)."
