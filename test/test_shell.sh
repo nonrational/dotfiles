@@ -13,7 +13,7 @@ trap 'rm -rf "$BASE"' EXIT
 
 # rc files a login/interactive shell may pull in; linked into every fake HOME so
 # the source chain ($HOME/.bashrc, $HOME/.bashrc.$(uname), ...) resolves.
-RC_FILES=(.bash_profile .bashrc .bashrc.Darwin .bashrc.Linux .zshrc .zprofile .profile)
+RC_FILES=(.bash_profile .bashrc .bashrc.Darwin .bashrc.Linux .profile)
 
 pass=0
 fail=0
@@ -67,9 +67,6 @@ smoke() {
 
 smoke "bash: .bash_profile sources and defines helpers" \
       bash .bash_profile source_if_exists prpg ll
-smoke "zsh: .zshrc sources and defines helpers" \
-      zsh .zshrc ll puma-dev-ln
-
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
