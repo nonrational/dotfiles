@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Clipboard bridge: socket-activated, inetd-style. launchd owns the listener on
+  127.0.0.1:2224 and spawns ~/bin/clipboard-bridge once per connection with the
+  socket on stdin/stdout, so nothing runs while idle. The port reaches exe.dev
+  VMs through the RemoteForward in ~/.ssh/config.d/exe.conf. No RunAtLoad and no
+  KeepAlive on purpose. Load with `make clipboard-bridge`.
+  $HOME goes through /bin/sh because plists cannot expand ~ and a hardcoded
+  username does not belong in a public repo.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>org.nonrational.clipboard-bridge</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>exec "$HOME/bin/clipboard-bridge"</string>
+  </array>
+  <key>Sockets</key>
+  <dict>
+    <key>Listener</key>
+    <dict>
+      <key>SockNodeName</key>
+      <string>127.0.0.1</string>
+      <key>SockServiceName</key>
+      <string>2224</string>
+      <key>SockType</key>
+      <string>stream</string>
+      <key>SockFamily</key>
+      <string>IPv4</string>
+    </dict>
+  </dict>
+  <key>inetdCompatibility</key>
+  <dict>
+    <key>Wait</key>
+    <false/>
+  </dict>
+</dict>
+</plist>

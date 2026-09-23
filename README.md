@@ -29,6 +29,7 @@ fi
 make init-submodules
 make deploy
 make link-karabiner
+make clipboard-bridge          # launch agent that serves clipboard images to exe.dev VMs
 
 # Authenticate with `gh` to clone private repo(s)
 gh auth login
@@ -53,6 +54,10 @@ cd .dotfiles
 make init-submodules
 make deploy
 ```
+
+# Clipboard bridge (exe.dev VMs)
+
+`make clipboard-bridge` loads `org.nonrational.clipboard-bridge`, a socket-activated launch agent on `127.0.0.1:2224` that answers image requests from the pasteboard and nothing else. `home/.ssh/config.d/exe.conf` reverse-forwards that port into every `*.exe.xyz` session and shares connections between windows; add `Include config.d/*.conf` as the first line of `~/.ssh/config` once. Inside a VM, Claude Code's ctrl+v then pastes whatever image is on the mac clipboard. The VM half is the `wl-paste` shim in [nonreagent/dotfiles](https://github.com/nonreagent/dotfiles); design and trust model: [clipboard bridge design](https://github.com/nonreagent/dotfiles/blob/main/docs/superpowers/specs/2026-09-07-clipboard-bridge-design.md). The include is global, so OpenSSH's permission check on it gates every `ssh`: if they all start failing with `Bad owner or permissions on ~/.ssh/config.d/exe.conf`, `chmod 644` the repo's copy.
 
 # Development
 
