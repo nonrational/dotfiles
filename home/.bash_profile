@@ -22,6 +22,7 @@ prepend_new_path_if_exists "/opt/homebrew/sbin" # apple silicon homebrew static 
 prepend_new_path_if_exists "$HOME/.asdf/shims"
 prepend_new_path_if_exists "$HOME/.local/bin"
 prepend_new_path_if_exists "$HOME/bin"
+prepend_new_path_if_exists "$HOME/.docker/bin"
 
 source_if_exists() {
   if [[ -s "$1" ]]; then

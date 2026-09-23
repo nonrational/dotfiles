@@ -28,8 +28,6 @@ home/.screenrc           ~/.screenrc
 home/.tmux.conf          ~/.tmux.conf
 home/.vim                ~/.vim
 home/.vimrc              ~/.vimrc
-home/.zprofile           ~/.zprofile
-home/.zshrc              ~/.zshrc
 home/bin.Darwin          ~/bin                 os=Darwin
 home/bin.Linux           ~/bin                 os=Linux
 fonts                    ~/Library/Fonts/dotfiles          os=Darwin
