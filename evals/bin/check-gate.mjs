@@ -50,10 +50,19 @@ const isHardFailure = (row) =>
     (meta(row).arguable !== true &&
       components(row).some((c) => !c.pass && c.assertion?.metric === 'choice')));
 
+// The rule judgment is recorded but never counts: a passage breaks more than
+// one rule, and the judge rejects a true rule the key did not name. A row
+// whose only failed asserts are informational passes for the floor.
+const INFORMATIONAL_METRICS = new Set(['rule']);
+const isInformational = (component) => INFORMATIONAL_METRICS.has(component.assertion?.metric);
+const countsAsPassed = (row) =>
+  row.success ||
+  (components(row).length > 0 && components(row).every((c) => c.pass || isInformational(c)));
+
 // Precedence: argv, then the skill's own `min_pass_rate` in evals.json, then
-// the default. A skill whose cases are soft by design (prose-register's
-// detection cases fail by construction) can carry a lower floor than one
-// whose cases all have a single right answer.
+// the default. A skill whose keys are contested or whose detection cases
+// record recall instead of failing (prose-register) can carry a lower floor
+// than one whose cases all have a single right answer.
 //
 // Only the named skill's file is parsed (the generator locates it the same
 // way), so a sibling's broken evals.json cannot fail this gate; an unreadable
@@ -80,10 +89,14 @@ if (!(minRate > 0 && minRate <= 1)) {
 }
 
 const hardFailures = rows.filter(isHardFailure);
-const passed = rows.filter((row) => row.success).length;
+const passed = rows.filter(countsAsPassed).length;
 const passRate = passed / rows.length;
 
-console.log(`${passed}/${rows.length} passed (rate ${(passRate * 100).toFixed(1)}%, floor ${(minRate * 100).toFixed(0)}%)`);
+const informational = rows.flatMap((row) => components(row).filter(isInformational));
+const informationalNote = informational.length
+  ? `; rule ${informational.filter((c) => c.pass).length}/${informational.length} informational`
+  : '';
+console.log(`${passed}/${rows.length} passed (rate ${(passRate * 100).toFixed(1)}%, floor ${(minRate * 100).toFixed(0)}%)${informationalNote}`);
 
 let failed = false;
 if (hardFailures.length > 0) {

@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, existsSync, lstatSync } from 'node:fs';
 import path from 'node:path';
+import { normalize } from '../asserts/heuristics.mjs';
 
 export const SUPPORTED_TYPES = new Set([
   'discrimination',
@@ -107,6 +108,29 @@ export function validateData(data) {
       }
     }
 
+    // Alternatives the rule judge accepts besides expected_rule; only
+    // discrimination cases have a stated rule to judge.
+    if (item.accepted_rules !== undefined) {
+      if (!item.type.startsWith('discrimination')) {
+        throw new Error(`${item.id}.accepted_rules applies only to discrimination cases`);
+      }
+      const rules = item.accepted_rules;
+      if (!Array.isArray(rules) || rules.length === 0 || rules.some((rule) => typeof rule !== 'string' || rule === '')) {
+        throw new Error(`${item.id}.accepted_rules must be a non-empty array of rule strings`);
+      }
+    }
+
+    // Below 1 the case records recall as its score instead of failing on a
+    // non-exhaustive violation list; only detection has recall to floor.
+    if (item.min_recall !== undefined) {
+      if (item.type !== 'detection') {
+        throw new Error(`${item.id}.min_recall applies only to detection cases`);
+      }
+      if (typeof item.min_recall !== 'number' || !(item.min_recall >= 0 && item.min_recall <= 1)) {
+        throw new Error(`${item.id}.min_recall must be a number in [0, 1]`);
+      }
+    }
+
     if (item.type === 'detection') {
       requireField(item.prompt, `${item.id}.prompt`);
       requireField(item.input_document, `${item.id}.input_document`);
@@ -122,6 +146,19 @@ export function validateData(data) {
       }
       for (const trap of item.traps) {
         requireField(trap.quote, `${item.id}.traps[].quote`);
+      }
+      // The grader matches by text overlap, so a quote the document does not
+      // contain verbatim (an ellipsis, a paraphrase) can never be found or
+      // tripped.
+      const document = normalize(item.input_document);
+      for (const { quote, anchor } of [...item.violations, ...item.traps]) {
+        if (!document.includes(normalize(quote))) {
+          throw new Error(`${item.id} quote is not in input_document verbatim: "${quote.slice(0, 40)}"`);
+        }
+        // An anchor settles a match on its own, so it must be part of the quote it stands for.
+        if (anchor !== undefined && (typeof anchor !== 'string' || anchor === '' || !normalize(quote).includes(normalize(anchor)))) {
+          throw new Error(`${item.id} anchor must be a non-empty substring of its quote: "${String(anchor).slice(0, 40)}"`);
+        }
       }
     }
   }

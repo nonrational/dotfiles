@@ -96,6 +96,67 @@ test('validateData accepts a min_pass_rate in (0, 1]', () => {
   assert.doesNotThrow(() => validateData(ok));
 });
 
+test('validateData accepts accepted_rules as a non-empty list of rule strings on a discrimination case', () => {
+  assert.doesNotThrow(() => validateData(arguableCase({ accepted_rules: ['Another rule.'] })));
+});
+
+test('validateData rejects an empty or non-string accepted_rules list', () => {
+  for (const bad of [[], 'Another rule.', ['ok', ''], [1]]) {
+    assert.throws(() => validateData(arguableCase({ accepted_rules: bad })), /d1\.accepted_rules must be a non-empty array of rule strings/);
+  }
+});
+
+test('validateData rejects accepted_rules on a case type with no stated rule to judge', () => {
+  const bad = {
+    skill: 'x',
+    cases: [{ id: 't1', type: 'transformation', input: 'i', task: 't', reference_after: 'r',
+      rubric: { violation_fixed: 'v' }, accepted_rules: ['x'] }],
+  };
+  assert.throws(() => validateData(bad), /t1\.accepted_rules applies only to discrimination cases/);
+});
+
+const detectionCase = (extra) => ({
+  skill: 'x',
+  cases: [{ id: 'x1', type: 'detection', prompt: 'p', input_document: 'the quoted line',
+    violations: [{ quote: 'quoted line', rule: 'r' }], traps: [], ...extra }],
+});
+
+test('validateData accepts a min_recall in [0, 1] on a detection case', () => {
+  for (const ok of [0, 0.5, 1]) {
+    assert.doesNotThrow(() => validateData(detectionCase({ min_recall: ok })));
+  }
+});
+
+test('validateData rejects a min_recall outside [0, 1]', () => {
+  for (const bad of [-0.1, 1.5, '0.5']) {
+    assert.throws(() => validateData(detectionCase({ min_recall: bad })), /x1\.min_recall must be a number in \[0, 1\]/);
+  }
+});
+
+test('validateData accepts an anchor that sits inside its quote', () => {
+  const ok = detectionCase({});
+  ok.cases[0].violations = [{ quote: 'quoted line', anchor: 'ed li', rule: 'r' }];
+  assert.doesNotThrow(() => validateData(ok));
+});
+
+test('validateData rejects an anchor that is empty or not inside its quote', () => {
+  for (const bad of ['', 'the quoted', 7]) {
+    const data = detectionCase({});
+    data.cases[0].violations = [{ quote: 'quoted line', anchor: bad, rule: 'r' }];
+    assert.throws(() => validateData(data), /x1 anchor must be a non-empty substring of its quote/, `anchor ${JSON.stringify(bad)}`);
+  }
+});
+
+test('validateData rejects a detection quote the document does not contain verbatim', () => {
+  const bad = detectionCase({ input_document: 'Therefore, trust the pilot.', traps: [{ quote: 'Therefore, trust...' }] });
+  bad.cases[0].violations = [{ quote: 'trust the pilot', rule: 'r' }];
+  assert.throws(() => validateData(bad), /x1 quote is not in input_document verbatim: "Therefore, trust\.\.\."/);
+});
+
+test('validateData rejects min_recall on a case type with no recall to floor', () => {
+  assert.throws(() => validateData(arguableCase({ min_recall: 0.5 })), /d1\.min_recall applies only to detection cases/);
+});
+
 test('validateData rejects a min_pass_rate outside (0, 1]', () => {
   for (const bad of [0, 1.5, '0.5', -1]) {
     const data = { ...arguableCase({}), min_pass_rate: bad };

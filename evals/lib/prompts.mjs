@@ -112,10 +112,17 @@ Notes:
 ${item.grading_note || 'None.'}`;
 }
 
+// The judge sees only the reference rule and the alternatives the case lists;
+// grading_note stays human-facing. Passed as free text, a note that asked for
+// a precise two-rule answer was read as a requirement and failed the answers
+// that met it.
 export function buildRuleRubric(item) {
+  const accepted = item.accepted_rules?.length
+    ? item.accepted_rules.map((rule) => `- ${rule}`).join('\n')
+    : 'None.';
   return `Grade only the line in the output that begins with "RULE:". Ignore which option was chosen and anything else in the output.
 
-The RULE line passes if it names the same principle as the reference rule in any wording, names the part of a compound reference rule that decides this case, or names an alternative the author's notes accept. It fails if it names a different principle, is missing, or is too vague to tell this rule apart from the skill's other rules.
+The RULE line passes if it names the same principle as the reference rule in any wording, names the part of a compound reference rule that decides this case, or names one of the accepted alternative rules. It fails if it names a different principle, is missing, or is too vague to tell this rule apart from the skill's other rules.
 
 Reference rule:
 ${item.expected_rule ?? item.expected_rule_for_worst}
@@ -123,6 +130,6 @@ ${item.expected_rule ?? item.expected_rule_for_worst}
 Rule text from the skill:
 ${item.rule_quote || 'None.'}
 
-Author's notes (may list accepted alternative rules):
-${item.grading_note || 'None.'}`;
+Accepted alternative rules (any one of these also passes):
+${accepted}`;
 }
