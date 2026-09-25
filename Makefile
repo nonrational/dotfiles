@@ -35,6 +35,11 @@ set-shell:
 setup:
 	./setup.sh $(ARGS)
 
+# One command for a new exe.dev VM as an @nonreagent host; see the script.
+exe-box:
+	@test -n "$(NAME)" || { echo "usage: make exe-box NAME=<name>"; exit 1; }
+	./scripts/new-exe-box.sh "$(NAME)"
+
 brew-bundle:
 	/opt/homebrew/bin/brew shellenv > /tmp/brew-shell.env
 	source /tmp/brew-shell.env && which brew && brew update && brew bundle

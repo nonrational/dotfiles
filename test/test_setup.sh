@@ -491,6 +491,82 @@ test_pipe_on_mac_without_clt_is_checkpoint_1() {
     fi
 }
 
+# --- new-exe-box.sh --------------------------------------------------------
+
+# An ssh stub that logs each call, saves whatever arrived on stdin for the
+# call that ran `gh auth login`, and fails `<host> true` the first
+# $STUB_SSH_NOT_READY times so the wait loop has something to wait for.
+stub_ssh() {
+    cat > "$SB/bin/ssh" <<EOF
+#!/bin/bash
+echo "ssh \$*" >> "$LOG"
+case "\$*" in
+    *" true")
+        n=\$(cat "$SB/notready" 2>/dev/null || echo 0)
+        if [ "\$n" -lt "\${STUB_SSH_NOT_READY:-0}" ]; then echo \$((n + 1)) > "$SB/notready"; exit 255; fi
+        ;;
+    *"gh auth login"*) cat > "$SB/token.stdin" ;;
+esac
+exit 0
+EOF
+    chmod +x "$SB/bin/ssh"
+}
+
+exe_box() {
+    set +e
+    out="$(HOME="$FAKEHOME" PATH="$SB/bin:$PATH" EXE_BOX_POLL=0 EXE_BOX_WAIT="${EXE_BOX_WAIT:-5}" \
+        EXE_BOX_SETUP_URL="https://example.invalid/setup.sh" \
+        EXE_BOX_GH_TOKEN_REF="op://Vault/item/token" "$ROOT/scripts/new-exe-box.sh" "$@" 2>&1)"
+    status=$?
+    set -e
+}
+
+test_exe_box_creates_waits_injects_and_runs_setup() {
+    sandbox; stub_ssh; stub op "tok-123"
+    STUB_SSH_NOT_READY=2 exe_box mybox
+    if [ "$status" -eq 0 ] \
+        && grep -q '^ssh .*exe.dev new --name mybox --json$' "$LOG" \
+        && [ "$(grep -c '^ssh .*mybox.exe.xyz true$' "$LOG")" -eq 3 ] \
+        && grep -q '^op read op://Vault/item/token$' "$LOG" \
+        && grep -q '^ssh .*mybox.exe.xyz gh auth login --with-token && gh auth setup-git$' "$LOG" \
+        && grep -q '^ssh .*mybox.exe.xyz curl -fsSL https://example.invalid/setup.sh | bash$' "$LOG" \
+        && [ "$(tail -1 <<<"$out")" = "ready: mybox.exe.xyz https://mybox.exe.xyz/" ]; then
+        ok "new-exe-box creates the VM, waits for ssh, injects the token, runs setup, prints the URL"
+    else
+        bad "exe-box flow: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_token_goes_over_stdin_only() {
+    sandbox; stub_ssh; stub op "tok-123"
+    exe_box mybox
+    if [ "$(cat "$SB/token.stdin")" = "tok-123" ] && ! grep -q 'tok-123' "$LOG" && ! echo "$out" | grep -q 'tok-123'; then
+        ok "the token reaches ssh on stdin and appears in no argument or output"
+    else
+        bad "token: stdin=$(cat "$SB/token.stdin" 2>&1) log=$(cat "$LOG") out=$out"
+    fi
+}
+
+test_exe_box_times_out_waiting() {
+    sandbox; stub_ssh; stub op "tok-123"
+    STUB_SSH_NOT_READY=1000000 EXE_BOX_WAIT=1 exe_box mybox
+    if [ "$status" -eq 1 ] && echo "$out" | grep -q 'did not answer within 1s' && ! grep -q '^op read' "$LOG"; then
+        ok "a box that never answers ssh fails with a timeout before any secret is read"
+    else
+        bad "timeout: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_exe_box_requires_name() {
+    sandbox; stub_ssh; stub op
+    exe_box
+    if [ "$status" -ne 0 ] && echo "$out" | grep -q 'usage: new-exe-box.sh <name>' && ! grep -q '^ssh' "$LOG"; then
+        ok "new-exe-box without a name prints usage and creates nothing"
+    else
+        bad "usage: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
 test_link_karabiner_is_idempotent
 test_link_karabiner_refuses_real_directory
 test_link_sublime_skips_existing_clone
@@ -518,6 +594,10 @@ test_pipe_clones_and_execs_as_first_run
 test_pipe_reuses_existing_clone
 test_pipe_dry_run_does_not_clone
 test_pipe_on_mac_without_clt_is_checkpoint_1
+test_exe_box_creates_waits_injects_and_runs_setup
+test_token_goes_over_stdin_only
+test_exe_box_times_out_waiting
+test_exe_box_requires_name
 
 echo
 echo "$pass passed, $fail failed"
