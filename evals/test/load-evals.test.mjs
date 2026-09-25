@@ -6,11 +6,12 @@ import { SUPPORTED_TYPES, findEvalFiles, loadEvals, validateData } from '../lib/
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
-test('findEvalFiles locates both existing suites', () => {
+test('findEvalFiles locates every existing suite', () => {
   const files = findEvalFiles(REPO_ROOT);
   const skills = files.map((f) => path.basename(path.dirname(f)));
   assert.ok(skills.includes('code-comment-register'));
   assert.ok(skills.includes('prose-register'));
+  assert.ok(skills.includes('code-review-register'));
 });
 
 test('code-comment-register evals validate with zero unsupported cases', () => {
