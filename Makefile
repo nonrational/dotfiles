@@ -26,7 +26,9 @@ macos-accept:
 check-macos-defaults:
 	@./scripts/macos-defaults.sh check
 
-macos: macos-doctor macos-apply
+# The full bootstrap. .macos writes every default itself, so macos-apply (the
+# delta) is not a prerequisite here; it is the routine follow-up to macos-audit.
+macos: macos-doctor
 	sh .macos
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
