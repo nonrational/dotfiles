@@ -22,3 +22,8 @@ Use this when picking a model and reasoning effort for a task — your own or a 
 1. What is this — generate, decide, build or transcribe?
 2. Pick the model from the list above; set effort by stakes, not line count.
 3. Delegating? State model and effort explicitly in the dispatch.
+
+### Handing off a plan
+
+- **A written plan is the transcribe case.** When every step's code is spelled out, the implementers are Sonnet (effort by each task's risk), per-task reviewers are Sonnet at high, and one final whole-branch review runs on the top tier. Recommend that split by name in the handoff.
+- **Never default to "the session model does it all" on a top-tier session.** Native execution is for plans whose steps are not written out, or when the human asks for it.

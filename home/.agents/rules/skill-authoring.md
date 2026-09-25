@@ -44,3 +44,5 @@ grep -rnE '^(source|forked-from): https?://' <tooling-dirs>   # e.g. the skills 
 Anchor on the URL, not the key. A bare `source:` also matches template blocks *inside* a skill's body, where the same word means something else entirely.
 
 Name the relationship honestly. If the structure survived, it is `forked-from`, not "inspired by". Leave the original where it is; overwriting a vendored artifact in place erases the breadcrumb back to whoever wrote it.
+
+A skill graduating from a downstream overlay (nonreagent's) into this repo gets no `forked-from`: the overlay copy is deleted on its next build, so the pointer would dangle, and the author is the same person either way.
