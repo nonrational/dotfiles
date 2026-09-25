@@ -58,7 +58,7 @@ export default async function generateTests() {
     const base = {
       description: `${item.id} (${item.type})`,
       vars: { subject_prompt: literal(prompt) },
-      metadata: { skill: data.skill, case_id: item.id, case_type: item.type },
+      metadata: { skill: data.skill, case_id: item.id, case_type: item.type, ...(item.arguable && { arguable: true }) },
     };
 
     if (item.type.startsWith('discrimination')) {

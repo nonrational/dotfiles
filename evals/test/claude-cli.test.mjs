@@ -17,6 +17,13 @@ test('runClaude parses the envelope into output, cost, and token usage', async (
   assert.deepEqual(result.tokenUsage, { total: 120, prompt: 100, completion: 20 });
 });
 
+test('runClaude records the models that served the call, so a run can be attributed to one', async () => {
+  process.env.EVAL_CLAUDE_CMD = STUB;
+  const result = await runClaude({ args: ['-p'], prompt: 'p', cwd: HERE });
+  delete process.env.EVAL_CLAUDE_CMD;
+  assert.deepEqual(result.metadata, { models: ['claude-stub-1', 'claude-stub-2'] });
+});
+
 test('runClaude passes args through verbatim, empty strings included', async () => {
   process.env.EVAL_CLAUDE_CMD = ECHO;
   const result = await runClaude({ args: ['-p', '--tools', ''], prompt: 'p', cwd: HERE });

@@ -20,6 +20,21 @@ test('discrimination prompt letters variants and demands ANSWER/RULE lines', () 
   assert.ok(!prompt.includes('expected_rule'));
 });
 
+test('discrimination prompt asks for reasoning before the ANSWER/RULE lines, so the verdict is not the first thing written', () => {
+  const item = {
+    id: 'disc-x', type: 'discrimination', prompt: 'p', variants: { first: 'AAA', second: 'BBB' },
+    correct: 'second', expected_rule: 'r',
+  };
+  const rank = { id: 'r-x', type: 'discrimination-rank', prompt: 'p', stages: { a: '1', b: '2', c: '3' },
+    correct_ranking: ['a', 'b', 'c'], expected_rule_for_worst: 'w' };
+  for (const [name, c] of [['pick', item], ['rank', rank]]) {
+    const { prompt } = buildSubjectPrompt(SKILL, c);
+    const reasoning = prompt.indexOf('a few sentences');
+    assert.ok(reasoning > prompt.indexOf('\n\n' + (name === 'pick' ? 'Pick one' : 'Rank the')), `${name}: instruction precedes reasoning ask`);
+    assert.ok(reasoning < prompt.indexOf('End with exactly these two lines'), `${name}: reasoning ask precedes the format lines`);
+  }
+});
+
 test('transformation prompt carries task and input, demands code-only reply', () => {
   const item = { id: 't-x', type: 'transformation', task: 'Do the thing.', input: 'CODE HERE' };
   const { prompt, letterToKey } = buildSubjectPrompt(SKILL, item);

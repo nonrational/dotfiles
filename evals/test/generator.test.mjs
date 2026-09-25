@@ -203,3 +203,13 @@ test('subject prompts never leak an answer-key value the subject cannot already 
     }
   }
 });
+
+test('only the prose-register cases with an arguable key carry the flag', async () => {
+  const tests = await withEnv(
+    { EVAL_SKILL: 'prose-register', EVAL_ONLY: undefined, EVAL_TYPES: undefined },
+    generateTests,
+  );
+  const flagged = tests.filter((t) => t.metadata.arguable === true).map((t) => t.metadata.case_id);
+  assert.deepEqual(flagged.sort(), ['disc-04', 'disc-08', 'disc-09', 'disc-11', 'disc-12']);
+  assert.ok(tests.every((t) => t.metadata.arguable === undefined || t.metadata.arguable === true));
+});

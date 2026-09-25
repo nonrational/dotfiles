@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import os from 'node:os';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -14,9 +14,9 @@ const GATE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../bin/
 const choice = (pass) => ({ pass, assertion: { type: 'javascript', metric: 'choice' } });
 const rule = (pass) => ({ pass, assertion: { type: 'llm-rubric', metric: 'rule' } });
 const detect = (pass) => ({ pass, assertion: { type: 'javascript' } });
-const row = (id, components) => ({
+const row = (id, components, metadata = {}) => ({
   success: components.length > 0 && components.every((c) => c.pass),
-  testCase: { metadata: { case_id: id } },
+  testCase: { metadata: { case_id: id, ...metadata } },
   gradingResult: components.length ? { componentResults: components } : null,
 });
 const passing = (n) => Array.from({ length: n }, (_, i) => row(`ok-${i}`, [choice(true), rule(true)]));
@@ -45,6 +45,26 @@ test('a wrong choice gates even above the floor', () => {
   assert.match(result.stderr, /disc-01/);
 });
 
+test('a wrong choice on an arguable case is soft: passes at the floor', () => {
+  const arguable = row('disc-11', [choice(false), rule(true)], { arguable: true });
+  const result = runGate([...passing(9), arguable]);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+});
+
+test('an arguable case still counts against the floor when it fails', () => {
+  const arguable = [1, 2].map((i) => row(`disc-0${i}`, [choice(false), rule(true)], { arguable: true }));
+  const result = runGate([...passing(8), ...arguable]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /pass rate/i);
+  assert.doesNotMatch(result.stderr, /hard failures/);
+});
+
+test('a subject error on an arguable case still gates because no assert ran', () => {
+  const result = runGate([...passing(19), row('disc-11', [], { arguable: true })]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /disc-11/);
+});
+
 test('a subject error gates because no assert ran', () => {
   const result = runGate([...passing(19), row('disc-02', [])]);
   assert.equal(result.status, 1);
@@ -62,6 +82,86 @@ test('the floor is overridable via argv', () => {
   const soft = [1, 2, 3].map((i) => row(`trans-0${i}`, [rule(false)]));
   const result = runGate([...passing(7), ...soft], '0.70');
   assert.equal(result.status, 0, result.stdout + result.stderr);
+});
+
+// EVAL_REPO_ROOT points the gate at a throwaway skills tree, so the floor
+// tests don't depend on the real evals.json values.
+function runGateWithSkills(skills, rows, ...args) {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'gate-root-'));
+  for (const [name, content] of Object.entries(skills)) {
+    const dir = path.join(root, 'home/.agents/skills', name);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, 'evals.json'), content);
+  }
+  const file = path.join(mkdtempSync(path.join(os.tmpdir(), 'gate-')), 'results.json');
+  writeFileSync(file, JSON.stringify({ results: { results: rows } }));
+  return spawnSync(process.execPath, [GATE, file, ...args], {
+    encoding: 'utf8',
+    env: { ...process.env, EVAL_REPO_ROOT: root },
+  });
+}
+
+const evalsJson = (extra = {}) => JSON.stringify({ skill: 'alpha', cases: [], ...extra });
+// 6 of 11 rows pass (54.5%): under the 90% default, over a 50% floor.
+const elevenRows = (skill) => [
+  ...Array.from({ length: 6 }, (_, i) => row(`ok-${i}`, [choice(true), rule(true)], { skill })),
+  ...Array.from({ length: 5 }, (_, i) => row(`det-0${i}`, [detect(false)], { skill })),
+];
+
+test("a skill's evals.json can set its own floor", () => {
+  const result = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0.5 }) }, elevenRows('alpha'));
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /floor 50%/);
+});
+
+test('a skill without a min_pass_rate keeps the 90% default', () => {
+  const result = runGateWithSkills({ alpha: evalsJson() }, elevenRows('alpha'));
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /floor 90%/);
+});
+
+test("an argv floor overrides the skill's own", () => {
+  const result = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0.5 }) }, elevenRows('alpha'), '0.90');
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /below the 90% floor/);
+});
+
+test("a sibling skill's malformed evals.json does not touch this skill's gate", () => {
+  const skills = { alpha: evalsJson({ min_pass_rate: 0.5 }), beta: '{ truncated' };
+  const result = runGateWithSkills(skills, elevenRows('alpha'));
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+});
+
+test("the skill's own unreadable evals.json warns and falls back to the default floor", () => {
+  const result = runGateWithSkills({ alpha: '{ truncated' }, elevenRows('alpha'));
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /cannot read alpha's min_pass_rate/);
+  assert.match(result.stdout, /floor 90%/);
+});
+
+test('a missing skills tree falls back to the default floor', () => {
+  const result = runGateWithSkills({}, elevenRows('alpha'));
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /floor 90%/);
+});
+
+test('rows from more than one skill fall back to the default floor', () => {
+  const rows = [...elevenRows('alpha'), ...elevenRows('beta')];
+  const result = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0.5 }) }, rows);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /floor 90%/);
+});
+
+test('an empty, non-numeric or out-of-range floor is rejected, not read as zero or NaN', () => {
+  const ok = [...Array(10)].map((_, i) => row(`ok-${i}`, [choice(true), rule(true)], { skill: 'alpha' }));
+  for (const bad of ['', 'abc', '0', '1.5']) {
+    const result = runGateWithSkills({ alpha: evalsJson() }, ok, bad);
+    assert.equal(result.status, 1, `argv ${JSON.stringify(bad)}`);
+    assert.match(result.stderr, /floor must be a number in \(0, 1\]/);
+  }
+  const zero = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0 }) }, ok);
+  assert.equal(zero.status, 1);
+  assert.match(zero.stderr, /floor must be a number in \(0, 1\]/);
 });
 
 test('an unreadable results file is a hard error', () => {
