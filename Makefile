@@ -32,6 +32,11 @@ set-shell:
 setup:
 	./setup.sh $(ARGS)
 
+# One command for a new exe.dev VM as an @nonreagent host; see the script.
+exe-box:
+	@test -n "$(NAME)" || { echo "usage: make exe-box NAME=<name>"; exit 1; }
+	./scripts/new-exe-box.sh "$(NAME)"
+
 brew-bundle:
 	/opt/homebrew/bin/brew shellenv > /tmp/brew-shell.env
 	source /tmp/brew-shell.env && which brew && brew update && brew bundle
@@ -253,4 +258,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default setup set-shell brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default setup exe-box set-shell brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

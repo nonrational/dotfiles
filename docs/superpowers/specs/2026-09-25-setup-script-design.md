@@ -151,23 +151,23 @@ The `gh` step is that repo's only interactive one. The device flow makes it so; 
 
 ## `scripts/new-exe-box.sh`: one command for a new VM
 
-Lives here, not downstream, because it runs from the Mac with the human's exe.dev key and 1Password session. exe.dev's `new` command takes `--setup-script`, which the default `exeuntu` image runs once at first boot, so the box provisions itself and this script is a wrapper.
+Lives here, not downstream, because it runs from the Mac with the human's exe.dev key and 1Password session. exe.dev's `new` command offers `--setup-script` for first boot, but a first-boot run cannot be watched and a second `setup.sh` started before it finishes would collide in `~/.dotfiles`; the wrapper runs the provisioning itself over ssh instead, sequentially.
 
 ```
 scripts/new-exe-box.sh <name>          # or make exe-box NAME=<name>
 ```
 
-1. `ssh exe.dev new --name <name> --json --setup-script /dev/stdin`, fed one line: the curl-to-bash for nonreagent's `setup.sh`. That run does the unattended part and halts at its `gh` checkpoint with no one watching, which is fine because of step 3.
-2. Poll `ssh -o StrictHostKeyChecking=accept-new <name>.exe.xyz true` until the box answers, with a bounded timeout.
-3. Inject the token over stdin, never through `--env` or the setup script, so it lands only in `gh`'s config on the VM, the same state an interactive login leaves:
+1. `ssh exe.dev new --name <name> --json`. The box comes up bare; no `--setup-script`, so nothing runs before the wrapper can watch it.
+2. Poll `ssh -o StrictHostKeyChecking=accept-new <name>.exe.xyz true` until the box answers, within `EXE_BOX_WAIT` seconds (default 300).
+3. Inject the token over stdin, never through `--env` or an argument, so it lands only in `gh`'s config on the VM, the same state an interactive login leaves:
 
    ```
    op read "op://<vault>/<item>/token" \
      | ssh <name>.exe.xyz 'gh auth login --with-token && gh auth setup-git'
    ```
 
-4. `ssh <name>.exe.xyz ~/.dotfiles/setup.sh`. The `gh` guard now passes and the run finishes through `sync-plugins.sh`. Idempotency is what makes the two-phase first boot work.
-5. Print the name and `https://<name>.exe.xyz`.
+4. `ssh <name>.exe.xyz 'curl -fsSL <nonreagent setup.sh URL> | bash'`. The run is sequential and as the login user, so there is no first-boot race and no second pass.
+5. Print the name and `https://<name>.exe.xyz/`.
 
 The 1Password item path is the script's one configuration value, read from `EXE_BOX_GH_TOKEN_REF` with a default in the script. `op` unlocking is the only human touch.
 
