@@ -5,7 +5,8 @@
 # a row in ../macos-defaults; run `make macos-audit` to compare them against the
 # machine. What is left cannot be expressed as a domain/key/value: nvram,
 # systemsetup, sysadminctl, PlistBuddy, chflags, lsregister, tmutil, and the
-# app restarts. Re-runnable; `make macos` runs it after applying the table.
+# app restarts. Re-runnable; setup.sh (and `make macos`) runs it after the
+# table applies, immediately before the reboot.
 
 # https://macos-defaults.com/
 
