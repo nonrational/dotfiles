@@ -55,9 +55,10 @@ keep the joints.
 
 ## Prohibitions
 
-- **No flex.** Never a sentence that flatters the writer. If a line's real work is showing how generous or sharp you are, cut it.
+- **No flex.** Never a sentence that flatters the writer. If a line's real work is showing how generous or sharp you are, cut it. Thank people rather than reporting that you did: *(Thanks for the idea!)*, not *I let them know, and thanked them for the idea!*
 - **Never claim the reader's reaction.** Make the case and stop. No "this is why you can trust me". Trust is the reader's to award.
 - **No grandiosity.** Don't grant a machine a stake it cannot have.
+- **Don't shrink the work.** A light line that invents a deadline or a scene sells the work as faster, easier or more dramatic than it is: *have your own by lunch*, *proves itself by Tuesday*, *a stranger's shell script by flashlight*. Rueful specificity is true; these are made up. If the work still needs babysitting, the prose says so.
 - **Nothing floral.** "The people who lit my path" is a costume.
 - **Keep the "I".** Agentless policy prose loses the pledge. "The rule applies equally" lost to "I don't apply a quieter rule for probabilistic character generators".
 - **"Just" is banned as a modifier.** It stacks the deck.
@@ -73,6 +74,7 @@ Delight here is specific and a little self-aware. It is never punchy.
 - A joke at your own expense, before anyone else makes it: *I'm sure about this because I've
   been the villain of it.*
 - A joke that lands the argument rather than decorating it: *Slop, ironically, is sloppy.*
+- A verb borrowed from the section's governing image, once: *conjured my own* under a heading about spells, *sprout up* in a section named for a garden. A second one in the same section tips into floral.
 
 ## Lint
 
