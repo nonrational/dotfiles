@@ -7,6 +7,14 @@ export const SKILL_FRAMING = {
     unit: 'comment',
     reply: 'Reply with only the revised code, nothing else.',
   },
+  'code-review-register': {
+    review: 'Review these draft code review comments.',
+    edit: 'Edit this draft code review comment.',
+    detect: 'Review this draft code review.',
+    material: 'Draft',
+    unit: 'comment',
+    reply: 'Reply with only the revised comment, nothing else.',
+  },
   'prose-register': {
     review: 'Review these versions of a prose passage.',
     edit: 'Edit this prose passage.',

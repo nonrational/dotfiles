@@ -187,7 +187,7 @@ test('generates all 24 prose-register tests, rank and structural included', asyn
 });
 
 test('subject prompts never leak an answer-key value the subject cannot already see', async () => {
-  for (const skill of ['code-comment-register', 'prose-register']) {
+  for (const skill of ['code-comment-register', 'prose-register', 'code-review-register']) {
     const evalsPath = findEvalFiles(REPO_ROOT).find((f) => path.basename(path.dirname(f)) === skill);
     const data = loadEvals(evalsPath);
     const casesById = Object.fromEntries(data.cases.map((c) => [c.id, c]));

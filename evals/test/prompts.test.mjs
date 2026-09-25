@@ -132,3 +132,19 @@ test('rank rule rubric uses the rule the worst version breaks', () => {
   const rubric = buildRuleRubric({ id: 'r', type: 'discrimination-rank', expected_rule_for_worst: 'WORST RULE' });
   assert.ok(rubric.includes('WORST RULE'));
 });
+
+test('code-review-register prompts frame the material as a draft review', () => {
+  const skill = 'code-review-register';
+  const disc = buildSubjectPrompt(skill, {
+    id: 'd', type: 'discrimination', prompt: 'P', variants: { a: 'AAA', b: 'BBB' }, correct: 'b', expected_rule: 'r',
+  });
+  assert.ok(disc.prompt.startsWith('Review these draft code review comments. Use the code-review-register skill if it is available.'));
+  const trans = buildSubjectPrompt(skill, { id: 't', type: 'transformation', task: 'T.', input: 'IN' });
+  assert.ok(trans.prompt.startsWith('Edit this draft code review comment. Use the code-review-register skill if it is available.'));
+  assert.ok(trans.prompt.includes('Draft:\nIN'));
+  assert.ok(trans.prompt.includes('Reply with only the revised comment, nothing else.'));
+  const det = buildSubjectPrompt(skill, { id: 'x', type: 'detection', prompt: 'P.', input_document: 'DOC' });
+  assert.ok(det.prompt.startsWith('Review this draft code review. Use the code-review-register skill if it is available.'));
+  assert.ok(det.prompt.includes('Draft:\nDOC'));
+  assert.ok(det.prompt.includes('"<exact offending comment text>"'));
+});
