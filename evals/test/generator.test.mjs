@@ -133,12 +133,12 @@ test('unknown EVAL_SKILL is a hard error', async () => {
   );
 });
 
-test('generates all 22 prose-register tests, rank and structural included', async () => {
+test('generates all 24 prose-register tests, rank and structural included', async () => {
   const tests = await withEnv(
     { EVAL_SKILL: 'prose-register', EVAL_ONLY: undefined, EVAL_TYPES: undefined },
     generateTests,
   );
-  assert.equal(tests.length, 22);
+  assert.equal(tests.length, 24);
   const byType = Object.groupBy(tests, (t) => t.metadata.case_type);
   assert.equal(byType['discrimination-rank'].length, 1);
   assert.equal(byType['discrimination-structural'].length, 2);
@@ -216,6 +216,6 @@ test('only the prose-register cases with an arguable key carry the flag', async 
     generateTests,
   );
   const flagged = tests.filter((t) => t.metadata.arguable === true).map((t) => t.metadata.case_id);
-  assert.deepEqual(flagged.sort(), ['disc-04', 'disc-08', 'disc-09', 'disc-11', 'disc-12']);
+  assert.deepEqual(flagged.sort(), ['disc-04', 'disc-08', 'disc-09', 'disc-11', 'disc-12', 'disc-13', 'disc-14']);
   assert.ok(tests.every((t) => t.metadata.arguable === undefined || t.metadata.arguable === true));
 });
