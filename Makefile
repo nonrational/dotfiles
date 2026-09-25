@@ -27,7 +27,7 @@ check-macos-defaults:
 	@./scripts/macos-defaults.sh check
 
 macos: macos-doctor macos-apply
-	sh .macos
+	./scripts/macos-bootstrap.sh
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
 macos-reset-dock:

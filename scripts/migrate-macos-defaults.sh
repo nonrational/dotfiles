@@ -1,5 +1,6 @@
 #!/bin/bash
-# One-shot: split .macos into the macos-defaults table (default) and the
+# One-shot: split .macos (now scripts/macos-bootstrap.sh) into the
+# macos-defaults table (default) and the
 # imperative lines that stay behind (--remainder). Committed so the 218-row
 # transcription can be reviewed rather than trusted.
 #

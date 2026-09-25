@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# ~/.macos — the imperative remainder. Every `defaults write` that used to live
-# here is now a row in ./macos-defaults; run `make macos-audit` to compare them
-# against the machine. What is left cannot be expressed as a domain/key/value:
-# nvram, systemsetup, PlistBuddy, chflags, lsregister, tmutil, and the app restarts.
-
-# ~/.macos — https://mths.be/macos
+# macOS bootstrap: the imperative remainder of the original ~/.macos
+# (https://mths.be/macos). Every `defaults write` that used to live here is now
+# a row in ../macos-defaults; run `make macos-audit` to compare them against the
+# machine. What is left cannot be expressed as a domain/key/value: nvram,
+# systemsetup, sysadminctl, PlistBuddy, chflags, lsregister, tmutil, and the
+# app restarts. Re-runnable; `make macos` runs it after applying the table.
 
 # https://macos-defaults.com/
 
@@ -17,7 +17,7 @@ osascript -e 'tell application "System Settings" to quit' 2> /dev/null
 # Ask for the administrator password upfront
 sudo -v
 
-# Keep-alive: update existing `sudo` time stamp until `.macos` has finished
+# Keep-alive: update existing `sudo` time stamp until this script has finished
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 ###############################################################################
@@ -25,13 +25,13 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 ###############################################################################
 
 # Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
+sudo nvram StartupMute=%01
 
 # Remove duplicates in the “Open With” menu (also see `lscleanup` alias)
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
 
 # Set the timezone; see `sudo systemsetup -listtimezones` for other values
-sudo systemsetup -settimezone "America/New_York" > /dev/null
+sudo systemsetup -settimezone "America/Los_Angeles" > /dev/null
 
 # Enable snap-to-grid for icons on the desktop and in other icon views
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
@@ -54,17 +54,19 @@ chflags nohidden ~/Library
 # Show the /Volumes folder
 sudo chflags nohidden /Volumes
 
-# Reset Launchpad, but keep the desktop wallpaper intact
-find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
+# Require the password immediately after sleep or the screen saver begins.
+# The old com.apple.screensaver rows are a one-time migration source that
+# loginwindow erases; this is the live setting. Prompts for the login password.
+sysadminctl -screenLock immediate -password -
 
-# Disable local Time Machine backups
+# Disable automatic Time Machine backups (backups run only on demand)
 hash tmutil &> /dev/null && sudo tmutil disable
 
 ###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################
 
-for app in "Activity Monitor" "Address Book" "Calendar" "cfprefsd" "Contacts" "Dock" "Finder" "Google Chrome Canary" "Google Chrome" "Mail" "Messages" "NotificationCenter" "Photos" "Safari" "SystemUIServer" "iCal"; do
+for app in "Activity Monitor" "Calendar" "cfprefsd" "Contacts" "Dock" "Finder" "Google Chrome" "Mail" "Messages" "NotificationCenter" "Photos" "Safari" "SystemUIServer"; do
 	killall "${app}" &> /dev/null
 done
 echo "Done. Note that some of these changes require a logout/restart to take effect."

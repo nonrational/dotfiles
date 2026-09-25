@@ -17,7 +17,7 @@ indent_size = 4
 [{Makefile,.gitmodules}]
 indent_style = tab
 
-[.macos]
+[scripts/macos-bootstrap.sh]
 # Shell continuations in this inherited macOS settings script use tabs.
 indent_style = tab
 

@@ -158,7 +158,7 @@ The 9 unset rows enter as `noaudit=unset` so the baseline is green: `helpviewer 
 
 All 218 `defaults write` lines leave. Roughly 45 lines remain: the System Settings quit, the sudo keepalive, `nvram SystemAudioVolume`, `systemsetup -settimezone`, the nine `PlistBuddy` Finder-view calls, both `chflags`, `lsregister`, the Dock `find -delete`, `tmutil disable`, the closing `killall` loop, and the final echo.
 
-It keeps its filename and gains a header comment pointing at `macos-defaults`. Nothing is symlinked to it — it has no `manifest` entry — so a later rename to `scripts/macos-imperative.sh` costs nothing but muscle memory.
+It keeps its filename and gains a header comment pointing at `macos-defaults`. Nothing is symlinked to it — it has no `manifest` entry — so a later rename to `scripts/macos-imperative.sh` costs nothing but muscle memory. (Renamed to `scripts/macos-bootstrap.sh` on 2026-09-25.)
 
 ## Make targets
 
@@ -196,5 +196,5 @@ Reads fail only for the reason above. Without Full Disk Access, `defaults read c
 - Comparing `array` and `dict` values. Normalizing plist container output is a larger job than drift detection warrants; those rows stay `noaudit=complex`.
 - Per-host rows. The `os=` and `host=` vocabulary parses but no row uses it.
 - Moving the imperative tail (`PlistBuddy`, `nvram`, `chflags`, `systemsetup`) into any declarative form.
-- Renaming `.macos`.
+- Renaming `.macos`. (Done 2026-09-25: `scripts/macos-bootstrap.sh`.)
 - Detecting settings the machine has that the table does not declare. Audit is one-directional: it only checks declared rows against the machine, never the reverse. A green audit means "everything declared is true," not "the machine is fully described."
