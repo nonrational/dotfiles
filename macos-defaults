@@ -731,7 +731,7 @@ org.macosforge.xquartz.X11	enable_iglx	bool	true
 org.x.X11	enable_test_extensions	bool	true
 
 # disable mouse acceleration
-.GlobalPreferences	com.apple.mouse.scaling	float	-1
+.GlobalPreferences	com.apple.mouse.scaling	float	3
 
 ###############################################################################
 # Siri                                                                        #
