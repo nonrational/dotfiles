@@ -37,3 +37,16 @@ test('judge appends a JSON-only instruction so promptfoo can parse the reply', a
   assert.ok(stdin.startsWith('grade this'));
   assert.ok(stdin.endsWith('Reply with only the JSON object.'));
 });
+
+test('EVAL_LOCAL mode runs bare with no --setting-sources or --disable-slash-commands', async () => {
+  process.env.EVAL_CLAUDE_CMD = ECHO;
+  process.env.EVAL_LOCAL = '1';
+  const { output } = await new JudgeProvider().callApi('grade this');
+  delete process.env.EVAL_CLAUDE_CMD;
+  delete process.env.EVAL_LOCAL;
+  const { args } = JSON.parse(output);
+  assert.deepEqual(args, [
+    '-p', '--output-format', 'json', '--model', JUDGE_MODEL,
+    '--bare', '--tools', '', '--no-session-persistence',
+  ]);
+});

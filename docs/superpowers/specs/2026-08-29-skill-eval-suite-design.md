@@ -100,6 +100,10 @@ Because a discrimination case now carries both kinds of assert, `check-gate` cla
 - `make eval SKILL=<name>` — one skill's full suite locally. Locally the developer's logged-in Claude Code session authenticates both subject and judge; `evals/.env` is optional.
 - CI: a new `evals` job on pull requests, ubuntu only, advisory (not a required check). It computes the affected skills: a change under `home/.agents/skills/<skill>/**` selects that skill if it has an `evals.json`, and a change under `evals/**` selects every evaluated skill. It runs `make eval SKILL=<name>` per affected skill as a matrix, installs the `claude` CLI from npm, authenticates with `CLAUDE_CODE_OAUTH_TOKEN` from repo secrets, and uploads `evals/results/latest.json` as a build artifact. Runs draw on the subscription's usage limits: roughly 25–30 `claude -p` sessions per skill including judge calls. Repo secrets never reach fork PRs; the job skips cleanly when the secret is absent.
 
+### Local mode
+
+`make eval-local SKILL=<name>` is a free authoring loop against a local Ollama model, not a reference run. Both providers run `claude --bare` with `--tools ''`, and the subject puts the skill's `SKILL.md` in the system prompt (`--append-system-prompt-file`) instead of behind the Skill tool, since a local model loses the task after a large tool result. A probe (2026-09-25) had two local models answer a discrimination case correctly in one turn under this bare-plus-system-prompt setup, after both failed the same case under the Skill tool loop.
+
 ### Retirement
 
 Each skill's `run-evals.mjs` is deleted once that skill passes through promptfoo: `code-comment-register`'s in Phase 1, `prose-register`'s in Phase 2 once every case type (including rank and structural) runs cleanly. Their transcript/`results/` conventions retire with them; promptfoo's own output takes over.

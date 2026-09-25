@@ -15,11 +15,16 @@ export default class JudgeProvider {
 
   async callApi(prompt) {
     const model = process.env.EVAL_JUDGE_MODEL || JUDGE_MODEL;
-    const args = [
-      '-p', '--output-format', 'json', '--model', model,
-      '--tools', '', '--disable-slash-commands', '--no-session-persistence',
-      '--setting-sources', 'project',
-    ];
+    // Bare mode skips hooks and works against a local endpoint (no OAuth
+    // involved); see the matching comment in providers/subject.mjs. This is
+    // an authoring-loop mode, not a reference run.
+    const args = process.env.EVAL_LOCAL
+      ? ['-p', '--output-format', 'json', '--model', model, '--bare', '--tools', '', '--no-session-persistence']
+      : [
+          '-p', '--output-format', 'json', '--model', model,
+          '--tools', '', '--disable-slash-commands', '--no-session-persistence',
+          '--setting-sources', 'project',
+        ];
     // claude -p sometimes wraps the grader's JSON in prose, which promptfoo
     // cannot parse; the suffix is the cheapest nudge back to bare JSON.
     return runClaude({ args, prompt: `${prompt}\n\nReply with only the JSON object.`, cwd: os.tmpdir() });
