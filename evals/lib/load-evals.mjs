@@ -1,7 +1,13 @@
 import { readFileSync, readdirSync, existsSync, lstatSync } from 'node:fs';
 import path from 'node:path';
 
-export const SUPPORTED_TYPES = new Set(['discrimination', 'transformation', 'detection']);
+export const SUPPORTED_TYPES = new Set([
+  'discrimination',
+  'discrimination-structural',
+  'discrimination-rank',
+  'transformation',
+  'detection',
+]);
 
 export function findEvalFiles(repoRoot) {
   const skillsDir = path.join(repoRoot, 'home/.agents/skills');
@@ -47,7 +53,7 @@ export function validateData(data) {
       continue;
     }
 
-    if (item.type === 'discrimination') {
+    if (item.type === 'discrimination' || item.type === 'discrimination-structural') {
       requireField(item.prompt, `${item.id}.prompt`);
       requireField(item.expected_rule, `${item.id}.expected_rule`);
       if (!item.variants || Object.keys(item.variants).length < 2) {
@@ -55,6 +61,19 @@ export function validateData(data) {
       }
       if (!Object.hasOwn(item.variants, item.correct)) {
         throw new Error(`${item.id}.correct does not name a variant`);
+      }
+    }
+
+    if (item.type === 'discrimination-rank') {
+      requireField(item.prompt, `${item.id}.prompt`);
+      requireField(item.expected_rule_for_worst, `${item.id}.expected_rule_for_worst`);
+      const stages = Object.keys(item.stages ?? {});
+      if (stages.length < 2) {
+        throw new Error(`${item.id}.stages must contain at least two choices`);
+      }
+      const ranking = Array.isArray(item.correct_ranking) ? item.correct_ranking : [];
+      if ([...ranking].sort().join('\n') !== [...stages].sort().join('\n')) {
+        throw new Error(`${item.id}.correct_ranking must order every stage exactly once`);
       }
     }
 

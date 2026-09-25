@@ -1,11 +1,23 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { findEvalFiles, loadEvals, validateData, SUPPORTED_TYPES } from './lib/load-evals.mjs';
-import { buildSubjectPrompt, buildTransformationRubric } from './lib/prompts.mjs';
+import { buildSubjectPrompt, buildTransformationRubric, buildRuleRubric } from './lib/prompts.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const JUDGE_PROVIDER = 'anthropic:messages:claude-sonnet-5';
+const JUDGE_PROVIDER = 'file://providers/judge.mjs';
 const RUBRIC_THRESHOLD = 0.75;
+
+// promptfoo renders every var value and every llm-rubric value as nunjucks; case text
+// (e.g. Hugo shortcodes in prose-register's documents) must pass through literally.
+const literal = (text) => `{% raw %}${text}{% endraw %}`;
+
+const judged = (value, metric) => ({
+  type: 'llm-rubric',
+  value: literal(value),
+  metric,
+  threshold: RUBRIC_THRESHOLD,
+  provider: JUDGE_PROVIDER,
+});
 
 function csvEnv(name) {
   const raw = process.env[name];
@@ -45,28 +57,25 @@ export default async function generateTests() {
     const { prompt, letterToKey } = buildSubjectPrompt(data.skill, item);
     const base = {
       description: `${item.id} (${item.type})`,
-      vars: { subject_prompt: prompt },
+      vars: { subject_prompt: literal(prompt) },
       metadata: { skill: data.skill, case_id: item.id, case_type: item.type },
     };
 
-    if (item.type === 'discrimination') {
+    if (item.type.startsWith('discrimination')) {
       base.vars.letter_to_key = letterToKey;
-      base.vars.correct = item.correct;
-      base.vars.expected_rule = item.expected_rule;
-      base.assert = [{ type: 'javascript', value: 'file://asserts/discrimination.mjs' }];
+      // promptfoo expands array vars into one test per element; join to a string to keep one row per case.
+      if (item.type === 'discrimination-rank') base.vars.correct_ranking = item.correct_ranking.join(',');
+      else base.vars.correct = item.correct;
+      base.assert = [
+        { type: 'javascript', value: 'file://asserts/discrimination.mjs', metric: 'choice' },
+        judged(buildRuleRubric(item), 'rule'),
+      ];
     } else if (item.type === 'detection') {
       base.vars.violations = item.violations;
       base.vars.traps = item.traps;
       base.assert = [{ type: 'javascript', value: 'file://asserts/detection.mjs' }];
     } else {
-      base.assert = [
-        {
-          type: 'llm-rubric',
-          value: buildTransformationRubric(item),
-          threshold: RUBRIC_THRESHOLD,
-          provider: JUDGE_PROVIDER,
-        },
-      ];
+      base.assert = [judged(buildTransformationRubric(item), 'rubric')];
     }
 
     return base;

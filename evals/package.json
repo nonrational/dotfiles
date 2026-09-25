@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Promptfoo-based eval suite for skills in home/.agents/skills",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test test/*.test.mjs"
   },
   "devDependencies": {
     "promptfoo": "^0.123.1"

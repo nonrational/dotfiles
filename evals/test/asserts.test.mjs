@@ -6,35 +6,53 @@ import assertDetection from '../asserts/detection.mjs';
 const discVars = {
   letter_to_key: { A: 'generic_comment', B: 'no_comment' },
   correct: 'no_comment',
-  expected_rule: 'No comment is a valid result; delete generic tradeoffs that do not explain the chosen value.',
 };
 
-test('discrimination passes on correct letter and overlapping rule', () => {
-  const output = 'ANSWER: B\nRULE: Delete the generic tradeoff; no comment is a valid result.';
+test('discrimination passes on the correct letter whatever the rule says', () => {
+  const output = 'ANSWER: B\nRULE: Brevity wins everywhere.';
   const result = assertDiscrimination(output, { vars: discVars });
   assert.equal(result.pass, true);
   assert.equal(result.score, 1);
 });
 
 test('discrimination fails on the wrong letter', () => {
-  const output = 'ANSWER: A\nRULE: Delete generic tradeoffs; no comment is a valid result.';
-  const result = assertDiscrimination(output, { vars: discVars });
+  const result = assertDiscrimination('ANSWER: A\nRULE: whatever', { vars: discVars });
   assert.equal(result.pass, false);
   assert.equal(result.score, 0);
-});
-
-test('discrimination half-scores a correct letter with an unrelated rule', () => {
-  const output = 'ANSWER: B\nRULE: Brevity wins everywhere.';
-  const result = assertDiscrimination(output, { vars: discVars });
-  assert.equal(result.pass, false);
-  assert.equal(result.score, 0.5);
-  assert.match(result.reason, /weak rule match/);
+  assert.match(result.reason, /expected no_comment/);
 });
 
 test('discrimination fails cleanly when no ANSWER line is present', () => {
   const result = assertDiscrimination('I refuse to pick.', { vars: discVars });
   assert.equal(result.pass, false);
   assert.match(result.reason, /No ANSWER line/);
+});
+
+const rankVars = {
+  letter_to_key: { A: 'original', B: 'over_tight', C: 'restored' },
+  correct_ranking: 'restored,original,over_tight',
+};
+
+test('rank passes on the exact best-first ordering', () => {
+  const result = assertDiscrimination('ANSWER: C, A, B\nRULE: r', { vars: rankVars });
+  assert.equal(result.pass, true);
+});
+
+test('rank fails on any other ordering', () => {
+  const result = assertDiscrimination('ANSWER: C, B, A\nRULE: r', { vars: rankVars });
+  assert.equal(result.pass, false);
+  assert.match(result.reason, /expected restored > original > over_tight/);
+});
+
+test('single choice ignores words on the ANSWER line', () => {
+  const result = assertDiscrimination('ANSWER: Version B\nRULE: r', { vars: discVars });
+  assert.equal(result.pass, true);
+});
+
+test('discrimination reads the last ANSWER line, not one echoed from the format template', () => {
+  const output = 'Format: ANSWER: <letter>\n...\nANSWER: B\nRULE: r';
+  const result = assertDiscrimination(output, { vars: discVars });
+  assert.equal(result.pass, true);
 });
 
 const detVars = {
