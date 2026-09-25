@@ -155,6 +155,130 @@ test_set_shell_requires_brew_bash() {
     fi
 }
 
+# --- setup-lib.sh ----------------------------------------------------------
+
+# A minimal sourcing script: two guards, three runs, and both OS entry points.
+lib_fixture() {
+    mkdir -p "$SB/repo/scripts"
+    cp "$ROOT/scripts/setup-lib.sh" "$SB/repo/scripts/"
+    cp "$ROOT/scripts/host-id.sh" "$SB/repo/scripts/"
+    cat > "$SB/repo/fixture.sh" <<'EOF'
+#!/bin/bash
+set -euf -o pipefail
+SETUP_ROOT="$(cd "$(dirname "$0")" && pwd)"
+. "$SETUP_ROOT/scripts/setup-lib.sh"
+holds() { return 0; }
+fails() { return 1; }
+run_a() { echo "ran a"; }
+run_b() { echo "ran b"; }
+run_c() { echo "ran c"; }
+setup_darwin() {
+    step "a" holds run_a
+    step "b" fails run_b
+    first_run_step "c" run_c
+    if [ "${FIXTURE_CHECKPOINT:-0}" = 1 ]; then checkpoint 7 "do the thing"; fi
+    echo "after checkpoint"
+}
+setup_linux() { echo "linux path"; }
+run_setup "$@"
+EOF
+    chmod +x "$SB/repo/fixture.sh"
+}
+
+# Run the fixture with a stubbed uname and the sandbox HOME.
+fixture() {
+    set +e
+    out="$(HOME="$FAKEHOME" PATH="$SB/bin:$PATH" "$SB/repo/fixture.sh" "$@" 2>&1 </dev/null)"
+    status=$?
+    set -e
+}
+
+test_step_skips_runs_and_reports() {
+    sandbox; lib_fixture; stub uname Darwin
+    fixture
+    if [ "$status" -eq 0 ] && echo "$out" | grep -q '^skip: a$' && echo "$out" | grep -q '^run: b$' \
+        && echo "$out" | grep -q '^ran b$' && ! echo "$out" | grep -q 'ran a'; then
+        ok "step skips when the guard holds and runs when it fails"
+    else
+        bad "step: status=$status out=$out"
+    fi
+}
+
+test_dry_run_would_not_run() {
+    sandbox; lib_fixture; stub uname Darwin
+    fixture --dry-run
+    if [ "$status" -eq 0 ] && echo "$out" | grep -q '^would: b$' && ! echo "$out" | grep -q 'ran b'; then
+        ok "--dry-run prints would: and runs nothing"
+    else
+        bad "dry-run: status=$status out=$out"
+    fi
+}
+
+test_first_run_step_is_gated() {
+    sandbox; lib_fixture; stub uname Darwin
+    fixture
+    local off="$out"
+    SETUP_FIRST_RUN=1 fixture
+    if echo "$off" | grep -q '^skip: c (first run only)$' && echo "$out" | grep -q '^ran c$'; then
+        ok "first_run_step runs only when SETUP_FIRST_RUN=1"
+    else
+        bad "first_run: off=$off on=$out"
+    fi
+}
+
+test_checkpoint_halts_with_exit_1() {
+    sandbox; lib_fixture; stub uname Darwin
+    FIXTURE_CHECKPOINT=1 fixture
+    if [ "$status" -eq 1 ] && echo "$out" | grep -q '^checkpoint 7: do the thing$' \
+        && echo "$out" | grep -q '^re-run .*fixture\.sh when done\.$' && ! echo "$out" | grep -q 'after checkpoint'; then
+        ok "checkpoint prints its instruction and exits 1 before later steps"
+    else
+        bad "checkpoint: status=$status out=$out"
+    fi
+}
+
+test_converged_line_and_linux_dispatch() {
+    sandbox; lib_fixture; stub uname Linux
+    fixture
+    if [ "$status" -eq 0 ] && echo "$out" | grep -q '^linux path$' && echo "$out" | grep -q '^setup: converged (Linux)$'; then
+        ok "run_setup dispatches on uname and prints the converged line"
+    else
+        bad "dispatch: status=$status out=$out"
+    fi
+}
+
+test_unknown_flag_is_usage_error() {
+    sandbox; lib_fixture; stub uname Darwin
+    fixture --bogus
+    if [ "$status" -eq 2 ] && echo "$out" | grep -q '^usage: setup.sh'; then
+        ok "an unknown flag prints usage and exits 2"
+    else
+        bad "usage: status=$status out=$out"
+    fi
+}
+
+test_unsupported_os_fails() {
+    sandbox; lib_fixture; stub uname Plan9
+    fixture
+    if [ "$status" -eq 1 ] && echo "$out" | grep -q 'unsupported OS Plan9'; then
+        ok "an unsupported OS exits 1 with its name"
+    else
+        bad "unsupported: status=$status out=$out"
+    fi
+}
+
+test_run_without_tty_survives() {
+    # fixture() already redirects stdin from /dev/null; with no controlling
+    # terminal (CI) the /dev/tty reopen must be skipped, not fatal.
+    sandbox; lib_fixture; stub uname Linux
+    fixture
+    if [ "$status" -eq 0 ]; then
+        ok "a run with stdin not a tty completes"
+    else
+        bad "no-tty: status=$status out=$out"
+    fi
+}
+
 test_link_karabiner_is_idempotent
 test_link_karabiner_refuses_real_directory
 test_link_sublime_skips_existing_clone
@@ -163,6 +287,14 @@ test_brew_install_skips_when_present
 test_set_shell_skips_when_already_set
 test_set_shell_appends_and_changes
 test_set_shell_requires_brew_bash
+test_step_skips_runs_and_reports
+test_dry_run_would_not_run
+test_first_run_step_is_gated
+test_checkpoint_halts_with_exit_1
+test_converged_line_and_linux_dispatch
+test_unknown_flag_is_usage_error
+test_unsupported_os_fails
+test_run_without_tty_survives
 
 echo
 echo "$pass passed, $fail failed"
