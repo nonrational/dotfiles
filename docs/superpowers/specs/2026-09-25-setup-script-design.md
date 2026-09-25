@@ -57,14 +57,14 @@ The OS branch is by `uname`, the way the manifest's `os=` condition is.
 
 ### Split: `scripts/setup-lib.sh` holds the harness, `setup.sh` holds the steps
 
-The harness is the reusable part and the tricky shell: self-clone, `/dev/tty` prompts, the first-run flag, `step`, `checkpoint`, the runner, `--dry-run`. The steps are repo-specific. They are separate files from the first commit so nonreagent can vendor the harness the way it already vendors `deploy.sh` and `scripts/host-id.sh` (see Downstream).
+The harness is the reusable part and the tricky shell: `/dev/tty` prompts, the first-run flag, `step`, `checkpoint`, the runner, `--dry-run`. The self-clone is the one piece that cannot live there, because under `curl | bash` no lib exists on disk yet; it is a short function at the top of each `setup.sh`, parameterized by `SETUP_REPO_URL` and `SETUP_CLONE_DIR`. The steps are repo-specific. They are separate files from the first commit so nonreagent can vendor the harness the way it already vendors `deploy.sh` and `scripts/host-id.sh` (see Downstream).
 
 `setup-lib.sh` exposes four functions and nothing else:
 
 - `step <name> <guard-fn> <run-fn>`: if the guard exits 0, print `skip: <name>` and move on; otherwise run, or under `--dry-run` print `would: <name>`.
 - `first_run_step <name> <run-fn>`: as `step`, but only when `SETUP_FIRST_RUN=1`; otherwise print `skip: <name> (first run only)`.
 - `checkpoint <n> <message>`: print the numbered instruction, tell the user to re-run `setup.sh`, exit 1.
-- `run_setup`: the self-bootstrap check, the OS dispatch to `setup_darwin` or `setup_linux`, and the summary line.
+- `run_setup`: argument parsing, the `/dev/tty` reopen, the OS dispatch to `setup_darwin` or `setup_linux`, and the summary line.
 
 The step and guard functions live in `setup.sh` and call make targets. `setup.sh` contributes ordering, `brew shellenv`, the checkpoints, and the first-run gate. Nothing else.
 
@@ -84,8 +84,8 @@ The step and guard functions live in `setup.sh` and call make targets. `setup.sh
 12. First run only: `restore-preferences`, then `macos-reset-dock`.
 13. `macos-disable-restore-apps-on-login`. Guard: the ByHost loginwindow files are empty and immutable.
 14. `macos-doctor`. On failure: checkpoint 2, "grant Full Disk Access to this terminal, restart it, then re-run".
-15. `macos-apply`, then `scripts/macos-bootstrap.sh`.
-16. Reboot: checkpoint 3 by nature. The script prints that it is rebooting and runs the existing osascript.
+15. `macos-apply`, then `scripts/macos-bootstrap.sh`. Guard: `scripts/macos-defaults.sh audit` exits 0, the same pattern `deploy` uses; it runs after the doctor step so Full Disk Access is already granted.
+16. Reboot: checkpoint 3 by nature. Runs only when this run applied the table (step 15's own flag, not the audit), so a Mac that was already converged before this run skips it instead of rebooting every re-run. The script prints that it is rebooting and runs the existing osascript.
 
 The `make macos` target keeps working on its own (doctor, apply, bootstrap, reboot) but `setup.sh` calls its three parts separately so the doctor failure is a checkpoint rather than a make error.
 
@@ -110,7 +110,7 @@ The self-clone is the only thing that sets `SETUP_FIRST_RUN`. The two destructiv
 
 ### Checkpoints
 
-A checkpoint prints one numbered instruction, says "re-run setup.sh when done", and exits 1. Re-running starts from the top; every earlier step is a no-op by then, so there is no state file to keep or corrupt. Exit 1 rather than 0 so a wrapper (CI, the exe-box script) can tell "halted for a human" from "converged".
+A checkpoint prints one numbered instruction, says how to re-run it (the curl line before a clone exists, the script's own path after), and exits 1. Re-running starts from the top; every earlier step is a no-op by then, so there is no state file to keep or corrupt. Exit 1 rather than 0 so a wrapper (CI, the exe-box script) can tell "halted for a human" from "converged".
 
 ### `--dry-run`
 

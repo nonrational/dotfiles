@@ -279,6 +279,218 @@ test_run_without_tty_survives() {
     fi
 }
 
+# --- setup.sh --------------------------------------------------------------
+
+# A sandbox repo: the real setup.sh and lib, a stub deploy.sh whose audit
+# result is $STUB_DEPLOY_AUDIT (0/1), a stub scripts/macos-defaults.sh whose
+# audit result is $STUB_MACOS_AUDIT (0/1), a stub macos-bootstrap.sh, a
+# karabiner dir, one declared submodule, and a .git dir so the checkout
+# detection holds.
+setup_repo() {
+    REPO="$SB/repo"
+    mkdir -p "$REPO/scripts" "$REPO/karabiner" "$REPO/.git" "$REPO/etc/sub"
+    cp "$ROOT/setup.sh" "$REPO/setup.sh"
+    cp "$ROOT/scripts/setup-lib.sh" "$ROOT/scripts/host-id.sh" "$REPO/scripts/"
+    printf '[submodule "sub"]\n\tpath = etc/sub\n\turl = x\n' > "$REPO/.gitmodules"
+    printf '#!/bin/bash\necho "deploy.sh $*" >> "%s"\n[ "$1" = audit ] && exit "${STUB_DEPLOY_AUDIT:-1}"\nexit 0\n' "$LOG" > "$REPO/deploy.sh"
+    printf '#!/bin/bash\necho "macos-defaults.sh $*" >> "%s"\n[ "$1" = audit ] && exit "${STUB_MACOS_AUDIT:-1}"\nexit 0\n' "$LOG" > "$REPO/scripts/macos-defaults.sh"
+    printf '#!/bin/bash\necho "macos-bootstrap.sh" >> "%s"\n' "$LOG" > "$REPO/scripts/macos-bootstrap.sh"
+    chmod +x "$REPO/deploy.sh" "$REPO/scripts/macos-defaults.sh" "$REPO/scripts/macos-bootstrap.sh"
+    printf '#!/bin/bash\n[ "$1" = shellenv ] && exit 0\n' > "$SB/brew"; chmod +x "$SB/brew"
+    printf '#!/bin/bash\n' > "$SB/bash"; chmod +x "$SB/bash"
+    echo "$SB/bash" > "$SB/shells"
+}
+
+# Stubs describing a fully converged Mac; tests knock out one at a time.
+converged_mac() {
+    stub uname Darwin
+    stub xcode-select
+    stub make
+    stub dscl "UserShell: $SB/bash"
+    stub launchctl "org.nonrational.clipboard-bridge"
+    stub gh
+    stub osascript
+    echo x > "$REPO/etc/sub/file"
+    mkdir -p "$FAKEHOME/.config" "$FAKEHOME/.sublime3/.git" "$FAKEHOME/Library/Application Support" "$FAKEHOME/Library/Preferences/ByHost"
+    ln -s "$REPO/karabiner" "$FAKEHOME/.config/karabiner"
+    ln -s "$FAKEHOME/.sublime3" "$FAKEHOME/Library/Application Support/Sublime Text"
+    : > "$FAKEHOME/Library/Preferences/ByHost/com.apple.loginwindow.ABC.plist"
+    export STUB_DEPLOY_AUDIT=0
+    export STUB_MACOS_AUDIT=0
+}
+
+setup_run() {
+    set +e
+    out="$(HOME="$FAKEHOME" PATH="$SB/bin:$PATH" SETUP_BREW="$SB/brew" SETUP_BREW_BASH="$SB/bash" \
+        SETUP_ETC_SHELLS="$SB/shells" "$REPO/setup.sh" "$@" 2>&1 </dev/null)"
+    status=$?
+    set -e
+}
+
+# The make targets, in the order setup.sh must call them on a Mac that has
+# nothing yet (first run, deploy audit failing, every guard false).
+MAC_ORDER="brew-install brew-bundle set-shell init-submodules deploy link-karabiner clipboard-bridge link-sublime restore-preferences macos-reset-dock macos-disable-restore-apps-on-login macos-doctor macos-apply"
+
+test_mac_runs_every_target_in_order_on_first_run() {
+    sandbox; setup_repo
+    rm "$SB/brew"
+    stub uname Darwin; stub xcode-select; stub make; stub dscl "UserShell: /bin/zsh"; stub launchctl; stub gh; stub osascript
+    export STUB_DEPLOY_AUDIT=1 STUB_FAIL='gh auth status'
+    SETUP_FIRST_RUN=1 setup_run
+    unset STUB_FAIL
+    local targets
+    targets="$(grep '^make -C' "$LOG" | awk '{print $4}' | tr '\n' ' ' | sed 's/ $//')"
+    if [ "$status" -eq 0 ] && [ "$targets" = "$MAC_ORDER" ] && grep -q '^gh auth login$' "$LOG" \
+        && grep -q '^macos-bootstrap.sh$' "$LOG" && grep -q '^osascript' "$LOG"; then
+        ok "first run on a bare Mac calls every target in order, then bootstrap and reboot"
+    else
+        bad "mac order: status=$status targets=[$targets] out=$out"
+    fi
+}
+
+test_mac_converged_is_all_skips() {
+    sandbox; setup_repo; converged_mac
+    setup_run
+    if [ "$status" -eq 0 ] && ! grep -q '^make -C .* \(brew-install\|set-shell\|init-submodules\|deploy\|link-karabiner\|clipboard-bridge\|link-sublime\|macos-disable-restore-apps-on-login\)$' "$LOG" \
+        && ! grep -q '^gh auth login' "$LOG" && ! grep -q 'restore-preferences\|macos-reset-dock' "$LOG" \
+        && ! grep -q 'macos-apply' "$LOG" && ! grep -q '^osascript' "$LOG" \
+        && echo "$out" | grep -q '^skip: restore-preferences (first run only)$'; then
+        ok "a converged Mac skips every guarded target and the first-run steps"
+    else
+        bad "converged: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_mac_dry_run_runs_nothing() {
+    sandbox; setup_repo
+    stub uname Darwin; stub xcode-select; stub make; stub dscl "UserShell: /bin/zsh"; stub launchctl; stub gh; stub osascript
+    export STUB_DEPLOY_AUDIT=1 STUB_MACOS_AUDIT=1
+    setup_run --dry-run
+    if [ "$status" -eq 0 ] && ! grep -q '^make' "$LOG" && ! grep -q '^osascript' "$LOG" \
+        && echo "$out" | grep -q '^would: deploy$' && echo "$out" | grep -q '^would: reboot$'; then
+        ok "--dry-run reports every pending step and calls no target"
+    else
+        bad "dry-run: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_missing_clt_is_checkpoint_1() {
+    sandbox; setup_repo
+    stub uname Darwin; stub xcode-select; stub make
+    STUB_FAIL='xcode-select -p' setup_run
+    if [ "$status" -eq 1 ] && echo "$out" | grep -q '^checkpoint 1: ' && grep -q '^xcode-select --install' "$LOG" && ! grep -q '^make' "$LOG"; then
+        ok "missing Command Line Tools halts at checkpoint 1 before any target"
+    else
+        bad "clt: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_doctor_failure_is_checkpoint_2() {
+    sandbox; setup_repo; converged_mac
+    STUB_FAIL="make -C $REPO macos-doctor" setup_run
+    if [ "$status" -eq 1 ] && echo "$out" | grep -q '^checkpoint 2: .*Full Disk Access' && ! grep -q 'macos-apply' "$LOG"; then
+        ok "a failing macos-doctor halts at checkpoint 2 before apply"
+    else
+        bad "doctor: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_failed_step_stops_run() {
+    sandbox; setup_repo; converged_mac
+    export STUB_DEPLOY_AUDIT=1
+    STUB_EXIT=2 STUB_FAIL="make -C $REPO deploy" setup_run
+    if [ "$status" -ne 0 ] && [ "$status" -ne 1 ] && ! grep -q 'link-karabiner\|macos-doctor' "$LOG"; then
+        ok "a failing step stops the run with its own exit code, not the checkpoint's"
+    else
+        bad "failed step: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_linux_runs_only_submodules_and_deploy() {
+    sandbox; setup_repo
+    stub uname Linux; stub make
+    export STUB_DEPLOY_AUDIT=1
+    SETUP_FIRST_RUN=1 setup_run
+    local targets
+    targets="$(grep '^make -C' "$LOG" | awk '{print $4}' | tr '\n' ' ' | sed 's/ $//')"
+    if [ "$status" -eq 0 ] && [ "$targets" = "init-submodules deploy" ]; then
+        ok "Linux runs init-submodules and deploy and nothing else"
+    else
+        bad "linux: status=$status targets=[$targets] out=$out"
+    fi
+}
+
+# Piped runs: `cat setup.sh | bash` from outside any checkout.
+pipe_run() {
+    set +e
+    out="$(cd "$SB" && cat "$ROOT/setup.sh" | HOME="$FAKEHOME" PATH="$SB/bin:$PATH" \
+        SETUP_REPO_URL="https://example.invalid/dotfiles" bash -s -- "$@" 2>&1)"
+    status=$?
+    set -e
+}
+
+# A git stub whose clone creates a fake checkout with a setup.sh that reports
+# how it was exec'd.
+stub_git_clone() {
+    cat > "$SB/bin/git" <<EOF
+#!/bin/bash
+echo "git \$*" >> "$LOG"
+if [ "\$1" = clone ]; then
+    mkdir -p "\$3/.git"
+    cat > "\$3/setup.sh" <<'INNER'
+#!/bin/bash
+echo "exec-ed first_run=\${SETUP_FIRST_RUN:-0} args=\$*"
+INNER
+    chmod +x "\$3/setup.sh"
+fi
+EOF
+    chmod +x "$SB/bin/git"
+}
+
+test_pipe_clones_and_execs_as_first_run() {
+    sandbox; stub uname Linux; stub_git_clone
+    pipe_run
+    if [ "$status" -eq 0 ] && grep -q "^git clone https://example.invalid/dotfiles $FAKEHOME/.dotfiles$" "$LOG" \
+        && echo "$out" | grep -q '^exec-ed first_run=1 args=$'; then
+        ok "piped from outside a checkout, setup.sh clones and execs the clone as a first run"
+    else
+        bad "pipe clone: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_pipe_reuses_existing_clone() {
+    sandbox; stub uname Linux; stub_git_clone
+    mkdir -p "$FAKEHOME/.dotfiles/.git"
+    printf '#!/bin/bash\necho "exec-ed first_run=${SETUP_FIRST_RUN:-0} args=$*"\n' > "$FAKEHOME/.dotfiles/setup.sh"
+    chmod +x "$FAKEHOME/.dotfiles/setup.sh"
+    pipe_run
+    if [ "$status" -eq 0 ] && ! grep -q '^git clone' "$LOG" && echo "$out" | grep -q '^exec-ed first_run=0 args=$'; then
+        ok "piped with ~/.dotfiles present, setup.sh execs it without marking a first run"
+    else
+        bad "pipe reuse: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_pipe_dry_run_does_not_clone() {
+    sandbox; stub uname Linux; stub_git_clone
+    pipe_run --dry-run
+    if [ "$status" -eq 0 ] && ! grep -q '^git clone' "$LOG" && echo "$out" | grep -q '^would: clone https://example.invalid/dotfiles'; then
+        ok "piped --dry-run reports the clone and does nothing"
+    else
+        bad "pipe dry-run: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_pipe_on_mac_without_clt_is_checkpoint_1() {
+    sandbox; stub uname Darwin; stub xcode-select; stub_git_clone
+    STUB_FAIL='xcode-select -p' pipe_run
+    if [ "$status" -eq 1 ] && echo "$out" | grep -q '^checkpoint 1: ' && ! grep -q '^git clone' "$LOG"; then
+        ok "piped on a Mac without Command Line Tools halts at checkpoint 1 before cloning"
+    else
+        bad "pipe clt: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
 test_link_karabiner_is_idempotent
 test_link_karabiner_refuses_real_directory
 test_link_sublime_skips_existing_clone
@@ -295,6 +507,17 @@ test_converged_line_and_linux_dispatch
 test_unknown_flag_is_usage_error
 test_unsupported_os_fails
 test_run_without_tty_survives
+test_mac_runs_every_target_in_order_on_first_run
+test_mac_converged_is_all_skips
+test_mac_dry_run_runs_nothing
+test_missing_clt_is_checkpoint_1
+test_doctor_failure_is_checkpoint_2
+test_failed_step_stops_run
+test_linux_runs_only_submodules_and_deploy
+test_pipe_clones_and_execs_as_first_run
+test_pipe_reuses_existing_clone
+test_pipe_dry_run_does_not_clone
+test_pipe_on_mac_without_clt_is_checkpoint_1
 
 echo
 echo "$pass passed, $fail failed"
