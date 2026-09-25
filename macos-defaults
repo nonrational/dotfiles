@@ -113,12 +113,9 @@ com.apple.AppleMultitouchTrackpad	TrackpadThreeFingerVertSwipeGesture	bool	true
 com.apple.AppleMultitouchTrackpad	TrackpadTwoFingerDoubleTapGesture	bool	false
 com.apple.AppleMultitouchTrackpad	TrackpadTwoFingerFromRightEdgeSwipeGesture	bool	false
 
-# Increase sound quality for Bluetooth headphones/headsets
-com.apple.BluetoothAudioAgent	Apple Bitpool Min (editable)	int	40
-
 # Enable full keyboard access for all controls
 # (e.g. enable Tab in modal dialogs)
-NSGlobalDomain	AppleKeyboardUIMode	int	3
+NSGlobalDomain	AppleKeyboardUIMode	int	2
 
 # Disable press-and-hold for keys in favor of key repeat
 NSGlobalDomain	ApplePressAndHoldEnabled	bool	false
@@ -188,9 +185,11 @@ NSGlobalDomain	AppleMetricUnits	bool	false
 # Screen                                                                      #
 ###############################################################################
 
-# Require password immediately after sleep or screen saver begins
-com.apple.screensaver	askForPassword	int	1
-com.apple.screensaver	askForPasswordDelay	int	0
+# Require password immediately after sleep or screen saver begins:
+# not a defaults row any more. loginwindow reads askForPassword and
+# askForPasswordDelay once as a migration source and then erases them; the
+# live value is a per-user grace period set by `sysadminctl -screenLock`,
+# which scripts/macos-bootstrap.sh runs.
 
 # Save screenshots to the desktop
 com.apple.screencapture	location	string	${HOME}/Desktop
@@ -201,12 +200,10 @@ com.apple.screencapture	type	string	png
 # Disable shadow in screenshots
 com.apple.screencapture	disable-shadow	bool	true
 
-# Enable subpixel font rendering on non-Apple LCDs
+# Lighter font smoothing (0 = off, 1 = light, 2 = medium, 3 = strong).
+# Subpixel rendering left with Mojave; this only sets stroke weight now.
 # Reference: https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
 NSGlobalDomain	AppleFontSmoothing	int	1
-
-# Enable HiDPI display modes (requires restart)
-/Library/Preferences/com.apple.windowserver	DisplayResolutionEnabled	bool	true
 
 ###############################################################################
 # Finder                                                                      #
@@ -385,6 +382,10 @@ com.apple.dock	wvous-bl-modifier	int	0
 ###############################################################################
 # Safari & WebKit                                                             #
 ###############################################################################
+# Dropped 2026-09-25, no longer read by Safari 26: Top Sites (gone in Safari
+# 14), plug-ins (14), Java (12), Do Not Track (12.1), extension auto-update
+# (13, extensions come from the App Store), and the inline-playback rows
+# (per-site autoplay settings replaced them in 11).
 
 # Privacy: don’t send search queries to Apple
 com.apple.Safari	UniversalSearchEnabled	bool	false	noaudit=tcc
@@ -408,12 +409,6 @@ com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2BackspaceKey
 
 # Hide Safari’s bookmarks bar by default
 com.apple.Safari	ShowFavoritesBar	bool	false	noaudit=tcc
-
-# Hide Safari’s sidebar in Top Sites
-com.apple.Safari	ShowSidebarInTopSites	bool	false	noaudit=tcc
-
-# Disable Safari’s thumbnail cache for History and Top Sites
-com.apple.Safari	DebugSnapshotsUpdatePolicy	int	2	noaudit=tcc
 
 # Enable Safari’s debug menu
 com.apple.Safari	IncludeInternalDebugMenu	bool	true	noaudit=tcc
@@ -446,41 +441,17 @@ com.apple.Safari	AutoFillMiscellaneousForms	bool	false	noaudit=tcc
 # Warn about fraudulent websites
 com.apple.Safari	WarnAboutFraudulentWebsites	bool	true	noaudit=tcc
 
-# Disable plug-ins
-com.apple.Safari	WebKitPluginsEnabled	bool	false	noaudit=tcc
-com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2PluginsEnabled	bool	false	noaudit=tcc
-
-# Disable Java
-com.apple.Safari	WebKitJavaEnabled	bool	false	noaudit=tcc
-com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabled	bool	false	noaudit=tcc
-com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabledForLocalFiles	bool	false	noaudit=tcc
-
 # Block pop-up windows
 com.apple.Safari	WebKitJavaScriptCanOpenWindowsAutomatically	bool	false	noaudit=tcc
 com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically	bool	false	noaudit=tcc
 
-# Disable auto-playing video
-com.apple.Safari	WebKitMediaPlaybackAllowsInline	bool	false	noaudit=tcc
-com.apple.SafariTechnologyPreview	WebKitMediaPlaybackAllowsInline	bool	false
-com.apple.Safari	com.apple.Safari.ContentPageGroupIdentifier.WebKit2AllowsInlineMediaPlayback	bool	false	noaudit=tcc
-com.apple.SafariTechnologyPreview	com.apple.Safari.ContentPageGroupIdentifier.WebKit2AllowsInlineMediaPlayback	bool	false
-
-# Enable “Do Not Track”
-com.apple.Safari	SendDoNotTrackHTTPHeader	bool	true	noaudit=tcc
-
-# Update extensions automatically
-com.apple.Safari	InstallExtensionUpdatesAutomatically	bool	true	noaudit=tcc
 
 ###############################################################################
 # Mail                                                                        #
 ###############################################################################
 
-# Disable send and reply animations in Mail.app
-com.apple.mail	DisableReplyAnimations	bool	true	noaudit=tcc
-com.apple.mail	DisableSendAnimations	bool	true	noaudit=tcc
-
-# Copy email addresses as `foo@example.com` instead of `Foo Bar <foo@example.com>` in Mail.app
-com.apple.mail	AddressesIncludeNameOnPasteboard	bool	false	noaudit=tcc
+# Dropped 2026-09-25: DisableReplyAnimations, DisableSendAnimations and
+# AddressesIncludeNameOnPasteboard have no reader in Mail 26.
 
 # Add the keyboard shortcut ⌘ + Enter to send an email in Mail.app
 com.apple.mail	NSUserKeyEquivalents	dict-add	Send @\\U21a9	noaudit=complex
@@ -595,24 +566,19 @@ com.apple.ActivityMonitor	SortColumn	string	CPUUsage
 com.apple.ActivityMonitor	SortDirection	int	0
 
 ###############################################################################
-# Address Book, Calendar, TextEdit, and Disk Utility                          #
+# Address Book, TextEdit, and QuickTime Player                                #
 ###############################################################################
+# Dropped 2026-09-25: the Calendar debug menu (pre-10.8) and both Disk Utility
+# rows (the El Capitan rewrite reads neither).
 
 # Enable the debug menu in Address Book
 com.apple.addressbook	ABShowDebugMenu	bool	true	noaudit=unset
-
-# Enable the debug menu in Calendar (pre-10.8)
-com.apple.iCal	IncludeDebugMenu	bool	true
 
 # Use plain text mode for new TextEdit documents
 com.apple.TextEdit	RichText	int	0	noaudit=unset
 # Open and save files as UTF-8 in TextEdit
 com.apple.TextEdit	PlainTextEncoding	int	4	noaudit=unset
 com.apple.TextEdit	PlainTextEncodingForWrite	int	4	noaudit=unset
-
-# Enable the debug menu in Disk Utility
-com.apple.DiskUtility	DUDebugMenuEnabled	bool	true
-com.apple.DiskUtility	advanced-image-options	bool	true
 
 # Auto-play videos when opened with QuickTime Player
 com.apple.QuickTimePlayerX	MGPlayMovieOnOpen	bool	true	noaudit=unset
@@ -621,11 +587,8 @@ com.apple.QuickTimePlayerX	MGPlayMovieOnOpen	bool	true	noaudit=unset
 # Mac App Store                                                               #
 ###############################################################################
 
-# Enable the WebKit Developer Tools in the Mac App Store
-com.apple.appstore	WebKitDeveloperExtras	bool	true
-
-# Enable Debug Menu in the Mac App Store
-com.apple.appstore	ShowDebugMenu	bool	true
+# Dropped 2026-09-25: the App Store debug menu and WebKit developer tools
+# rows; the Mojave rewrite reads neither.
 
 # Enable the automatic update check
 com.apple.SoftwareUpdate	AutomaticCheckEnabled	bool	true
@@ -639,7 +602,7 @@ com.apple.SoftwareUpdate	AutomaticDownload	int	1
 # Install System data files & security updates
 com.apple.SoftwareUpdate	CriticalUpdateInstall	int	1
 
-# Automatically download apps purchased on other Macs
+# Install system data files (XProtect, Gatekeeper and MRT definitions)
 com.apple.SoftwareUpdate	ConfigDataInstall	int	1
 
 # Turn on app auto-update
@@ -654,19 +617,6 @@ com.apple.commerce	AutoUpdateRestartRequired	bool	true
 
 # Prevent Photos from opening automatically when devices are plugged in
 currentHost:com.apple.ImageCapture	disableHotPlug	bool	true
-
-###############################################################################
-# Messages                                                                    #
-###############################################################################
-
-# Disable automatic emoji substitution (i.e. use plain text smileys)
-com.apple.messageshelper.MessageController	SOInputLineSettings	dict-add	automaticEmojiSubstitutionEnablediMessage -bool false	noaudit=complex
-
-# Disable smart quotes as it’s annoying for messages that contain code
-com.apple.messageshelper.MessageController	SOInputLineSettings	dict-add	automaticQuoteSubstitutionEnabled -bool false	noaudit=complex
-
-# Disable continuous spell checking
-com.apple.messageshelper.MessageController	SOInputLineSettings	dict-add	continuousSpellCheckingEnabled -bool false	noaudit=complex
 
 ###############################################################################
 # Google Chrome & Google Chrome Canary                                        #
@@ -700,11 +650,6 @@ com.google.Chrome.canary	PMPrintingExpandedStateForPrint2	bool	true
 # Use all F1, F2 as standard keys
 -g	com.apple.keyboard.fnState	bool	true
 
-# Stop the "Try Safari!" nagification
-com.apple.coreservices.uiagent	CSUIHasSafariBeenLaunched	bool	true
-com.apple.coreservices.uiagent	CSUIRecommendSafariNextNotificationDate	date	2050-01-01T00:00:00Z	noaudit=complex
-com.apple.coreservices.uiagent	CSUILastOSVersionWhereSafariRecommendationWasMade	float	10.99
-
 # Disable "floating thumbnail" preview and screenshot delay
 com.apple.screencapture	show-thumbnail	bool	false
 
@@ -730,20 +675,13 @@ com.apple.driver.AppleBluetoothMultitouch.trackpad	TrackpadTwoFingerFromRightEdg
 org.macosforge.xquartz.X11	enable_iglx	bool	true
 org.x.X11	enable_test_extensions	bool	true
 
-# disable mouse acceleration
+# Mouse tracking speed (-1 disables acceleration entirely)
 .GlobalPreferences	com.apple.mouse.scaling	float	3
 
 ###############################################################################
 # Siri                                                                        #
 ###############################################################################
 
-# Disable Siri
+# Disable Siri and hide its menu bar item
+com.apple.assistant.support	Assistant Enabled	bool	false
 com.apple.Siri	StatusMenuVisible	bool	false	noaudit=unset
-com.apple.Siri	UserHasDeclinedEnable	bool	true	noaudit=unset
-
-###############################################################################
-# Game Center                                                                 #
-###############################################################################
-
-# Disable Game Center notifications
-com.apple.GameCenter	GKInviteAlertEnabled	bool	false	noaudit=unset
