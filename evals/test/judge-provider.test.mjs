@@ -18,6 +18,8 @@ test('judge disables tools and skills, pins its model, and runs outside the repo
   assert.ok(args.includes('--disable-slash-commands'));
   assert.ok(args.includes('--no-session-persistence'));
   assert.ok(!args.includes('--bare'), '--bare ignores OAuth tokens');
+  const settingSources = args.indexOf('--setting-sources');
+  assert.deepEqual(args.slice(settingSources, settingSources + 2), ['--setting-sources', 'project']);
   assert.equal(args[args.indexOf('--model') + 1], JUDGE_MODEL);
   assert.equal(JUDGE_MODEL, 'claude-sonnet-5');
   assert.ok(!cwd.startsWith(REPO_ROOT), `judge cwd ${cwd} is inside the repo`);
