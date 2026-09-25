@@ -35,12 +35,18 @@ chmod +x "$BASE/pbcopybin/pbcopy"
 # copy-mode-vi binding for y, stop the server. Output lands in $got, exit in $status.
 # TMUX_TMPDIR keeps the socket under $BASE, so the EXIT trap removes it even
 # where tmux leaves the dead socket file behind after kill-server.
+# The config loads through source-file rather than -f because errors from a -f
+# load never reach a command client; source-file prints them and exits non-zero.
+# tmux 3.7c prints nothing for the single-key form (`list-keys -T copy-mode-vi y`),
+# so list the whole table and keep the y binding plus any non-binding line, which
+# is where config load errors surface.
 y_binding() {
   local sock="tmuxtest-$$-$RANDOM"
   set +e
-  got="$(HOME="$FAKEHOME" SHELL=/bin/sh PATH="$1" TMUX_TMPDIR="$BASE" "$TMUX_BIN" -L "$sock" -f "$CONF" start-server \; list-keys -T copy-mode-vi y 2>&1)"
+  got="$(HOME="$FAKEHOME" SHELL=/bin/sh PATH="$1" TMUX_TMPDIR="$BASE" "$TMUX_BIN" -L "$sock" -f /dev/null start-server \; source-file "$CONF" \; list-keys -T copy-mode-vi 2>&1)"
   status=$?
   set -e
+  got="$(awk '!/^bind-key/ || $4 == "y"' <<<"$got")"
   TMUX_TMPDIR="$BASE" "$TMUX_BIN" -L "$sock" kill-server 2>/dev/null || true
 }
 
