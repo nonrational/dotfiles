@@ -25,11 +25,11 @@ home/.nethackrc          ~/.nethackrc
 home/.profile            ~/.profile
 home/.railsrc            ~/.railsrc
 home/.screenrc           ~/.screenrc
+home/.ssh/config.d/exe.conf  ~/.ssh/config.d/exe.conf  os=Darwin
 home/.tmux.conf          ~/.tmux.conf
 home/.vim                ~/.vim
 home/.vimrc              ~/.vimrc
-home/.zprofile           ~/.zprofile
-home/.zshrc              ~/.zshrc
 home/bin.Darwin          ~/bin                 os=Darwin
 home/bin.Linux           ~/bin                 os=Linux
 fonts                    ~/Library/Fonts/dotfiles          os=Darwin
+home/Library/LaunchAgents/org.nonrational.clipboard-bridge.plist  ~/Library/LaunchAgents/org.nonrational.clipboard-bridge.plist  os=Darwin

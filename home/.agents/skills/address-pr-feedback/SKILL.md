@@ -1,6 +1,6 @@
 ---
 name: address-pr-feedback
-description: 'Fetch, triage, and address review comments on your own open PR. Use this whenever you have reviewer feedback to work through — inline comments, suggestions, or top-level notes left by teammates. Covers the full cycle: pulling comments from GitHub, bucketing each one as accept/rebut/defer, implementing the accepted ones, and replying to every thread. Trigger on prompts like "address the feedback on my PR", "triage the review comments", "work through the PR comments", or any link to a PR that has open review feedback.'
+description: 'Atomically fetch, triage, and address review comments on an open PR. Use this whenever you have reviewer feedback to work through (e.g. inline comments, suggestions, or top-level notes left by teammates). Trigger on prompts like "address the feedback on my PR", "triage the review comments", "work through the PR comments", or any link to a PR that has open review feedback.'
 ---
 
 # Address PR Feedback

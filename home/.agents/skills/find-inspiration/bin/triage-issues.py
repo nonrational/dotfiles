@@ -119,6 +119,13 @@ def issue_body(item, run):
     for heading, key in sections:
         if item.get(key):
             parts.append(f"## {heading}\n\n{item[key]}")
+    # The session that lands an item reads the issue, not the skill, so the
+    # credit reminder has to travel in the body.
+    parts.append(
+        "## On landing\n\n"
+        f"If {source}'s author isn't under **Credits** in `README.md` yet, add them: "
+        "avatar, name, repo link. Credit the author, not the item."
+    )
     return "\n\n".join(parts) + "\n"
 
 

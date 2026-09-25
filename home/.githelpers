@@ -154,6 +154,38 @@ switch_wildcard() {
   fi
 }
 
+# `git switch`, but a branch checked out in another worktree is freed first by
+# removing that worktree. A dirty worktree is refused; -f discards its changes.
+take_branch() {
+  local force=""
+  case "$1" in -f | --force) force="--force"; shift ;; esac
+
+  local path
+  path=$(git worktree list --porcelain | awk -v ref="refs/heads/$1" '
+    /^worktree / { p = substr($0, 10) }
+    $0 == "branch " ref { print p; exit }')
+
+  if [ -n "$path" ] && [ "$path" != "$(git rev-parse --show-toplevel)" ]; then
+    # The first entry of `worktree list` is the main worktree, which cannot be removed.
+    if [ "$path" = "$(git worktree list --porcelain | sed -n '1s/^worktree //p')" ]; then
+      echo "'$1' is checked out in the main worktree ($path); nothing to remove" >&2
+      return 1
+    fi
+    if [ -z "$force" ]; then
+      if [ -n "$(git -C "$path" status --porcelain)" ]; then
+        echo "worktree $path has changes; use -f to discard them" >&2
+        return 1
+      fi
+      # git refuses even a clean worktree that holds submodules without --force;
+      # cleanliness (submodules included) was verified above.
+      force="--force"
+    fi
+    git worktree remove $force "$path" || return 1
+  fi
+
+  git switch "$@"
+}
+
 # Delete local-only branches with confirmation.
 delete_remoteless_branches_interactive() {
   git fetch origin --prune --tags -f

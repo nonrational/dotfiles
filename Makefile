@@ -80,6 +80,8 @@ check-editorconfig:
 test:
 	./test/test_deploy.sh
 	./test/test_shell.sh
+	./test/test_clipboard_bridge.sh
+	./test/test_tmux.sh
 	./test/test_macos_defaults.sh
 
 deploy:
@@ -145,6 +147,25 @@ check-copilot-instructions:
 # new check-* target is covered by both the moment it's added here.
 preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults
 
+# Skill eval suite (evals/). eval-validate is offline and free; eval and
+# eval-compare spend real API tokens (a headless claude session per case,
+# plus judge calls for transformation cases). Phase 2 wires eval-validate
+# into preflight and CI; until then all three are manual entry points.
+evals/node_modules: evals/package.json evals/package-lock.json
+	cd evals && npm ci
+
+eval-validate: evals/node_modules
+	cd evals && node bin/validate.mjs
+
+eval: evals/node_modules
+	@test -n "$(SKILL)" || { echo "usage: make eval SKILL=<skill-name>"; exit 1; }
+	cd evals && mkdir -p results && EVAL_SKILL=$(SKILL) npx promptfoo eval --no-cache -o results/latest.json
+	cd evals && node bin/check-gate.mjs results/latest.json
+
+eval-compare: evals/node_modules
+	@test -n "$(SKILL)" || { echo "usage: make eval-compare SKILL=<skill-name>"; exit 1; }
+	cd evals && EVAL_SKILL=$(SKILL) npx promptfoo eval --no-cache -c promptfooconfig.compare.yaml
+
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
 	mkdir -p $$HOME/.config
@@ -154,6 +175,15 @@ link-sublime:
 	git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
 	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text
 	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text
+
+# (Re)load the clipboard bridge launch agent: a socket-activated responder on
+# 127.0.0.1:2224 that hands the pasteboard image to exe.dev VMs (see
+# home/bin.Darwin/clipboard-bridge). deploy symlinks the plist, but launchd
+# only reads it at bootstrap: run this once after deploy and again after edits.
+clipboard-bridge:
+	-launchctl bootout gui/$$(id -u)/org.nonrational.clipboard-bridge 2>/dev/null
+	launchctl bootstrap gui/$$(id -u) $$HOME/Library/LaunchAgents/org.nonrational.clipboard-bridge.plist
+	@launchctl list | grep -q org.nonrational.clipboard-bridge && echo "org.nonrational.clipboard-bridge loaded; it spawns on connect to 127.0.0.1:2224"
 
 backup-preferences:
 	cp $$HOME/Library/Preferences/com.googlecode.iterm2.plist $$PWD/etc/com.googlecode.iterm2.plist
@@ -181,4 +211,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

@@ -1,4 +1,5 @@
 {
+  "syncClaudeAiSkills": false,
   "attribution": {
     "pr": "",
     "sessionUrl": false
@@ -46,7 +47,7 @@
     "frontend-design@claude-plugins-official": false,
     "rust-analyzer-lsp@claude-plugins-official": false
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",

@@ -70,6 +70,7 @@ Then **order the queue by unblock value**: bugs before enhancements, old `needs-
 - **One state role, one category role — enforced at write time.** Stage 4 replaces the old state label and reads the result back; two state roles on one issue is the base machine's halt condition, not a cosmetic bug.
 - **Every posted comment carries the tracker's provenance disclaimer** — the orchestrator's own posts included. Interview answers are posted as quotes attributed to the maintainer, under the same disclaimer.
 - **Isolation and cleanup are per item.** A repro worktree lives under `<repo>/.worktrees/`, detached, forbidden to commit or push, and is torn down with its scratch resources before the item returns, either path. A cut-short run leaves nothing behind.
+- **Never resume a completed run to bolt on a stage.** Cache replay is keyed on the recorded call prefix, and a later-session resume can miss entirely: every "cached" agent re-runs live, and stages with external side effects (tracker comments, labels, review posts) repeat them. For an incremental follow-up, pull the state the new stage needs out of the run's journal and launch a fresh, minimal workflow containing only the new agents. If a resume is unavoidable, audit every external surface the applied stages touch for duplicates immediately afterward.
 
 ## Close the run
 
@@ -90,6 +91,7 @@ Before declaring the run done, apply `superpowers:verification-before-completion
 - An issue about to end the run with two state labels, or with none.
 - A brief containing file paths or line numbers.
 - An issue flipped to `ready-for-agent` whose claim was never verified and whose brief the gate never saw.
+- Resuming a finished run whose agents post to the tracker.
 
 ## Rationalizations
 

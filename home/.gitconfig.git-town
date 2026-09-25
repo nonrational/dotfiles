@@ -9,7 +9,13 @@
   # publish (most often local commits sitting on main). Pushing stays an explicit
   # verb: `git sync` for this branch, `git propose` when it's ready for review.
   # (sync-tags=false keeps tag handling in `git f`)
-  up = "!git f && git town sync --all --no-push"
+  # A conflict on one branch stops sync --all for the whole stack, so on failure
+  # we skip the offending branch and let it resume, capped at 10 skips so a
+  # misconfigured repo (git-town not set up here) fails fast instead of
+  # spamming skip attempts forever. Skipped branches are just left unsynced
+  # until you deal with them manually (`git sync` on that branch) — nothing is
+  # discarded.
+  up = "!git f && git town sync --all --no-push; s=$?; i=0; while [ $s -ne 0 ] && [ $i -lt 10 ]; do git town skip; s=$?; i=$((i+1)); done"
 
   append = town append         # add a new branch as a child of the current one
   compress = town compress     # squash all commits on this branch into one
