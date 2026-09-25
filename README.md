@@ -6,54 +6,19 @@ _Architectural Digest_ for `$HOME`.
 
 # Installation
 
-## macOS
+## Any machine
 
 ```shell
-#!/usr/bin/env sh
-xcode-select --install
-
-git clone https://github.com/nonrational/dotfiles .dotfiles
-cd .dotfiles
-
-make brew-install
-make brew-bundle
-
-if [ -f /opt/homebrew/bin/bash ]; then
-  echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells
-  chsh -s '/opt/homebrew/bin/bash'
-else
-  echo 'Unable to set default shell to `/opt/homebrew/bin/bash`'
-fi
-
-# Better get a new terminal at this point.
-make init-submodules
-make deploy
-make link-karabiner
-make clipboard-bridge          # launch agent that serves clipboard images to exe.dev VMs
-
-# Authenticate with `gh` to clone private repo(s)
-gh auth login
-make link-sublime
-make restore-preferences
-
-# Almost there! Good idea to restart iTerm now, and take the opportunity to
-# ensure it has full disk access.
-make macos-reset-dock
-make macos-disable-restore-apps-on-login
-make macos
+curl -fsSL https://raw.githubusercontent.com/nonrational/dotfiles/main/setup.sh | bash
 ```
 
-## GNU/Linux
+That is the whole sequence, for a new Mac, a Linux host, or a machine catching up after months. `setup.sh` clones this repo into `~/.dotfiles` if it has to, then runs every step whose end state does not already hold; re-run it any time with `./setup.sh` or `make setup` (`make setup ARGS=--dry-run` shows what a run would do). On a Mac it halts at three checkpoints, each printed with a number and the instruction to re-run when done:
 
-```shell
-#!/usr/bin/env sh
+1. The Command Line Tools installer, on a machine without them.
+2. Full Disk Access for the terminal, which the `defaults` audit needs.
+3. The reboot at the end.
 
-git clone git@github.com:nonrational/dotfiles .dotfiles
-cd .dotfiles
-
-make init-submodules
-make deploy
-```
+The Dock reset and the iTerm, Amphetamine and Moom preference restore run only when `setup.sh` had to clone, so a re-run on an existing machine never wipes either. Linux runs only the submodule init and the deploy.
 
 # Clipboard bridge (exe.dev VMs)
 
