@@ -1,6 +1,7 @@
 {
   "skill": "code-comment-register",
   "skill_path": "home/.agents/skills/code-comment-register/SKILL.md",
+  "min_pass_rate": 0.75,
   "description": "Discrimination, transformation, and detection cases derived from an anonymized production comment review. The author removed unsupported rationale, moved surviving explanations beside the operations they protect, narrowed overbroad claims, and split test-level history from assertion-level caveats.",
   "provenance": {
     "date_mined": "2026-08-13",

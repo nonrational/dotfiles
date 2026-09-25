@@ -145,21 +145,25 @@ check-copilot-instructions:
 
 # The one definition of "safe to commit" -- CI runs this same target, so a
 # new check-* target is covered by both the moment it's added here.
-preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults
+preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults eval-validate eval-test
 
-# Skill eval suite (evals/). eval-validate is offline and free; eval and
-# eval-compare spend real API tokens (a headless claude session per case,
-# plus judge calls for transformation cases). Phase 2 wires eval-validate
-# into preflight and CI; until then all three are manual entry points.
+# Skill eval suite (evals/). eval-validate and eval-test are offline and free,
+# and run in preflight. eval and eval-compare spend subscription usage: a
+# headless claude session per case plus one per judged assert.
 evals/node_modules: evals/package.json evals/package-lock.json
 	cd evals && npm ci
 
 eval-validate: evals/node_modules
 	cd evals && node bin/validate.mjs
 
+eval-test: evals/node_modules
+	cd evals && npm test
+
+# promptfoo exits 100 on any failed test; let soft failures (judged rule, detection)
+# through so check-gate.mjs -- not promptfoo's exit code -- decides pass/fail.
 eval: evals/node_modules
 	@test -n "$(SKILL)" || { echo "usage: make eval SKILL=<skill-name>"; exit 1; }
-	cd evals && mkdir -p results && EVAL_SKILL=$(SKILL) npx promptfoo eval --no-cache -o results/latest.json
+	cd evals && mkdir -p results && EVAL_SKILL=$(SKILL) PROMPTFOO_FAILED_TEST_EXIT_CODE=0 npx promptfoo eval --no-cache -o results/latest.json
 	cd evals && node bin/check-gate.mjs results/latest.json
 
 eval-compare: evals/node_modules
@@ -211,4 +215,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
