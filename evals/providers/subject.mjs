@@ -50,6 +50,21 @@ export default class SubjectProvider {
 
     const model = process.env.EVAL_MODEL || 'sonnet';
 
+    if (process.env.EVAL_LOCAL) {
+      // Bare mode is the only mode that skips hooks, and it works against a
+      // local endpoint because no OAuth is involved. The skill goes in the
+      // system prompt rather than behind the Skill tool because a local
+      // model loses the task after a large tool result (probe: a 27B model
+      // loaded the skill then asked what to work on next). This measures
+      // whether the rule text as written moves the model, not whether skill
+      // loading works: an authoring loop, never a reference run.
+      const args = this.baseline
+        ? ['-p', '--output-format', 'json', '--no-session-persistence', '--model', model, '--bare', '--tools', '']
+        : ['-p', '--output-format', 'json', '--no-session-persistence', '--model', model, '--bare', '--tools', '',
+            '--append-system-prompt-file', path.join(REPO_ROOT, 'home/.agents/skills', skill, 'SKILL.md')];
+      return runClaude({ args, prompt, cwd });
+    }
+
     // User hooks and plugins (e.g. a SessionStart preamble) inject text into
     // the first turn that the subject answers instead of the eval prompt.
     // --setting-sources project drops that user config, but it also drops

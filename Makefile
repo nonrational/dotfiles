@@ -150,6 +150,17 @@ eval: evals/node_modules
 	cd evals && mkdir -p results && EVAL_SKILL=$(SKILL) PROMPTFOO_FAILED_TEST_EXIT_CODE=0 npx promptfoo eval --no-cache -o results/latest.json
 	cd evals && node bin/check-gate.mjs results/latest.json
 
+# Free authoring loop against a local Ollama model. Bare sessions with the skill in
+# the system prompt: checks that prompts render, graders parse and keys are sane,
+# not how the skill loads. Sonnet (make eval) stays the reference run.
+EVAL_LOCAL_URL ?= http://localhost:11434
+EVAL_LOCAL_MODEL ?= gemma4:latest
+eval-local: evals/node_modules
+	@test -n "$(SKILL)" || { echo "usage: make eval-local SKILL=<skill-name>"; exit 1; }
+	@curl -sf -m 5 "$(EVAL_LOCAL_URL)/api/version" >/dev/null || { echo "no Ollama at $(EVAL_LOCAL_URL); start it with 'ollama serve'"; exit 1; }
+	cd evals && mkdir -p results && EVAL_LOCAL=1 ANTHROPIC_BASE_URL=$(EVAL_LOCAL_URL) ANTHROPIC_AUTH_TOKEN=ollama EVAL_MODEL=$(EVAL_LOCAL_MODEL) EVAL_JUDGE_MODEL=$(EVAL_LOCAL_MODEL) EVAL_SKILL=$(SKILL) PROMPTFOO_FAILED_TEST_EXIT_CODE=0 npx promptfoo eval --no-cache -j 1 -o results/local.json
+	cd evals && node bin/check-gate.mjs results/local.json
+
 eval-compare: evals/node_modules
 	@test -n "$(SKILL)" || { echo "usage: make eval-compare SKILL=<skill-name>"; exit 1; }
 	cd evals && EVAL_SKILL=$(SKILL) npx promptfoo eval --no-cache -c promptfooconfig.compare.yaml
@@ -199,4 +210,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-local eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations

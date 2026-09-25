@@ -129,3 +129,49 @@ test('a stale skill symlink pointing elsewhere is replaced', async () => {
 
   assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(REPO_ROOT, 'home/.agents/skills', SKILL)));
 });
+
+test('EVAL_LOCAL mode runs bare with the skill in the system prompt, not the Skill tool', async () => {
+  process.env.EVAL_CLAUDE_CMD = ECHO;
+  process.env.EVAL_LOCAL = '1';
+  const skill = new SubjectProvider({ label: 'skill', config: {} });
+  const model = process.env.EVAL_MODEL || 'sonnet';
+  const skillFile = path.join(REPO_ROOT, 'home/.agents/skills', SKILL, 'SKILL.md');
+
+  const skillArgs = JSON.parse((await skill.callApi('p')).output).args;
+
+  assert.deepEqual(skillArgs, [
+    '-p', '--output-format', 'json', '--no-session-persistence', '--model', model,
+    '--bare', '--tools', '', '--append-system-prompt-file', skillFile,
+  ]);
+});
+
+test('EVAL_LOCAL mode baseline is the same call without the skill system prompt', async () => {
+  process.env.EVAL_CLAUDE_CMD = ECHO;
+  process.env.EVAL_LOCAL = '1';
+  const baseline = new SubjectProvider({ label: 'baseline', config: { baseline: true } });
+  const model = process.env.EVAL_MODEL || 'sonnet';
+
+  const baselineArgs = JSON.parse((await baseline.callApi('p')).output).args;
+
+  assert.deepEqual(baselineArgs, [
+    '-p', '--output-format', 'json', '--no-session-persistence', '--model', model,
+    '--bare', '--tools', '',
+  ]);
+  assert.ok(!baselineArgs.includes('--append-system-prompt-file'));
+});
+
+test('EVAL_LOCAL mode drops --setting-sources, --allowedTools, and --disable-slash-commands', async () => {
+  process.env.EVAL_CLAUDE_CMD = ECHO;
+  process.env.EVAL_LOCAL = '1';
+  const skill = new SubjectProvider({ label: 'skill', config: {} });
+  const baseline = new SubjectProvider({ label: 'baseline', config: { baseline: true } });
+
+  const skillArgs = JSON.parse((await skill.callApi('p')).output).args;
+  const baselineArgs = JSON.parse((await baseline.callApi('p')).output).args;
+
+  for (const args of [skillArgs, baselineArgs]) {
+    assert.ok(!args.includes('--setting-sources'));
+    assert.ok(!args.includes('--allowedTools'));
+    assert.ok(!args.includes('--disable-slash-commands'));
+  }
+});
