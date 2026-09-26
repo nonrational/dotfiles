@@ -60,12 +60,6 @@ jobs:
         with:
           node-version: "24"
       - run: npm install -g @anthropic-ai/claude-code@2.1.278
-      # The repo has no root .claude/, so link the skill under test where
-      # claude -p looks for user skills. Without it the subject silently runs
-      # as the baseline.
-      - run: |
-          mkdir -p "$HOME/.claude/skills"
-          ln -s "$GITHUB_WORKSPACE/home/.agents/skills/$SKILL" "$HOME/.claude/skills/$SKILL"
       - run: make eval SKILL="$SKILL"
       - if: always()
         uses: actions/upload-artifact@v7
