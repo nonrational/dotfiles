@@ -181,3 +181,49 @@ test('an unreadable results file is a hard error', () => {
   const result = spawnSync(process.execPath, [GATE, '/nonexistent/results.json'], { encoding: 'utf8' });
   assert.equal(result.status, 1);
 });
+
+test('a draft row with a wrong choice never hard-gates and stays out of the floor', () => {
+  const rows = [...passing(9), row('draft-1', [choice(false), rule(true)], { status: 'draft' })];
+  const result = runGate(rows);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /9\/9 passed/);
+  assert.match(result.stdout, /1 draft rows, 0 passed/);
+});
+
+test('draft rows do not lift the pass rate either', () => {
+  // 8 of 9 gated rows pass (88.9%), under the 90% default; 5 passing drafts must not rescue it.
+  const rows = [
+    ...passing(8),
+    row('det-0', [detect(false)]),
+    ...Array.from({ length: 5 }, (_, i) => row(`draft-${i}`, [choice(true), rule(true)], { status: 'draft' })),
+  ];
+  const result = runGate(rows);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /8\/9 passed/);
+  assert.match(result.stdout, /5 draft rows, 5 passed/);
+});
+
+test('a run of only draft rows passes and says so', () => {
+  const rows = Array.from({ length: 3 }, (_, i) => row(`draft-${i}`, [choice(false), rule(false)], { status: 'draft' }));
+  const result = runGate(rows);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /no approved rows; nothing gated/);
+  assert.match(result.stdout, /3 draft rows, 0 passed/);
+});
+
+test('a draft row with no components hard-gates because the harness never got an answer', () => {
+  const rows = [...passing(9), row('draft-2', [], { status: 'draft' })];
+  const result = runGate(rows);
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.match(result.stdout, /9\/9 passed/);
+  assert.match(result.stderr, /draft-2/);
+});
+
+test('the informational rule tally is scoped to gated rows, not drafts', () => {
+  const gatedRows = Array.from({ length: 3 }, (_, i) => row(`ok-${i}`, [choice(true), rule(true)]));
+  const draftRows = Array.from({ length: 2 }, (_, i) => row(`draft-${i}`, [choice(true), rule(false)], { status: 'draft' }));
+  const result = runGate([...gatedRows, ...draftRows]);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /rule 3\/3 informational/);
+  assert.match(result.stdout, /2 draft rows, 2 passed/);
+});

@@ -18,11 +18,11 @@ let failed = false;
 for (const file of files) {
   const skill = suiteSkill(file);
   try {
-    const { caseCount, unsupported } = validateData(loadSuite(file));
+    const { caseCount, unsupported, draftCount } = validateData(loadSuite(file));
     const warning = unsupported.length
       ? ` (${unsupported.length} case(s) of unsupported type skipped: ${[...new Set(unsupported.map((u) => u.type))].join(', ')})`
       : '';
-    console.log(`${skill}: ${caseCount} cases ok${warning}`);
+    console.log(`${skill}: ${caseCount} cases ok${draftCount ? ` (${draftCount} draft)` : ''}${warning}`);
   } catch (error) {
     failed = true;
     console.error(`${skill}: INVALID — ${error.message}`);
