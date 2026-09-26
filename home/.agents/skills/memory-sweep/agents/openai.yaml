@@ -1,0 +1,5 @@
+interface:
+  display_name: "Memory Sweep"
+  short_description: "Route per-machine agent memories into durable stores and retire them"
+policy:
+  allow_implicit_invocation: false
