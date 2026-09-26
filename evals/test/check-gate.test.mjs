@@ -95,13 +95,13 @@ test('the floor is overridable via argv', () => {
 });
 
 // EVAL_REPO_ROOT points the gate at a throwaway skills tree, so the floor
-// tests don't depend on the real evals.json values.
+// tests don't depend on the real suites' values.
 function runGateWithSkills(skills, rows, ...args) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'gate-root-'));
   for (const [name, content] of Object.entries(skills)) {
-    const dir = path.join(root, 'home/.agents/skills', name);
+    const dir = path.join(root, 'home/.agents/skills', name, 'evals');
     mkdirSync(dir, { recursive: true });
-    writeFileSync(path.join(dir, 'evals.json'), content);
+    writeFileSync(path.join(dir, 'README.md'), content);
   }
   const file = path.join(mkdtempSync(path.join(os.tmpdir(), 'gate-')), 'results.json');
   writeFileSync(file, JSON.stringify({ results: { results: rows } }));
@@ -111,39 +111,42 @@ function runGateWithSkills(skills, rows, ...args) {
   });
 }
 
-const evalsJson = (extra = {}) => JSON.stringify({ skill: 'alpha', cases: [], ...extra });
+// A README with only frontmatter is a valid, empty suite.
+const readme = (extra = {}) =>
+  `---\n${Object.entries({ skill: 'alpha', ...extra }).map(([k, v]) => `${k}: ${v}`).join('\n')}\n---\n`;
+const MALFORMED_README = '---\nskill: [unclosed\n---\n';
 // 6 of 11 rows pass (54.5%): under the 90% default, over a 50% floor.
 const elevenRows = (skill) => [
   ...Array.from({ length: 6 }, (_, i) => row(`ok-${i}`, [choice(true), rule(true)], { skill })),
   ...Array.from({ length: 5 }, (_, i) => row(`det-0${i}`, [detect(false)], { skill })),
 ];
 
-test("a skill's evals.json can set its own floor", () => {
-  const result = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0.5 }) }, elevenRows('alpha'));
+test("a skill's README can set its own floor", () => {
+  const result = runGateWithSkills({ alpha: readme({ min_pass_rate: 0.5 }) }, elevenRows('alpha'));
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.match(result.stdout, /floor 50%/);
 });
 
 test('a skill without a min_pass_rate keeps the 90% default', () => {
-  const result = runGateWithSkills({ alpha: evalsJson() }, elevenRows('alpha'));
+  const result = runGateWithSkills({ alpha: readme() }, elevenRows('alpha'));
   assert.equal(result.status, 1);
   assert.match(result.stdout, /floor 90%/);
 });
 
 test("an argv floor overrides the skill's own", () => {
-  const result = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0.5 }) }, elevenRows('alpha'), '0.90');
+  const result = runGateWithSkills({ alpha: readme({ min_pass_rate: 0.5 }) }, elevenRows('alpha'), '0.90');
   assert.equal(result.status, 1);
   assert.match(result.stderr, /below the 90% floor/);
 });
 
-test("a sibling skill's malformed evals.json does not touch this skill's gate", () => {
-  const skills = { alpha: evalsJson({ min_pass_rate: 0.5 }), beta: '{ truncated' };
+test("a sibling skill's malformed README does not touch this skill's gate", () => {
+  const skills = { alpha: readme({ min_pass_rate: 0.5 }), beta: MALFORMED_README };
   const result = runGateWithSkills(skills, elevenRows('alpha'));
   assert.equal(result.status, 0, result.stdout + result.stderr);
 });
 
-test("the skill's own unreadable evals.json warns and falls back to the default floor", () => {
-  const result = runGateWithSkills({ alpha: '{ truncated' }, elevenRows('alpha'));
+test("the skill's own unreadable README warns and falls back to the default floor", () => {
+  const result = runGateWithSkills({ alpha: MALFORMED_README }, elevenRows('alpha'));
   assert.equal(result.status, 1);
   assert.match(result.stderr, /cannot read alpha's min_pass_rate/);
   assert.match(result.stdout, /floor 90%/);
@@ -157,7 +160,7 @@ test('a missing skills tree falls back to the default floor', () => {
 
 test('rows from more than one skill fall back to the default floor', () => {
   const rows = [...elevenRows('alpha'), ...elevenRows('beta')];
-  const result = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0.5 }) }, rows);
+  const result = runGateWithSkills({ alpha: readme({ min_pass_rate: 0.5 }) }, rows);
   assert.equal(result.status, 1);
   assert.match(result.stdout, /floor 90%/);
 });
@@ -165,11 +168,11 @@ test('rows from more than one skill fall back to the default floor', () => {
 test('an empty, non-numeric or out-of-range floor is rejected, not read as zero or NaN', () => {
   const ok = [...Array(10)].map((_, i) => row(`ok-${i}`, [choice(true), rule(true)], { skill: 'alpha' }));
   for (const bad of ['', 'abc', '0', '1.5']) {
-    const result = runGateWithSkills({ alpha: evalsJson() }, ok, bad);
+    const result = runGateWithSkills({ alpha: readme() }, ok, bad);
     assert.equal(result.status, 1, `argv ${JSON.stringify(bad)}`);
     assert.match(result.stderr, /floor must be a number in \(0, 1\]/);
   }
-  const zero = runGateWithSkills({ alpha: evalsJson({ min_pass_rate: 0 }) }, ok);
+  const zero = runGateWithSkills({ alpha: readme({ min_pass_rate: 0 }) }, ok);
   assert.equal(zero.status, 1);
   assert.match(zero.stderr, /floor must be a number in \(0, 1\]/);
 });

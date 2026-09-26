@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { findEvalFiles, loadEvals, validateData, SUPPORTED_TYPES } from './lib/load-evals.mjs';
+import { findSuites, loadSuite, suiteSkill, validateData, SUPPORTED_TYPES } from './lib/load-evals.mjs';
 import { buildSubjectPrompt, buildTransformationRubric, buildRuleRubric } from './lib/prompts.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,14 +30,12 @@ export default async function generateTests() {
     throw new Error('EVAL_SKILL is required (e.g. EVAL_SKILL=code-comment-register)');
   }
 
-  const evalsPath = findEvalFiles(REPO_ROOT).find(
-    (file) => path.basename(path.dirname(file)) === skillName,
-  );
-  if (!evalsPath) {
-    throw new Error(`no evals.json found for skill "${skillName}" under home/.agents/skills`);
+  const readme = findSuites(REPO_ROOT).find((file) => suiteSkill(file) === skillName);
+  if (!readme) {
+    throw new Error(`no evals/README.md found for skill "${skillName}" under home/.agents/skills`);
   }
 
-  const data = loadEvals(evalsPath);
+  const data = loadSuite(readme);
   validateData(data);
 
   const onlyIds = csvEnv('EVAL_ONLY');
