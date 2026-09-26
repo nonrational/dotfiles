@@ -29,6 +29,9 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
+      # The affected-skills script loads suites through the Markdown loader,
+      # which needs the eval package's dependencies installed.
+      - run: cd evals && npm ci
       - id: affected
         env:
           HAS_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
