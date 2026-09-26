@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Offline structural validation of every eval suite: zero model calls.
 // Unsupported case types warn rather than fail, so a new type can be
-// authored in evals.json before the generator grades it.
+// authored as a case file before the generator grades it.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { findSuites, loadSuite, suiteSkill, validateData } from '../lib/load-evals.mjs';
