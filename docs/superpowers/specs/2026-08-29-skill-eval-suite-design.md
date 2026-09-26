@@ -22,7 +22,7 @@ It is explicitly not [Bernard](https://github.com/nonrational/bernard), which an
 ## Decisions
 
 1. **Runner: promptfoo**, replacing both `run-evals.mjs` copies. It brings the assertion library, web viewer for eyeballing judge transcripts, run-to-run diffing, caching, and a maintained CI action.
-2. **Data: `evals.json` stays canonical.** It carries provenance, evidence maps, answer-key separation, traps, and coverage gaps that promptfoo's native test format has no home for. A generator is the only consumer; cases are never rewritten into promptfoo YAML.
+2. **Data: `evals.json` stays canonical.** It carries provenance, evidence maps, answer-key separation, traps, and coverage gaps that promptfoo's native test format has no home for. A generator is the only consumer; cases are never rewritten into promptfoo YAML. **Superseded 2026-09-25:** the canonical format is now one Markdown file per case under `evals/`, with a README per suite and a required `status`; see `2026-09-25-eval-cases-markdown-design.md`. The loader returns the same data shape, so the rest of this document stands.
 3. **CI: validate always, full runs path-filtered.** Structural validation (zero model calls) joins `preflight`. Full model runs trigger only on PRs touching the evaluated skill's directory.
 4. **Phase 1 skill: `code-comment-register`**, because 14 of its 16 cases grade deterministically, making parity with the old runner checkable without judge noise. `prose-register` follows as proof the generator generalizes.
 
