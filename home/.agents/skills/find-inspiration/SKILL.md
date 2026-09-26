@@ -43,7 +43,7 @@ a state main has never been in.
   (`home/.copilot/instructions/*.instructions.md`). Renames dangle these silently, so
   `make check-symlinks`, `check-skills`, `check-copilot-instructions` and `check-skill-frontmatter`
   guard them. Many skills are vendored via the `mattpocock-skills` submodule and are not editable here.
-- **macOS defaults:** imperative `.macos` + `make macos-*`. **Vendored:** git submodules.
+- **macOS defaults:** the `macos-defaults` table + `scripts/macos-bootstrap.sh` + `make macos-*`. **Vendored:** git submodules.
 - **Tests:** `make test` = `test/test_deploy.sh` + `test/test_shell.sh`, both sandboxing a
   throwaway `$HOME`.
 - **CI:** `.github/workflows/ci.yml` on ubuntu + macOS runs `make test`, a deploy apply/audit
