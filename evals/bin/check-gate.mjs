@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { findEvalFiles, loadEvals } from '../lib/load-evals.mjs';
+import { findSuites, loadSuite, suiteSkill } from '../lib/load-evals.mjs';
 
 // EVAL_REPO_ROOT lets the unit tests point the gate at a throwaway skills tree.
 const REPO_ROOT = process.env.EVAL_REPO_ROOT ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -59,19 +59,19 @@ const countsAsPassed = (row) =>
   row.success ||
   (components(row).length > 0 && components(row).every((c) => c.pass || isInformational(c)));
 
-// Precedence: argv, then the skill's own `min_pass_rate` in evals.json, then
+// Precedence: argv, then the skill's own `min_pass_rate` in evals/README.md, then
 // the default. A skill whose keys are contested or whose detection cases
 // record recall instead of failing (prose-register) can carry a lower floor
 // than one whose cases all have a single right answer.
 //
 // Only the named skill's file is parsed (the generator locates it the same
-// way), so a sibling's broken evals.json cannot fail this gate; an unreadable
+// way), so a sibling's broken evals/README.md cannot fail this gate; an unreadable
 // one falls back to the stricter default and says so.
 function skillMinRate(skill) {
   if (!skill) return undefined;
   try {
-    const file = findEvalFiles(REPO_ROOT).find((candidate) => path.basename(path.dirname(candidate)) === skill);
-    return file ? loadEvals(file).min_pass_rate : undefined;
+    const file = findSuites(REPO_ROOT).find((candidate) => suiteSkill(candidate) === skill);
+    return file ? loadSuite(file).min_pass_rate : undefined;
   } catch (error) {
     console.error(`cannot read ${skill}'s min_pass_rate, using the default: ${error.message}`);
     return undefined;

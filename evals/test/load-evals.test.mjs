@@ -2,29 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SUPPORTED_TYPES, findEvalFiles, loadEvals, validateData } from '../lib/load-evals.mjs';
+import { SUPPORTED_TYPES, findSuites, loadSuite, suiteSkill, validateData } from '../lib/load-evals.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
-test('findEvalFiles locates every existing suite', () => {
-  const files = findEvalFiles(REPO_ROOT);
-  const skills = files.map((f) => path.basename(path.dirname(f)));
+test('findSuites locates every existing suite', () => {
+  const skills = findSuites(REPO_ROOT).map(suiteSkill);
   assert.ok(skills.includes('code-comment-register'));
   assert.ok(skills.includes('prose-register'));
   assert.ok(skills.includes('code-review-register'));
 });
 
 test('code-comment-register evals validate with zero unsupported cases', () => {
-  const data = loadEvals(
-    path.join(REPO_ROOT, 'home/.agents/skills/code-comment-register/evals.json'),
-  );
+  const data = loadSuite(path.join(REPO_ROOT, 'home/.agents/skills/code-comment-register/evals/README.md'));
   const { caseCount, unsupported } = validateData(data);
   assert.equal(caseCount, 16);
   assert.equal(unsupported.length, 0);
 });
 
 test('prose-register evals validate with zero unsupported cases', () => {
-  const data = loadEvals(path.join(REPO_ROOT, 'home/.agents/skills/prose-register/evals.json'));
+  const data = loadSuite(path.join(REPO_ROOT, 'home/.agents/skills/prose-register/evals/README.md'));
   const { caseCount, unsupported } = validateData(data);
   assert.equal(caseCount, 24);
   assert.equal(unsupported.length, 0);

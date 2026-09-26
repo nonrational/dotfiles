@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assertDiscrimination from '../asserts/discrimination.mjs';
 import assertDetection, { quotesOverlap } from '../asserts/detection.mjs';
-import { findEvalFiles, loadEvals } from '../lib/load-evals.mjs';
+import { findSuites, loadSuite } from '../lib/load-evals.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -222,8 +222,8 @@ test('detection credits a quote holding two whole keys to both', () => {
 // text with a trap would flag the trap on a correct answer; keep the fixtures
 // free of that.
 test('no detection case has a violation quote that would itself trip one of its traps', () => {
-  for (const file of findEvalFiles(REPO_ROOT)) {
-    const data = loadEvals(file);
+  for (const file of findSuites(REPO_ROOT)) {
+    const data = loadSuite(file);
     for (const item of data.cases.filter((c) => c.type === 'detection')) {
       for (const violation of item.violations) {
         for (const trap of item.traps) {

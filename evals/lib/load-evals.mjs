@@ -1,5 +1,4 @@
-import { readFileSync, readdirSync, existsSync, lstatSync } from 'node:fs';
-import path from 'node:path';
+export { findSuites, loadSuite, suiteSkill } from './suite-md.mjs';
 import { normalize } from '../asserts/heuristics.mjs';
 
 export const SUPPORTED_TYPES = new Set([
@@ -9,24 +8,6 @@ export const SUPPORTED_TYPES = new Set([
   'transformation',
   'detection',
 ]);
-
-export function findEvalFiles(repoRoot) {
-  const skillsDir = path.join(repoRoot, 'home/.agents/skills');
-  const files = [];
-  for (const entry of readdirSync(skillsDir)) {
-    const dir = path.join(skillsDir, entry);
-    // Vendored skills are symlinks into the submodule; only real directories
-    // in this repo can carry evals we maintain.
-    if (lstatSync(dir).isSymbolicLink() || !lstatSync(dir).isDirectory()) continue;
-    const evalsPath = path.join(dir, 'evals.json');
-    if (existsSync(evalsPath)) files.push(evalsPath);
-  }
-  return files.sort();
-}
-
-export function loadEvals(evalsPath) {
-  return JSON.parse(readFileSync(evalsPath, 'utf8'));
-}
 
 function requireField(value, label) {
   if (value === undefined || value === null || value === '') {

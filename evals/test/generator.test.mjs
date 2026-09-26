@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import generateTests from '../tests.mjs';
-import { findEvalFiles, loadEvals } from '../lib/load-evals.mjs';
+import { findSuites, loadSuite, suiteSkill } from '../lib/load-evals.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -129,7 +129,7 @@ test('missing EVAL_SKILL is a hard error', async () => {
 test('unknown EVAL_SKILL is a hard error', async () => {
   await assert.rejects(
     withEnv({ EVAL_SKILL: 'no-such-skill', EVAL_ONLY: undefined, EVAL_TYPES: undefined }, generateTests),
-    /no evals\.json/,
+    /no evals\/README\.md/,
   );
 });
 
@@ -188,8 +188,8 @@ test('generates all 24 prose-register tests, rank and structural included', asyn
 
 test('subject prompts never leak an answer-key value the subject cannot already see', async () => {
   for (const skill of ['code-comment-register', 'prose-register', 'code-review-register']) {
-    const evalsPath = findEvalFiles(REPO_ROOT).find((f) => path.basename(path.dirname(f)) === skill);
-    const data = loadEvals(evalsPath);
+    const readme = findSuites(REPO_ROOT).find((f) => suiteSkill(f) === skill);
+    const data = loadSuite(readme);
     const casesById = Object.fromEntries(data.cases.map((c) => [c.id, c]));
     const tests = await withEnv(
       { EVAL_SKILL: skill, EVAL_ONLY: undefined, EVAL_TYPES: undefined },
