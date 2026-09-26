@@ -30,12 +30,18 @@ export function validateData(data) {
 
   const ids = new Set();
   const unsupported = [];
+  let draftCount = 0;
 
   for (const item of data.cases) {
     requireField(item.id, 'case.id');
     requireField(item.type, `${item.id}.type`);
     if (ids.has(item.id)) throw new Error(`Duplicate case id: ${item.id}`);
     ids.add(item.id);
+
+    if (item.status !== 'draft' && item.status !== 'approved') {
+      throw new Error(`${item.id}.status must be "draft" or "approved"`);
+    }
+    if (item.status === 'draft') draftCount++;
 
     if (!SUPPORTED_TYPES.has(item.type)) {
       unsupported.push({ id: item.id, type: item.type });
@@ -144,5 +150,5 @@ export function validateData(data) {
     }
   }
 
-  return { caseCount: data.cases.length, unsupported };
+  return { caseCount: data.cases.length, unsupported, draftCount };
 }

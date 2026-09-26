@@ -219,3 +219,16 @@ test('only the prose-register cases with an arguable key carry the flag', async 
   assert.deepEqual(flagged.sort(), ['disc-04', 'disc-08', 'disc-09', 'disc-11', 'disc-12', 'disc-13', 'disc-14']);
   assert.ok(tests.every((t) => t.metadata.arguable === undefined || t.metadata.arguable === true));
 });
+
+test('every generated row carries the case status so the gate can tell drafts apart', async () => {
+  const tests = await withEnv(
+    { EVAL_SKILL: 'code-review-register', EVAL_ONLY: undefined, EVAL_TYPES: undefined },
+    generateTests,
+  );
+  assert.ok(tests.every((t) => t.metadata.status === 'draft'), 'review-register cases migrated as draft');
+  const approved = await withEnv(
+    { EVAL_SKILL: 'code-comment-register', EVAL_ONLY: undefined, EVAL_TYPES: undefined },
+    generateTests,
+  );
+  assert.ok(approved.every((t) => t.metadata.status === 'approved'));
+});
