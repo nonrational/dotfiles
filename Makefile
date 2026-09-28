@@ -4,8 +4,38 @@ EDITORCONFIG_CHECKER ?= editorconfig-checker
 default:
 	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
 
+BREW ?= /opt/homebrew/bin/brew
+BREW_BASH ?= /opt/homebrew/bin/bash
+SHELLS_FILE ?= /etc/shells
+
 brew-install:
-	/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	@if [ -x "$(BREW)" ]; then \
+		echo "brew already installed at $(BREW)"; \
+	else \
+		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+	fi
+
+# Make the brew bash the login shell. Replaces the README's inline block;
+# safe to re-run, and the only step of setup.sh that needs sudo without a
+# defaults write behind it.
+set-shell:
+	@[ -x "$(BREW_BASH)" ] || { echo "error: $(BREW_BASH) missing; run make brew-bundle first" >&2; exit 1; }
+	@grep -qx "$(BREW_BASH)" "$(SHELLS_FILE)" || echo "$(BREW_BASH)" | sudo tee -a "$(SHELLS_FILE)" >/dev/null
+	@if [ "$$(dscl . -read ~ UserShell | awk '{print $$2}')" = "$(BREW_BASH)" ]; then \
+		echo "login shell already $(BREW_BASH)"; \
+	else \
+		chsh -s "$(BREW_BASH)"; \
+	fi
+
+# setup.sh is the one entry point for a new or existing machine; `make setup`
+# is the alias, ARGS passes flags through (make setup ARGS=--dry-run).
+setup:
+	./setup.sh $(ARGS)
+
+# One command for a new exe.dev VM as an @nonreagent host; see the script.
+exe-box:
+	@test -n "$(NAME)" || { echo "usage: make exe-box NAME=<name>"; exit 1; }
+	./scripts/new-exe-box.sh "$(NAME)"
 
 brew-bundle:
 	/opt/homebrew/bin/brew shellenv > /tmp/brew-shell.env
@@ -83,6 +113,7 @@ test:
 	./test/test_clipboard_bridge.sh
 	./test/test_tmux.sh
 	./test/test_macos_defaults.sh
+	./test/test_setup.sh
 
 deploy:
 	./deploy.sh apply
@@ -172,13 +203,24 @@ eval-compare: evals/node_modules
 
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
-	mkdir -p $$HOME/.config
-	ln -s $$PWD/karabiner $$HOME/.config/karabiner
+	@mkdir -p $$HOME/.config
+	@if [ "$$(readlink $$HOME/.config/karabiner 2>/dev/null)" = "$$PWD/karabiner" ]; then \
+		echo "karabiner already linked"; \
+	elif [ -e $$HOME/.config/karabiner ] && [ ! -L $$HOME/.config/karabiner ]; then \
+		echo "error: $$HOME/.config/karabiner exists and is not a symlink; move it aside" >&2; exit 1; \
+	else \
+		ln -sfn $$PWD/karabiner $$HOME/.config/karabiner; \
+	fi
 
 link-sublime:
-	git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
-	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text
-	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text
+	@[ -d $$HOME/.sublime3/.git ] || git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
+	@if [ "$$(readlink "$$HOME/Library/Application Support/Sublime Text" 2>/dev/null)" = "$$HOME/.sublime3" ]; then \
+		echo "Sublime Text already linked"; \
+	elif [ -e "$$HOME/Library/Application Support/Sublime Text" ] && [ ! -L "$$HOME/Library/Application Support/Sublime Text" ]; then \
+		echo "error: $$HOME/Library/Application Support/Sublime Text exists and is not a symlink; move it aside" >&2; exit 1; \
+	else \
+		ln -sfn $$HOME/.sublime3 "$$HOME/Library/Application Support/Sublime Text"; \
+	fi
 
 # (Re)load the clipboard bridge launch agent: a socket-activated responder on
 # 127.0.0.1:2224 that hands the pasteboard image to exe.dev VMs (see
@@ -203,7 +245,8 @@ restore-preferences:
 
 macos-disable-restore-apps-on-login:
 	# See https://apple.stackexchange.com/a/322787
-	# clear the file if it isn't empty
+	# clear the file if it isn't empty (lifting the flag a previous run set)
+	find ~/Library/Preferences/ByHost/ -name 'com.apple.loginwindow*' -exec chflags nouimmutable {} \;
 	find ~/Library/Preferences/ByHost/ -name 'com.apple.loginwindow*' ! -size 0 -exec tee {} \; < /dev/null
 	# set the user immutable flag
 	find ~/Library/Preferences/ByHost/ -name 'com.apple.loginwindow*' -exec chflags uimmutable {} \;
@@ -215,4 +258,4 @@ init-submodules:
 	git submodule update --init --recursive
 
 # grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
+.PHONY: default setup exe-box set-shell brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
