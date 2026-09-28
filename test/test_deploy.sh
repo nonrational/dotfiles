@@ -342,12 +342,12 @@ test_manifest_covers_link_dotfiles() {
     # .agents is an in-repo root (source of truth for rules/skills/ext);
     # .config and .ssh contain individually deployed files (and ~/.ssh also
     # holds keys and an unmanaged config, so it must never become a link).
-    # None is a deploy target, so all are excluded like .gitmodules and .macos.
+    # None is a deploy target, so all are excluded like .gitmodules.
     local linked
     linked="$(cd "$ROOT/home" && find . -maxdepth 1 -name '.*' \
         ! -name '.' ! -name '.AppleDouble' ! -name '.DS_Store' \
         ! -name '.git' ! -name '.github' ! -name '.gitignore' \
-        ! -name '.gitmodules' ! -name '.macos' ! -name '.agents' \
+        ! -name '.gitmodules' ! -name '.agents' \
         ! -name '.config' ! -name '.ssh' -exec basename {} \; | sort)"
     local sources
     sources="$(grep -v '^[[:space:]]*#' "$ROOT/manifest" | awk 'NF{print $1}' | sort -u)"
