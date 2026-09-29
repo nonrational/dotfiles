@@ -150,5 +150,6 @@
   renameLimit = 999999
 [rebase]
   instructionFormat = (%an <%ae>) %s
+  autostash = true
 [advice]
   skippedCherryPicks = false
