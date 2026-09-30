@@ -70,6 +70,7 @@ Match the *amount* of answer to what was asked. A reply is not a checklist to cl
 - **Don't do the recipient's homework.** When they own a decision, acknowledge it and defer.
 - **You don't have to answer every question in the incoming message.** State the recommendation, reassure where it helps, name the next step. Punting a whole thread to later is a legitimate move, not a gap.
 - **Avoid the consulting-memo shape.** Bullets, hedges, and "here's the reasoning" at paragraph length read as mechanical corpospeak. Conversational bias for action.
+- **Frame gaps as proposals, not refusals.** When a partner's data or request falls short, pair the gap with a default we could adopt and ask whether it works: "Could we default X to Y?" A flat "we can't" ends the conversation; a proposal gives the other side something to say yes to. Still name the risk when the default can't be undone later.
 
 ---
 
