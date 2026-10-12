@@ -1,6 +1,9 @@
 SHELL := /bin/bash
 EDITORCONFIG_CHECKER ?= editorconfig-checker
 
+# Every target is a command, not a file (and `test/` is a directory), so rebuild unconditionally instead of maintaining a .PHONY list.
+MAKEFLAGS += -B
+
 default:
 	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
 
@@ -213,6 +216,3 @@ set-file-associations:
 
 init-submodules:
 	git submodule update --init --recursive
-
-# grep '^\w' Makefile | sed 's/:.*//g' | tr '\n' ' ' | pbcopy
-.PHONY: default macos-setup init-post-reboot brew-install brew-bundle macos-reset-dock macos macos-doctor macos-audit macos-apply macos-accept check-macos-defaults check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions preflight test deploy eval-validate eval-test eval eval-compare clipboard-bridge link-karabiner link-sublime backup-preferences restore-preferences disable-restore-apps-on-login set-file-associations
