@@ -1,5 +1,4 @@
-import { readFileSync, readdirSync, existsSync, lstatSync } from 'node:fs';
-import path from 'node:path';
+export { findSuites, loadSuite, suiteSkill } from './suite-md.mjs';
 import { normalize } from '../asserts/heuristics.mjs';
 
 export const SUPPORTED_TYPES = new Set([
@@ -9,24 +8,6 @@ export const SUPPORTED_TYPES = new Set([
   'transformation',
   'detection',
 ]);
-
-export function findEvalFiles(repoRoot) {
-  const skillsDir = path.join(repoRoot, 'home/.agents/skills');
-  const files = [];
-  for (const entry of readdirSync(skillsDir)) {
-    const dir = path.join(skillsDir, entry);
-    // Vendored skills are symlinks into the submodule; only real directories
-    // in this repo can carry evals we maintain.
-    if (lstatSync(dir).isSymbolicLink() || !lstatSync(dir).isDirectory()) continue;
-    const evalsPath = path.join(dir, 'evals.json');
-    if (existsSync(evalsPath)) files.push(evalsPath);
-  }
-  return files.sort();
-}
-
-export function loadEvals(evalsPath) {
-  return JSON.parse(readFileSync(evalsPath, 'utf8'));
-}
 
 function requireField(value, label) {
   if (value === undefined || value === null || value === '') {
@@ -49,12 +30,18 @@ export function validateData(data) {
 
   const ids = new Set();
   const unsupported = [];
+  let draftCount = 0;
 
   for (const item of data.cases) {
     requireField(item.id, 'case.id');
     requireField(item.type, `${item.id}.type`);
     if (ids.has(item.id)) throw new Error(`Duplicate case id: ${item.id}`);
     ids.add(item.id);
+
+    if (item.status !== 'draft' && item.status !== 'approved') {
+      throw new Error(`${item.id}.status must be "draft" or "approved"`);
+    }
+    if (item.status === 'draft') draftCount++;
 
     if (!SUPPORTED_TYPES.has(item.type)) {
       unsupported.push({ id: item.id, type: item.type });
@@ -163,5 +150,5 @@ export function validateData(data) {
     }
   }
 
-  return { caseCount: data.cases.length, unsupported };
+  return { caseCount: data.cases.length, unsupported, draftCount };
 }
