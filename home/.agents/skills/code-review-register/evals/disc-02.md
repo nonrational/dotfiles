@@ -1,7 +1,7 @@
 ---
 id: disc-02
 type: discrimination
-status: draft
+status: approved
 correct: three_part
 expected_rule: A nit needs its label, one clause of reasoning, and a blocking-or-not signal.
 accepted_rules:

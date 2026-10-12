@@ -1,7 +1,7 @@
 ---
 id: disc-09
 type: discrimination
-status: draft
+status: approved
 correct: with_path
 expected_rule: Critique comes with a path to resolution, never on its own.
 accepted_rules:

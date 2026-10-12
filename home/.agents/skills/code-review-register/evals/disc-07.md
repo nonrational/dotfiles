@@ -1,7 +1,7 @@
 ---
 id: disc-07
 type: discrimination
-status: draft
+status: approved
 correct: unpacked
 expected_rule: Shorthand and metaphor are unpacked in the same sentence with a clause of plain-language context.
 accepted_rules:

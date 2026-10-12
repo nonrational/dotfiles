@@ -1,7 +1,7 @@
 ---
 id: disc-13
 type: discrimination
-status: draft
+status: approved
 correct: warm_no_joke
 expected_rule: "On a blocking security issue the humor is dialed down: stay warm but drop the jokes."
 accepted_rules:

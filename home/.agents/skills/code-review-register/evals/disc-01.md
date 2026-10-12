@@ -1,7 +1,7 @@
 ---
 id: disc-01
 type: discrimination
-status: draft
+status: approved
 correct: with_reason
 expected_rule: A question carries the reason it is asked or the answer that would resolve it; a bare question is never posted.
 ---

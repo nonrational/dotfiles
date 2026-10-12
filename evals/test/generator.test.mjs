@@ -221,14 +221,9 @@ test('only the prose-register cases with an arguable key carry the flag', async 
 });
 
 test('every generated row carries the case status so the gate can tell drafts apart', async () => {
-  const tests = await withEnv(
-    { EVAL_SKILL: 'code-review-register', EVAL_ONLY: undefined, EVAL_TYPES: undefined },
-    generateTests,
-  );
-  assert.ok(tests.every((t) => t.metadata.status === 'draft'), 'review-register cases migrated as draft');
-  const approved = await withEnv(
-    { EVAL_SKILL: 'code-comment-register', EVAL_ONLY: undefined, EVAL_TYPES: undefined },
-    generateTests,
-  );
-  assert.ok(approved.every((t) => t.metadata.status === 'approved'));
+  for (const skill of ['code-review-register', 'code-comment-register']) {
+    const tests = await withEnv({ EVAL_SKILL: skill, EVAL_ONLY: undefined, EVAL_TYPES: undefined }, generateTests);
+    assert.ok(tests.length > 0, `${skill} generated no rows`);
+    assert.ok(tests.every((t) => t.metadata.status === 'approved'), `${skill} cases are approved`);
+  }
 });

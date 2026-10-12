@@ -1,7 +1,7 @@
 ---
 id: disc-03
 type: discrimination
-status: draft
+status: approved
 correct: request_changes
 expected_rule: An approval never carries a blocking comment; when something must change first, request changes instead.
 accepted_rules:

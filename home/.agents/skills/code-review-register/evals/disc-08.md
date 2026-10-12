@@ -1,7 +1,7 @@
 ---
 id: disc-08
 type: discrimination
-status: draft
+status: approved
 correct: bottom_line_first
 expected_rule: The ask or conclusion goes in the first sentence; the reasoning follows it.
 ---

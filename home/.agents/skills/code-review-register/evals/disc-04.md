@@ -1,7 +1,7 @@
 ---
 id: disc-04
 type: discrimination
-status: draft
+status: approved
 correct: style_non_blocking
 expected_rule: Where a helper lives is a structure preference, and structure defaults to non-blocking.
 accepted_rules:

@@ -1,7 +1,7 @@
 ---
 id: disc-06
 type: discrimination
-status: draft
+status: approved
 correct: suggestion_block
 expected_rule: A one-line fix is offered as a suggestion block, not as prose asking for the change.
 ---

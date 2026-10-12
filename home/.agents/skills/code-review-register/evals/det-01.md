@@ -1,7 +1,7 @@
 ---
 id: det-01
 type: detection
-status: draft
+status: approved
 ---
 
 Review this draft code review with code-review-register. List every comment that breaks the register and the rule it breaks. Do not flag comments that follow it.

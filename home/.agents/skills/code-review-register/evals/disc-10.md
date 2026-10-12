@@ -1,7 +1,7 @@
 ---
 id: disc-10
 type: discrimination
-status: draft
+status: approved
 correct: code_target
 expected_rule: A joke targets the code or the situation, never the author's judgment or competence.
 ---

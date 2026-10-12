@@ -1,7 +1,7 @@
 ---
 id: trans-03
 type: transformation
-status: draft
+status: approved
 ---
 
 ## rule

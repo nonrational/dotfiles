@@ -1,7 +1,7 @@
 ---
 id: disc-12
 type: discrimination
-status: draft
+status: approved
 correct: approved
 expected_rule: A review with only non-blocking comments approves, and says so, rather than withholding approval.
 ---

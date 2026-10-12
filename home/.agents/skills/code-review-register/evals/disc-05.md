@@ -1,7 +1,7 @@
 ---
 id: disc-05
 type: discrimination
-status: draft
+status: approved
 correct: plain
 expected_rule: Data loss is a blocker and is marked blocking in plain words, never softened into a nit.
 accepted_rules:
