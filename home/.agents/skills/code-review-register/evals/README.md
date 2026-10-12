@@ -34,4 +34,4 @@ Discrimination, transformation, and detection cases for the reviewer's voice: wh
 
 ## Notes
 
-Both detection documents plant a correct blocking comment, a three-part nit, a reasoned question, a code-targeted joke, or a suggestion block as traps. A subject that reads the register as 'soften everything' or 'strip all personality' should trip them. disc-11 is the one taste key and is flagged arguable. Case count: 13 discrimination, 3 transformation, 2 detection.
+Both detection documents plant a correct blocking comment, a three-part nit, a reasoned question, a code-targeted joke, or a suggestion block as traps. A subject that reads the register as 'soften everything' or 'strip all personality' should trip them. Case count: 12 discrimination, 3 transformation, 2 detection.
