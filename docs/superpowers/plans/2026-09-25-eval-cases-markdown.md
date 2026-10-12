@@ -97,7 +97,7 @@ A throwaway suite for the loader tests. The harness reads only the frontmatter a
 ```
 
 `evals/test/fixtures/suite/home/.agents/skills/fixture-skill/evals/disc-01.md` (note the fenced variant whose `#` lines would otherwise be headings, and the raw variant with an inner suggestion fence):
-````markdown
+~~~markdown
 ---
 id: disc-01
 type: discrimination
@@ -138,7 +138,7 @@ retry(1)
 ## note
 
 Only the reason differs.
-````
+~~~
 
 `evals/test/fixtures/suite/home/.agents/skills/fixture-skill/evals/rank-01.md`:
 ```markdown
@@ -204,7 +204,7 @@ A rewrite that invents a reason fails.
 ```
 
 `evals/test/fixtures/suite/home/.agents/skills/fixture-skill/evals/det-01.md` (four-backtick outer fence because the document holds a three-backtick fence):
-`````markdown
+~~~markdown
 ---
 id: det-01
 type: detection
@@ -236,7 +236,7 @@ const name = `${base}.csv`;
 
 - quote: The filename drops the extension.
   why_valid: A fix offered as a suggestion block.
-`````
+~~~
 
 - [ ] **Step 3: Write the failing tests**
 

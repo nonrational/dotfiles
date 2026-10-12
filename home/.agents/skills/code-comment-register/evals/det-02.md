@@ -8,7 +8,7 @@ Review these test comments with code-comment-register. List every failing commen
 
 ## document
 
-```
+~~~
 # The streaming parser must match the string parser.
 test "streaming parser matches string parser" do
   assert via_stream(input()) == via_string(input())
@@ -32,7 +32,7 @@ test "keeps parser overhead below the input-size budget" do
   # Runtime-wide sampling may include unrelated allocations.
   assert peak < byte_size(payload) / 3
 end
-```
+~~~
 
 ## violations
 

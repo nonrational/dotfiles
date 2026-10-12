@@ -8,7 +8,7 @@ Review this draft code review with code-review-register. List every comment that
 
 ## document
 
-````
+~~~
 [export.ts:8] Should this read `settings.locale` instead of `user.locale`? The importer writes `settings.locale`, so I want to know which one the export is meant to reflect when the two differ.
 
 [export.ts:19] Blocking: `buildRows` should be named `toCsvRows` to match the importer.
@@ -23,7 +23,7 @@ Review this draft code review with code-review-register. List every comment that
 ```suggestion
 const filename = `${name}.csv`;
 ```
-````
+~~~
 
 ## violations
 

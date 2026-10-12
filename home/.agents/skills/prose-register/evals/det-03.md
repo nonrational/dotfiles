@@ -10,12 +10,12 @@ List every register violation in this document fragment, quoting the offending t
 
 ## document
 
-```
+~~~
 description: >-
   Same company, same invoice, same artifact — one rewrite by strangers, one
   by a machine. Why the two binaries don't feel the same, and what
   authorship trust is made of.
-```
+~~~
 
 ## violations
 

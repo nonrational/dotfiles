@@ -9,14 +9,14 @@ Find every failing comment.
 
 ## document
 
-````
+~~~
 [a.ts:1] Why is this 50?
 
 [a.ts:9] The filename drops the extension.
 ```suggestion
 const name = `${base}.csv`;
 ```
-````
+~~~
 
 ## violations
 

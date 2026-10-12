@@ -8,6 +8,7 @@ Review this draft code review with code-review-register. List every comment that
 
 ## document
 
+~~~
 [limiter.ts:12] Why is the bucket size 50?
 
 [limiter.ts:27] nit: `refill` would read better as `refillTokens`, since it also updates `lastRefillAt`. Not blocking.
@@ -19,6 +20,7 @@ Review this draft code review with code-review-register. List every comment that
 [limiter.test.ts:9] nit: move the fixture to `beforeEach`.
 
 [limiter.ts:63] Requesting changes for the refill math only; the nits are your call. Ha, the token-bucket rewrite is tidy.
+~~~
 
 ## violations
 

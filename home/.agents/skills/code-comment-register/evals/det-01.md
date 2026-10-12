@@ -8,7 +8,7 @@ Review these inline comments with code-comment-register. List every failing comm
 
 ## document
 
-```
+~~~
 # Larger chunks use more memory. Smaller chunks use more CPU.
 @chunk_size 192_000
 
@@ -31,7 +31,7 @@ end
 # Decoder errors include the submitted payload. Submitted data must not reach
 # logs or durable task metadata.
 defp public_reason({:decode_error, _details}), do: "invalid payload"
-```
+~~~
 
 ## violations
 

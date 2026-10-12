@@ -11,7 +11,7 @@ List every register violation in this draft, quoting the offending text and nami
 
 ## document
 
-```
+~~~
 Recently, the creator of Bun burned through roughly $200,000 worth of tokens to rewrite their core runtime from Zig into Rust. The migration was completed in mere weeks, with 99% of the commits authored by a pre-release AI model.
 
 It caused an immediate uproar in developer communities. The idea of an AI unilaterally rewriting a low-level systems programming language runtime feels inherently unsettling. But here is the hard truth: very soon, if you run tools like Claude locally on your machine, it will be executing on that very Rust rewrite. Like it or not, we are being forced to become users of AI-authored infrastructure.
@@ -56,7 +56,7 @@ This is exactly why I've recently started committing under an alter-ego GitHub p
 The era of solo authorship is over. Moving forward, the "integrity of the author" no longer means proving that you typed every single character by hand. It means being completely transparent about *how* you collaborate with AI. It means proving to your users that while the machine provided the Competence, a human being was there to provide the Character and the Caring.
 
 *(I'm currently formalizing these thoughts into an AI manifesto, which I am drafting in a separate agent session and will publish here soon).*
-```
+~~~
 
 ## violations
 

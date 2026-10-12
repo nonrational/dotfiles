@@ -11,7 +11,7 @@ List every register violation in this draft, quoting the offending text and nami
 
 ## document
 
-```
+~~~
 The creator of Bun spent $165,000 in tokens to rewrite his runtime from Zig to Rust. It took eleven days. A pre-release Claude Fable 5 wrote nearly all of the 6,778 commits.
 
 Developers did not take it well. Soon, though, if you run Claude on your own machine, it will run on that rewrite. We are becoming users of infrastructure no human wrote.
@@ -66,7 +66,7 @@ So I have started committing under a second name, "non-reagent," when I lean har
 Solo authorship is over. The integrity of the author no longer means you typed every character by hand. It means you are honest about how you worked with the machine. It means showing your readers that a person supplied the Character and the Caring the machine could not.
 
 *(I'm currently formalizing these thoughts into an AI manifesto, which I am drafting in a separate agent session and will publish here soon).*
-```
+~~~
 
 ## violations
 

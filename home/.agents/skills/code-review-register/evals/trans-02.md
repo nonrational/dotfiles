@@ -6,9 +6,9 @@ status: draft
 
 ## rule
 
-````
+~~~
 When the fix is a small, concrete code change (roughly one to a few lines), propose it as a GitHub ```suggestion``` block, not prose describing the change. Keep only the question or ask plus the one clause of why.
-````
+~~~
 
 ## input
 
@@ -20,20 +20,20 @@ Edit this draft comment according to code-review-register. The fix is one line: 
 
 ## reference
 
-````
+~~~
 A client sending `Content-Type` skips the JSON branch: the header map keeps the original casing and this lookup is case-sensitive.
 ```suggestion
 const type = getHeader(headers, "content-type");
 ```
-````
+~~~
 
 ## rubric
 
-````yaml
+~~~yaml
 violation_fixed: Is the fix offered as a ```suggestion``` block containing the replacement line, rather than prose asking for the change?
 placement: Does the prose carry the ask and the why in a sentence or two, with no separate sentence that spells out the code change the block already shows (for example 'could you lowercase the key')? A question that names the fix, and a blocking-or-not signal, both pass.
 no_new_violation: Is the suggested line the one-line fix given in the task, with nothing else changed or added?
-````
+~~~
 
 ## note
 
