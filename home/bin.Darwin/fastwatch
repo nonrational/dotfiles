@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# Continuous Fast.com speed monitor. The corporate TLS inspection CA is
-# applied only to the Node process that talks to Fast.com.
+# Continuous Fast.com speed monitor. When present, the corporate TLS inspection
+# CA is applied only to the Node process that talks to Fast.com; machines
+# without that file run with the default trust store.
 
 set -euo pipefail
 
@@ -71,7 +72,11 @@ trap 'cleanup; summary; exit 0' INT TERM
 trap cleanup EXIT
 
 measure() {
-  NODE_EXTRA_CA_CERTS=$CA_CERT npx --yes fast-cli --upload --json
+  if [[ -r $CA_CERT ]]; then
+    NODE_EXTRA_CA_CERTS=$CA_CERT npx --yes fast-cli --upload --json
+  else
+    npx --yes fast-cli --upload --json
+  fi
 }
 
 printf 'fastwatch: testing every %ss. Press Ctrl-C for a summary.\n' "$interval"
