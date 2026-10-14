@@ -94,4 +94,14 @@ fi
 
 printf '%s' "${segments[0]}"
 printf "${DIM} · ${RESET}%s" "${segments[@]:1}"
+
+# Append graft's graph status when the workspace is wired for it. graft init
+# writes a per-project helper that reads the same session JSON, so the global
+# statusline stays in charge and graft only adds a segment.
+graft_helper="${dir:+$dir/.claude/helpers/graft-statusline.cjs}"
+if [ -n "$graft_helper" ] && [ -r "$graft_helper" ] \
+  && graft_seg=$(CLAUDE_PROJECT_DIR="$dir" timeout 2 node "$graft_helper" <<<"$input" 2>/dev/null) \
+  && [ -n "$graft_seg" ]; then
+  printf "${DIM} · ${RESET}%s" "$graft_seg"
+fi
 printf '\n'
