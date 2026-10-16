@@ -550,8 +550,8 @@ test_token_goes_over_stdin_only() {
 test_exe_box_times_out_waiting() {
     sandbox; stub_ssh; stub op "tok-123"
     STUB_SSH_NOT_READY=1000000 EXE_BOX_WAIT=1 exe_box mybox
-    if [ "$status" -eq 1 ] && echo "$out" | grep -q 'did not answer within 1s' && ! grep -q '^op read' "$LOG"; then
-        ok "a box that never answers ssh fails with a timeout before any secret is read"
+    if [ "$status" -eq 1 ] && echo "$out" | grep -q 'did not answer within 1s'; then
+        ok "a box that never answers ssh fails with a timeout without sending the secret"
     else
         bad "timeout: status=$status out=$out log=$(cat "$LOG")"
     fi

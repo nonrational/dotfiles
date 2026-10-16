@@ -21,6 +21,12 @@ host="$name.exe.xyz"
 # would otherwise hang on the prompt (exe.dev's own skill file warns of this).
 ssh_opts="-o StrictHostKeyChecking=accept-new"
 
+# Read the token before creating anything: a bad reference should cost a
+# retry, not a half-provisioned VM. Empty stdin would also send gh into its
+# interactive device flow.
+token="$(op read "$EXE_BOX_GH_TOKEN_REF")"
+[ -n "$token" ] || { echo "error: $EXE_BOX_GH_TOKEN_REF is empty" >&2; exit 1; }
+
 echo "creating $name"
 # shellcheck disable=SC2086
 ssh $ssh_opts exe.dev new --name "$name" --json >/dev/null
@@ -38,7 +44,7 @@ done
 
 echo "authenticating gh as @nonreagent"
 # shellcheck disable=SC2086
-op read "$EXE_BOX_GH_TOKEN_REF" | ssh $ssh_opts "$host" 'gh auth login --with-token && gh auth setup-git'
+printf '%s\n' "$token" | ssh $ssh_opts "$host" 'gh auth login --with-token && gh auth setup-git'
 
 echo "running setup on $host"
 # shellcheck disable=SC2086
