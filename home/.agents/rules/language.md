@@ -57,9 +57,9 @@ _Guidance for how we should talk to eachother in-session_.
 - Ban emojis
 - Ban charged language. Prefer neutral, modern phrases (e.g., "allowlist/blocklist", "leader/follower")
 - Ban generic or inflated jargon. "business logic" or "framework" is better than "finite state machine via directed acyclic graph" _unless_ the specificity is necessary to model the domain.
-- Ban "gates" as a dependency verb. Use a phrase that names the actual relationship.
-  - Good: "X establishes the foundation for Y to build on", "Y layers on top of X", "X enables Y", "X is a prerequisite for Y"
-  - Bad: "X gates Y"
+- Ban "gate" in every form ("gate", "gates", "gated", "gating"), as noun, verb, or adjective, in prose and in code comments. Name the actual mechanism or relationship. Exempt only a quoted identifier or a term from an external source.
+  - Good: "X establishes the foundation for Y to build on", "Y layers on top of X", "X enables Y", "X is a prerequisite for Y", "no country check", "the flag controls whether Y runs"
+  - Bad: "X gates Y", "no country gate", "the rollout is gated on Z"
 
 ---
 

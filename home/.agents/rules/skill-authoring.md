@@ -20,7 +20,7 @@ Invent a neutral, universally-recognizable example — support tickets, invoices
 
 ### Verify before you finish
 
-Grep the artifact for the source project's identifiers before calling it done — a clean grep is the gate:
+Grep the artifact for the source project's identifiers before calling it done — a clean grep is the pass condition:
 
 ```bash
 grep -rniE '<client>|<product>|<domain-noun>|<vendor>|<repo>' <artifact-dir>
