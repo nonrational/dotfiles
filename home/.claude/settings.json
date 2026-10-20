@@ -22,6 +22,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/ring-tmux-bell.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/speak/speak-response.sh"
           }
         ]
       }
@@ -32,6 +36,20 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/ring-tmux-bell.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/speak/stop-speech.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/speak/speak-context.sh"
           }
         ]
       }
