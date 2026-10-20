@@ -41,4 +41,6 @@
 !agents/*
 !commands/*
 !hooks/*
+!hooks/*/
+!hooks/*/*
 !output-styles/*
