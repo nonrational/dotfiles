@@ -5,6 +5,7 @@
 # without that file run with the default trust store.
 
 set -euo pipefail
+set -m
 
 DEFAULT_INTERVAL=300
 CA_CERT=/Users/Shared/Certs/cert_SSL-Decrypt-Cert-Trusted.pem
@@ -64,8 +65,16 @@ summary() {
 }
 
 cleanup() {
-  [[ -n $measure_pid ]] && kill "$measure_pid" 2>/dev/null || true
-  [[ -n $measure_output ]] && rm -f "$measure_output"
+  # The measurement runs in its own process group (set -m) so one kill reaches
+  # npx, node, and fast-cli together instead of only the wrapper subshell.
+  # Plain `if` rather than `&&` chains: a false test as the last command would
+  # make this function fail under set -e and abort the INT trap before summary.
+  if [[ -n $measure_pid ]]; then
+    kill -- "-$measure_pid" 2>/dev/null || true
+  fi
+  if [[ -n $measure_output ]]; then
+    rm -f "$measure_output"
+  fi
 }
 
 trap 'cleanup; summary; exit 0' INT TERM
