@@ -3,8 +3,9 @@
 # copy-mode `y` binding follows pbcopy availability (pipe through pbcopy where
 # it exists, plain copy plus the terminal's OSC 52 elsewhere). Each case starts
 # its own tmux server on a private socket under a fake HOME, so nothing here
-# touches a live session. PATH is set per case, and tmux is invoked by absolute
-# path because bash resolves a command with the temporarily assigned PATH.
+# touches a live session. The default-shell cases use a stub fish on PATH. PATH
+# is set per case, and tmux is invoked by absolute path because bash resolves a
+# command with the temporarily assigned PATH.
 set -euf -o pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -27,7 +28,13 @@ fi
 TMUX_BIN="$(command -v tmux)"
 
 FAKEHOME="$BASE/home"
-mkdir -p "$FAKEHOME" "$BASE/nobin" "$BASE/pbcopybin"
+mkdir -p "$FAKEHOME" "$BASE/nobin" "$BASE/pbcopybin" "$BASE/fishbin"
+printf '#!/bin/sh\nexit 0\n' > "$BASE/fishbin/fish"
+chmod +x "$BASE/fishbin/fish"
+# The config's run-shell calls `tmux` by name, as it would on a real host where
+# the server was started from a PATH that holds tmux. nobin carries only that
+# link, so "no fish" stays true while tmux resolves.
+ln -s "$(command -v tmux)" "$BASE/nobin/tmux"
 printf '#!/bin/sh\ncat >/dev/null\n' > "$BASE/pbcopybin/pbcopy"
 chmod +x "$BASE/pbcopybin/pbcopy"
 
@@ -77,9 +84,43 @@ test_y_plain_copy_without_pbcopy() {
   fi
 }
 
+# default_shell <PATH> <SHELL>: load the config in a fresh server and print the
+# global default-shell. The config sets it through run-shell, which blocks the
+# command queue until the override has run, so one read after the load sees the
+# final value. exit-empty off keeps the sessionless server alive for that read.
+# Load output lands in $load_out.
+default_shell() {
+  local sock="tmuxtest-$$-$RANDOM"
+  set +e
+  load_out="$(HOME="$FAKEHOME" SHELL="$2" PATH="$1" TMUX_TMPDIR="$BASE" "$TMUX_BIN" -L "$sock" -f /dev/null start-server \; set -g exit-empty off \; source-file "$CONF" 2>&1)"
+  got="$(TMUX_TMPDIR="$BASE" "$TMUX_BIN" -L "$sock" show-options -gv default-shell 2>&1)"
+  set -e
+  TMUX_TMPDIR="$BASE" "$TMUX_BIN" -L "$sock" kill-server 2>/dev/null || true
+}
+
+test_default_shell_fish_present() {
+  default_shell "$BASE/fishbin:$BASE/nobin" /bin/sh
+  if [ "$got" = "$BASE/fishbin/fish" ] && [ -z "$load_out" ]; then
+    ok "default-shell is fish's absolute path when fish is on PATH"
+  else
+    bad "default-shell is fish's absolute path when fish is on PATH (got: $got; load: $load_out)"
+  fi
+}
+
+test_default_shell_fish_absent() {
+  default_shell "$BASE/nobin" /bin/sh
+  if [ "$got" = "/bin/sh" ] && [ -z "$load_out" ]; then
+    ok "default-shell stays \$SHELL when fish is absent"
+  else
+    bad "default-shell stays \$SHELL when fish is absent (got: $got; load: $load_out)"
+  fi
+}
+
 test_config_loads
 test_y_pipes_to_pbcopy_when_present
 test_y_plain_copy_without_pbcopy
+test_default_shell_fish_present
+test_default_shell_fish_absent
 
 echo "----"
 echo "$pass passed, $fail failed"
