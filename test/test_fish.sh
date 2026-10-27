@@ -85,8 +85,74 @@ test_runtime_state_stays_out_of_repo() {
   fi
 }
 
+test_path_order() {
+  run_fish "/usr/bin:/bin" 'echo $PATH[1]'
+  if [ "$got" = "./bin" ]; then
+    ok "./bin is first on PATH"
+  else
+    bad "./bin is first on PATH (got: $got)"
+  fi
+  if [ -d /opt/homebrew/bin ]; then
+    run_fish "/usr/bin:/bin" 'contains -i /opt/homebrew/bin $PATH; and contains -i /usr/bin $PATH'
+    local brew usr
+    brew="$(echo "$got" | sed -n 1p)"
+    usr="$(echo "$got" | sed -n 2p)"
+    if [ -n "$brew" ] && [ -n "$usr" ] && [ "$brew" -lt "$usr" ]; then
+      ok "/opt/homebrew/bin precedes /usr/bin"
+    else
+      bad "/opt/homebrew/bin precedes /usr/bin (got: $got)"
+    fi
+  else
+    skip "/opt/homebrew/bin ordering (directory absent)"
+  fi
+}
+
+test_functions_defined() {
+  run_fish "$PATH" 'functions -q prpg reset_known_host'
+  if [ "$status" -eq 0 ]; then ok "prpg and reset_known_host defined"; else bad "prpg and reset_known_host defined (got: $got)"; fi
+  if [ "$(uname)" = Darwin ]; then
+    run_fish "$PATH" 'functions -q scutil_set_hostname'
+    if [ "$status" -eq 0 ]; then ok "scutil_set_hostname defined"; else bad "scutil_set_hostname defined (got: $got)"; fi
+  fi
+}
+
+test_prpg_length() {
+  run_fish "$PATH" 'prpg 20'
+  if [ "${#got}" -eq 20 ] && [[ "$got" != *[/+=]* ]]; then
+    ok "prpg 20 prints 20 characters without /+="
+  else
+    bad "prpg 20 prints 20 characters without /+= (got: $got)"
+  fi
+}
+
+test_aliases() {
+  local a
+  run_fish "$PATH" 'alias'
+  for a in ll la l rm df du grep hist psa cdate; do
+    if echo "$got" | grep -qE "^alias $a "; then ok "alias $a defined"; else bad "alias $a defined"; fi
+  done
+}
+
+test_editor_exports() {
+  if [ "$(uname)" != Darwin ]; then
+    skip "EDITOR/VISUAL exports (Darwin only)"
+    return
+  fi
+  run_fish "$PATH" 'echo $EDITOR; echo $VISUAL'
+  if [ "$got" = "$(printf 'subl -w -n\nsubl -w -n')" ]; then
+    ok "EDITOR and VISUAL are subl -w -n"
+  else
+    bad "EDITOR and VISUAL are subl -w -n (got: $got)"
+  fi
+}
+
 test_config_parses
 test_runtime_state_stays_out_of_repo
+test_path_order
+test_functions_defined
+test_prpg_length
+test_aliases
+test_editor_exports
 
 echo "----"
 echo "$pass passed, $fail failed"
