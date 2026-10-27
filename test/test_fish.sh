@@ -26,6 +26,7 @@ if ! command -v fish >/dev/null 2>&1; then
   exit 0
 fi
 FISH_BIN="$(command -v fish)"
+REAL_UNAME="$(command -v uname)"
 
 # fake_fish_home: print the path of a fresh throwaway HOME with .config/fish
 # holding links to the repo's tracked entries, and an empty bin/ for stub
@@ -236,6 +237,95 @@ test_starship_toml_valid() {
   fi
 }
 
+# stub_uname <home> <name>: a uname that reports <name> for `-n` and defers to
+# the real one otherwise, so darwin.fish's `test (uname) = Darwin` still works.
+stub_uname() {
+  cat >"$1/bin/uname" <<STUB
+#!/bin/sh
+if [ "\$1" = "-n" ]; then echo $2; else exec $REAL_UNAME "\$@"; fi
+STUB
+  chmod +x "$1/bin/uname"
+}
+
+test_local_hook() {
+  local h
+  h="$(fake_fish_home)"
+  mkdir -p "$h/hookdir" "$h/.local"
+  cat >"$h/.local/config.fish" <<HOOK
+set -gx LOCAL_HOOK_RAN 1
+fish_add_path --move --path $h/hookdir
+HOOK
+  set +e
+  got="$(HOME="$h" PATH="/usr/bin:/bin" "$FISH_BIN" -ic 'echo $LOCAL_HOOK_RAN; echo $PATH[1]' 2>&1)"
+  set -e
+  if [ "$got" = "$(printf '1\n./bin')" ]; then
+    ok "local hook is sourced and ./bin stays first on PATH"
+  else
+    bad "local hook is sourced and ./bin stays first on PATH (got: $got)"
+  fi
+  run_fish "/usr/bin:/bin" 'exit'
+  if [ -z "$got" ] && [ "$status" -eq 0 ]; then
+    ok "absent local config prints nothing"
+  else
+    bad "absent local config prints nothing (status $status, got: $got)"
+  fi
+}
+
+test_host_file_inert() {
+  local h
+  h="$(fake_fish_home)"
+  stub_uname "$h" otherhost
+  set +e
+  got="$(HOME="$h" PATH="$h/bin:/usr/bin:/bin" SSH_AUTH_SOCK=sentinel "$FISH_BIN" -ic 'echo $SSH_AUTH_SOCK' 2>&1)"
+  set -e
+  if [ "$got" = sentinel ]; then
+    ok "host file leaves SSH_AUTH_SOCK alone on another host"
+  else
+    bad "host file leaves SSH_AUTH_SOCK alone on another host (got: $got)"
+  fi
+  h="$(fake_fish_home)"
+  stub_uname "$h" nyx.lan
+  set +e
+  got="$(HOME="$h" PATH="$h/bin:/usr/bin:/bin" SSH_AUTH_SOCK=sentinel "$FISH_BIN" -ic 'echo $SSH_AUTH_SOCK; functions aws' 2>&1)"
+  set -e
+  if [[ "$got" == *"/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"* ]] && [[ "$got" == *"op plugin run"* ]]; then
+    ok "host file sets the 1Password agent socket and aws alias on nyx"
+  else
+    bad "host file sets the 1Password agent socket and aws alias on nyx (got: $got)"
+  fi
+}
+
+test_op_completion_guarded() {
+  local h
+  # Only config.fish is linked, so conf.d/00-path.fish cannot put a Homebrew
+  # op on PATH and the case holds on a Mac that has op installed.
+  h="$(fake_fish_home)"
+  rm "$h/.config/fish/conf.d" "$h/.config/fish/functions" "$h/.config/fish/completions" 2>/dev/null || true
+  set +e
+  got="$(env -u XDG_CONFIG_HOME HOME="$h" PATH="/usr/bin:/bin" "$FISH_BIN" -ic 'exit' 2>&1)"
+  status=$?
+  set -e
+  if [ -z "$got" ] && [ "$status" -eq 0 ]; then
+    ok "startup without op prints nothing"
+  else
+    bad "startup without op prints nothing (status $status, got: $got)"
+  fi
+  h="$(fake_fish_home)"
+  cat >"$h/bin/op" <<'STUB'
+#!/bin/sh
+if [ "$1 $2" = "completion fish" ]; then echo 'set -g OP_COMPLETION_LOADED 1'; fi
+STUB
+  chmod +x "$h/bin/op"
+  set +e
+  got="$(HOME="$h" PATH="$h/bin:/usr/bin:/bin" "$FISH_BIN" -ic 'echo $OP_COMPLETION_LOADED' 2>&1)"
+  set -e
+  if [ "$got" = 1 ]; then
+    ok "op completion loads when op is on PATH"
+  else
+    bad "op completion loads when op is on PATH (got: $got)"
+  fi
+}
+
 test_config_parses
 test_runtime_state_stays_out_of_repo
 test_path_order
@@ -247,6 +337,9 @@ test_starship_absent
 test_starship_loads_under_minimal_path
 test_starship_present
 test_starship_toml_valid
+test_local_hook
+test_host_file_inert
+test_op_completion_guarded
 
 echo "----"
 echo "$pass passed, $fail failed"
