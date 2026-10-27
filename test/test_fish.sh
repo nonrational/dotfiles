@@ -146,6 +146,96 @@ test_editor_exports() {
   fi
 }
 
+test_starship_absent() {
+  # Only starship.fish is linked, so the guard is tested without 00-path.fish
+  # adding Homebrew (and its starship) to PATH.
+  local h
+  h="$(mktemp -d "$BASE/home.XXXXXX")"
+  mkdir -p "$h/.config/fish/conf.d"
+  ln -s "$FISHDIR/conf.d/starship.fish" "$h/.config/fish/conf.d/starship.fish"
+  set +e
+  got="$(HOME="$h" PATH="/usr/bin:/bin" "$FISH_BIN" -ic 'type fish_prompt' 2>&1)"
+  set -e
+  if [[ "$got" != *starship* ]]; then
+    ok "fish_prompt is fish's own when starship is absent"
+  else
+    bad "fish_prompt is fish's own when starship is absent (got: $got)"
+  fi
+  set +e
+  got="$(HOME="$h" PATH="/usr/bin:/bin" "$FISH_BIN" -ic 'exit' 2>&1)"
+  status=$?
+  set -e
+  if [ -z "$got" ] && [ "$status" -eq 0 ]; then
+    ok "startup without starship prints nothing"
+  else
+    bad "startup without starship prints nothing (status $status, got: $got)"
+  fi
+}
+
+test_starship_loads_under_minimal_path() {
+  if [ ! -x /opt/homebrew/bin/starship ]; then
+    skip "starship under minimal PATH (/opt/homebrew/bin/starship absent)"
+    return
+  fi
+  run_fish "/usr/bin:/bin" 'functions fish_prompt'
+  if [[ "$got" == *starship* ]]; then
+    ok "starship prompt loads under a minimal GUI PATH"
+  else
+    bad "starship prompt loads under a minimal GUI PATH (got: $got)"
+  fi
+}
+
+# A stub starship answers only the two calls the init script and prompt make,
+# so the test exercises the wiring in conf.d/starship.fish without the real binary.
+test_starship_present() {
+  local h
+  h="$(fake_fish_home)"
+  cat >"$h/bin/starship" <<'STUB'
+#!/bin/sh
+case "$1 $2" in
+  "init fish") echo 'function fish_prompt; echo STUB; end' ;;
+  "prompt "*|"prompt ") echo STUB ;;
+esac
+STUB
+  chmod +x "$h/bin/starship"
+  set +e
+  got="$(HOME="$h" PATH="$h/bin:/usr/bin:/bin" "$FISH_BIN" -ic 'fish_prompt' 2>&1)"
+  set -e
+  if [[ "$got" == *STUB* ]]; then
+    ok "starship prompt is installed when starship is on PATH"
+  else
+    bad "starship prompt is installed when starship is on PATH (got: $got)"
+  fi
+}
+
+test_starship_toml_valid() {
+  local sb out err rc
+  if ! command -v starship >/dev/null 2>&1; then
+    skip "starship.toml validity (starship not installed)"
+    return
+  fi
+  # A missing file silently falls back to starship's defaults, so require it first.
+  if [ ! -f "$ROOT/home/.config/starship.toml" ]; then
+    bad "starship.toml renders a prompt (home/.config/starship.toml missing)"
+    return
+  fi
+  # A fresh repo keeps the git modules independent of this checkout's state.
+  sb="$(mktemp -d "$BASE/sb.XXXXXX")"
+  git -C "$sb" init -q
+  # starship exits 0 and prints a default prompt when the TOML is invalid,
+  # reporting the error on stderr, so stderr must be empty to prove validity.
+  set +e
+  out="$(cd "$sb" && STARSHIP_CONFIG="$ROOT/home/.config/starship.toml" starship prompt 2>"$BASE/starship.err")"
+  rc=$?
+  set -e
+  err="$(cat "$BASE/starship.err")"
+  if [ "$rc" -eq 0 ] && [ -n "$out" ] && [ -z "$err" ]; then
+    ok "starship.toml renders a prompt without errors"
+  else
+    bad "starship.toml renders a prompt without errors (status $rc, stderr: $err)"
+  fi
+}
+
 test_config_parses
 test_runtime_state_stays_out_of_repo
 test_path_order
@@ -153,6 +243,10 @@ test_functions_defined
 test_prpg_length
 test_aliases
 test_editor_exports
+test_starship_absent
+test_starship_loads_under_minimal_path
+test_starship_present
+test_starship_toml_valid
 
 echo "----"
 echo "$pass passed, $fail failed"
