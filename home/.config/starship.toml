@@ -2,7 +2,7 @@
 add_newline = false
 format = """
 $hostname$directory$git_branch$git_status$cmd_duration
-$character"""
+$sudo$character"""
 
 [directory]
 truncation_length = 3
@@ -24,6 +24,12 @@ behind = "▽"
 [cmd_duration]
 min_time = 2000
 format = "[$duration]($style) "
+
+[sudo]
+disabled = false
+symbol = "🧙 "
+style = "bold red"
+format = "[$symbol]($style)"
 
 [character]
 success_symbol = "[❯](green)"
