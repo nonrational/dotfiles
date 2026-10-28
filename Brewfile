@@ -19,6 +19,7 @@ brew "editorconfig-checker"  # Verify files follow .editorconfig
 brew "ffmpeg"              # Play, record, convert, and stream select audio and video codecs
 brew "figlet"              # Banner-like program prints strings as ASCII art
 brew "findutils"           # Collection of GNU find, xargs, and locate
+brew "fish"                # User-friendly command-line shell for UNIX-like operating systems
 brew "flyctl"              # Command-line tools for fly.io services
 brew "fswatch"             # Monitor a directory for changes and run a shell command
 brew "fzf"                 # Command-line fuzzy finder written in Go
@@ -42,6 +43,7 @@ brew "railway"             # Develop and deploy code with zero configuration
 brew "rclone"              # Rsync for cloud storage
 brew "readline"            # Library for command-line editing
 brew "rename"              # Perl-powered file rename script with many helpful built-ins
+brew "starship"            # Cross-shell prompt for astronauts
 brew "tmux"                # Terminal multiplexer
 brew "tmuxinator"          # Manage complex tmux sessions easily
 brew "watch"               # Executes a program periodically, showing output fullscreen

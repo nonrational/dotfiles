@@ -30,6 +30,10 @@ sudo nvram StartupMute=%01
 # Remove duplicates in the “Open With” menu (also see `lscleanup` alias)
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
 
+# An unset HostName lets macOS adopt whatever the router's DNS calls this IP
+# (often a generic "Mac"); pin it to the name System Settings already set.
+sudo scutil --set HostName "$(scutil --get LocalHostName).local"
+
 # Set the timezone; see `sudo systemsetup -listtimezones` for other values
 sudo systemsetup -settimezone "America/Los_Angeles" > /dev/null
 

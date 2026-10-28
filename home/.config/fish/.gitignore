@@ -1,0 +1,18 @@
+# Allowlist approach: ignore everything, then explicitly allow tracked files.
+#
+# fish writes runtime state here (fish_variables for universal variables, and
+# whatever plugins or `funcsave` leave behind), so a default-deny keeps it out.
+
+*
+
+# A file cannot be re-included while its parent directory is excluded, so each
+# tracked directory is listed explicitly.
+!conf.d/
+!functions/
+!completions/
+
+!.gitignore
+!config.fish
+!conf.d/*.fish
+!functions/*.fish
+!completions/*.fish

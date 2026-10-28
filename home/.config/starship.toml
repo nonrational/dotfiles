@@ -1,0 +1,30 @@
+# Symbols are plain Unicode so the prompt needs no Nerd Font on any host.
+add_newline = false
+format = """
+$hostname$directory$git_branch$git_status$cmd_duration
+$character"""
+
+[directory]
+truncation_length = 3
+fish_style_pwd_dir_length = 1
+style = "bold blue"
+repo_root_style = "bold"
+
+[git_branch]
+symbol = ""
+format = "[($branch)]($style) "
+style = "green"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "yellow"
+ahead = "△"
+behind = "▽"
+
+[cmd_duration]
+min_time = 2000
+format = "[$duration]($style) "
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"

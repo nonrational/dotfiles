@@ -85,6 +85,8 @@ test:
 	./test/test_shell.sh
 	./test/test_clipboard_bridge.sh
 	./test/test_tmux.sh
+	./test/test_kitty.sh
+	./test/test_fish.sh
 	./test/test_macos_defaults.sh
 
 deploy:
