@@ -25,6 +25,12 @@ behind = "▽"
 min_time = 2000
 format = "[$duration]($style) "
 
+[sudo]
+disabled = false
+symbol = "# "
+style = "bold red"
+format = "[$symbol]($style)"
+
 [character]
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
