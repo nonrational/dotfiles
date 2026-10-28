@@ -326,6 +326,34 @@ STUB
   fi
 }
 
+# Only autojump.fish is linked, so 00-path.fish cannot put a Homebrew autojump
+# ahead of the stub, and the absent case holds on a Mac that has autojump.
+test_autojump() {
+  local h
+  h="$(mktemp -d "$BASE/home.XXXXXX")"
+  mkdir -p "$h/.config/fish/conf.d" "$h/bin" "$h/share/autojump"
+  ln -s "$FISHDIR/conf.d/autojump.fish" "$h/.config/fish/conf.d/autojump.fish"
+  set +e
+  got="$(HOME="$h" PATH="/usr/bin:/bin" "$FISH_BIN" -ic 'functions -q j; or echo no-j' 2>&1)"
+  set -e
+  if [ "$got" = no-j ]; then
+    ok "startup without autojump prints nothing and defines no j"
+  else
+    bad "startup without autojump prints nothing and defines no j (got: $got)"
+  fi
+  printf '#!/bin/sh\n' >"$h/bin/autojump"
+  chmod +x "$h/bin/autojump"
+  echo 'function j; echo STUB; end' >"$h/share/autojump/autojump.fish"
+  set +e
+  got="$(HOME="$h" PATH="$h/bin:/usr/bin:/bin" "$FISH_BIN" -ic 'j' 2>&1)"
+  set -e
+  if [ "$got" = STUB ]; then
+    ok "j loads from the share/autojump beside the autojump binary"
+  else
+    bad "j loads from the share/autojump beside the autojump binary (got: $got)"
+  fi
+}
+
 test_config_parses
 test_runtime_state_stays_out_of_repo
 test_path_order
@@ -340,6 +368,7 @@ test_starship_toml_valid
 test_local_hook
 test_host_file_inert
 test_op_completion_guarded
+test_autojump
 
 echo "----"
 echo "$pass passed, $fail failed"
