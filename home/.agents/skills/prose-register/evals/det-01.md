@@ -74,7 +74,7 @@ The era of solo authorship is over. Moving forward, the "integrity of the author
   rule: Connectives are joints, not filler.
   fixed_in: c8fa24c
 - quote: If you miss, the cup is just sitting on the floor.
-  rule: '"Just" is banned as a modifier.'
+  rule: '"Just" is banned when it stacks the deck.'
   fixed_in: f98e637 (reworded, ahead of the formal purge in c26cd1a)
 - quote: low-risk tasks—throwaway games, little toys, boilerplate scripts
   rule: No em-dashes. Full stops, semicolons, parentheses, en-dashes.
@@ -83,10 +83,10 @@ The era of solo authorship is over. Moving forward, the "integrity of the author
   rule: "Lint: \"A triplet whose third item adds nothing the first two didn't.\""
   fixed_in: 24d944d
 - quote: are you just phoning it in?
-  rule: '"Just" is banned as a modifier.'
+  rule: '"Just" is banned when it stacks the deck.'
   fixed_in: c26cd1a
 - quote: does it just confidently blast out the first statistically probable solution?
-  rule: '"Just" is banned as a modifier.'
+  rule: '"Just" is banned when it stacks the deck.'
   fixed_in: c26cd1a
 - quote: I don't really need to worry about Character or Caring
   rule: Hedges of precision stay. Hedges of cowardice go.
