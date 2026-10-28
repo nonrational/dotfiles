@@ -6,7 +6,6 @@ $character"""
 
 [directory]
 truncation_length = 3
-truncation_symbol = "…/"
 fish_style_pwd_dir_length = 1
 style = "bold blue"
 repo_root_style = "bold"
