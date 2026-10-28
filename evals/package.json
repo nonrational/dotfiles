@@ -9,5 +9,9 @@
   "devDependencies": {
     "promptfoo": "^0.124.1",
     "yaml": "^2.9.1"
+  },
+  "overrides": {
+    "@azure/msal-node": "^7.1.0",
+    "basic-ftp": "^6.2.3"
   }
 }
