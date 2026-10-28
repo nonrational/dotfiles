@@ -67,6 +67,7 @@ cask "claude-code"         # Terminal-based AI coding assistant
 cask "docker-desktop"      # App to build and share containerised applications and microservices
 cask "dropbox"             # Client for the Dropbox cloud storage service
 cask "firefox"             # Web browser
+cask "font-hack-nerd-font"  # Hack typeface patched with Nerd Font icons
 cask "google-chrome"       # Web browser
 cask "handy"               # Speech to text application
 cask "istat-menus"         # ($) | System monitoring app
