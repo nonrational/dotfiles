@@ -1,5 +1,6 @@
 # Interactive-only setup lives here so scripts and `fish -c` stay fast and quiet.
 if status is-interactive
+  set -g fish_greeting
   command -q op; and op completion fish | source
 end
 
