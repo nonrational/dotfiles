@@ -354,6 +354,35 @@ test_autojump() {
   fi
 }
 
+# Only fzf.fish is linked, for the same reason as test_autojump.
+test_fzf() {
+  local h
+  h="$(mktemp -d "$BASE/home.XXXXXX")"
+  mkdir -p "$h/.config/fish/conf.d" "$h/bin"
+  ln -s "$FISHDIR/conf.d/fzf.fish" "$h/.config/fish/conf.d/fzf.fish"
+  set +e
+  got="$(HOME="$h" PATH="/usr/bin:/bin" "$FISH_BIN" -ic 'set -q FZF_LOADED; or echo no-fzf' 2>&1)"
+  set -e
+  if [ "$got" = no-fzf ]; then
+    ok "startup without fzf prints nothing"
+  else
+    bad "startup without fzf prints nothing (got: $got)"
+  fi
+  cat >"$h/bin/fzf" <<'STUB'
+#!/bin/sh
+if [ "$1" = "--fish" ]; then echo 'set -g FZF_LOADED 1'; fi
+STUB
+  chmod +x "$h/bin/fzf"
+  set +e
+  got="$(HOME="$h" PATH="$h/bin:/usr/bin:/bin" "$FISH_BIN" -ic 'echo $FZF_LOADED' 2>&1)"
+  set -e
+  if [ "$got" = 1 ]; then
+    ok "fzf bindings load when fzf is on PATH"
+  else
+    bad "fzf bindings load when fzf is on PATH (got: $got)"
+  fi
+}
+
 test_config_parses
 test_runtime_state_stays_out_of_repo
 test_path_order
@@ -369,6 +398,7 @@ test_local_hook
 test_host_file_inert
 test_op_completion_guarded
 test_autojump
+test_fzf
 
 echo "----"
 echo "$pass passed, $fail failed"
