@@ -175,6 +175,20 @@ setup_repo() {
     printf '#!/bin/bash\n[ "$1" = shellenv ] && exit 0\n' > "$SB/brew"; chmod +x "$SB/brew"
     printf '#!/bin/bash\n' > "$SB/bash"; chmod +x "$SB/bash"
     echo "$SB/bash" > "$SB/shells"
+    # The fake .git above is not a real repo, so answer `git submodule status`
+    # from $STUB_SUBMODULES; a leading '-' marks an uninitialized submodule.
+    cat > "$SB/bin/git" <<EOF
+#!/bin/bash
+call="git \$*"
+echo "\$call" >> "$LOG"
+IFS='|'
+for f in \${STUB_FAIL:-}; do
+    case "\$call" in "\$f"*) exit "\${STUB_EXIT:-1}" ;; esac
+done
+case "\$call" in "git -C $REPO submodule status") printf '%s\n' "\${STUB_SUBMODULES:-}" ;; esac
+EOF
+    chmod +x "$SB/bin/git"
+    export STUB_SUBMODULES='-0123abc etc/sub'
 }
 
 # Stubs describing a fully converged Mac; tests knock out one at a time.
@@ -183,7 +197,7 @@ converged_mac() {
     stub xcode-select
     stub make
     stub dscl "UserShell: $SB/bash"
-    stub launchctl "org.nonrational.clipboard-bridge"
+    stub launchctl
     stub gh
     stub osascript
     echo x > "$REPO/etc/sub/file"
@@ -193,6 +207,7 @@ converged_mac() {
     : > "$FAKEHOME/Library/Preferences/ByHost/com.apple.loginwindow.ABC.plist"
     export STUB_DEPLOY_AUDIT=0
     export STUB_MACOS_AUDIT=0
+    export STUB_SUBMODULES=' 0123abc etc/sub'
 }
 
 setup_run() {
@@ -211,7 +226,7 @@ test_mac_runs_every_target_in_order_on_first_run() {
     sandbox; setup_repo
     rm "$SB/brew"
     stub uname Darwin; stub xcode-select; stub make; stub dscl "UserShell: /bin/zsh"; stub launchctl; stub gh; stub osascript
-    export STUB_DEPLOY_AUDIT=1 STUB_FAIL='gh auth status'
+    export STUB_DEPLOY_AUDIT=1 STUB_FAIL='gh auth status|launchctl list'
     SETUP_FIRST_RUN=1 setup_run
     unset STUB_FAIL
     local targets
@@ -241,7 +256,7 @@ test_mac_dry_run_runs_nothing() {
     sandbox; setup_repo
     stub uname Darwin; stub xcode-select; stub make; stub dscl "UserShell: /bin/zsh"; stub launchctl; stub gh; stub osascript
     export STUB_DEPLOY_AUDIT=1 STUB_MACOS_AUDIT=1
-    setup_run --dry-run
+    STUB_FAIL='launchctl list' setup_run --dry-run
     if [ "$status" -eq 0 ] && ! grep -q '^make' "$LOG" && ! grep -q '^osascript' "$LOG" \
         && echo "$out" | grep -q '^would: deploy$' && echo "$out" | grep -q '^would: reboot$'; then
         ok "--dry-run reports every pending step and calls no target"
@@ -275,10 +290,84 @@ test_failed_step_stops_run() {
     sandbox; setup_repo; converged_mac
     export STUB_DEPLOY_AUDIT=1
     STUB_EXIT=2 STUB_FAIL="make -C $REPO deploy" setup_run
-    if [ "$status" -ne 0 ] && [ "$status" -ne 1 ] && ! grep -q 'link-karabiner\|macos-doctor' "$LOG"; then
-        ok "a failing step stops the run with its own exit code, not the checkpoint's"
+    if [ "$status" -eq 2 ] && ! grep -q 'link-karabiner\|macos-doctor' "$LOG"; then
+        ok "a failing step stops the run with exit 2, not the checkpoint's 1"
     else
         bad "failed step: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_failed_step_exits_2_with_name() {
+    sandbox; setup_repo; converged_mac
+    STUB_FAIL='gh auth status|gh auth login' setup_run
+    local after
+    after="$(echo "$out" | sed -n '/^failed: gh auth login$/,$p' | tail -n +2)"
+    if [ "$status" -eq 2 ] && echo "$out" | grep -q '^failed: gh auth login$' && ! echo "$after" | grep -q '^run:'; then
+        ok "a failing step exits 2, names itself, and nothing runs after it"
+    else
+        bad "failed name: status=$status out=$out"
+    fi
+}
+
+test_failed_apply_skips_bootstrap() {
+    sandbox; setup_repo; converged_mac
+    export STUB_MACOS_AUDIT=1
+    STUB_FAIL="make -C $REPO macos-apply" setup_run
+    if [ "$status" -eq 2 ] && ! grep -q '^macos-bootstrap.sh$' "$LOG" \
+        && echo "$out" | grep -q 'failed: macos-apply + macos-bootstrap'; then
+        ok "a failing macos-apply skips macos-bootstrap and exits 2"
+    else
+        bad "failed apply: status=$status out=$out log=$(cat "$LOG")"
+    fi
+}
+
+test_stale_gitmodules_entry_does_not_rerun_init() {
+    sandbox; setup_repo; converged_mac
+    rm "$SB/bin/git"; rm -rf "$REPO/.git"
+    printf '[submodule "stale"]\n\tpath = etc/stale\n\turl = x\n' > "$REPO/.gitmodules"
+    (unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE; git init -q "$REPO")
+    setup_run
+    if [ "$status" -eq 0 ] && echo "$out" | grep -q '^skip: init-submodules$'; then
+        ok "a .gitmodules entry with no gitlink does not rerun init-submodules"
+    else
+        bad "stale gitmodules: status=$status out=$out"
+    fi
+}
+
+test_git_failure_runs_init() {
+    sandbox; setup_repo; converged_mac
+    STUB_FAIL='git' setup_run
+    if echo "$out" | grep -q '^run: init-submodules$'; then
+        ok "a failing git submodule status runs init-submodules"
+    else
+        bad "git failure: status=$status out=$out"
+    fi
+}
+
+test_dry_run_summary_counts_pending() {
+    sandbox; setup_repo; converged_mac
+    rm "$SB/brew"
+    export STUB_DEPLOY_AUDIT=1
+    setup_run --dry-run
+    local n
+    n="$(echo "$out" | grep -c '^would:' || true)"
+    if [ "$status" -eq 0 ] && [ "$n" -gt 0 ] && [ "$(echo "$out" | tail -n 1)" = "setup: dry run (Darwin), $n would run" ] \
+        && ! echo "$out" | grep -q '^setup: converged'; then
+        ok "--dry-run ends with a count of the would: lines, not converged"
+    else
+        bad "dry summary: status=$status n=$n out=$out"
+    fi
+}
+
+test_reboot_failure_is_checkpoint_3() {
+    sandbox; setup_repo; converged_mac
+    export STUB_MACOS_AUDIT=1
+    STUB_FAIL='osascript' setup_run
+    if [ "$status" -eq 1 ] && [ "$(echo "$out" | grep -c '^checkpoint 3:')" -eq 1 ] \
+        && echo "$out" | grep '^checkpoint 3:' | grep -q '^checkpoint 3: the reboot request failed'; then
+        ok "a failed reboot request halts at checkpoint 3"
+    else
+        bad "reboot failure: status=$status out=$out"
     fi
 }
 
@@ -327,7 +416,7 @@ test_pipe_clones_and_execs_as_first_run() {
     sandbox; stub uname Linux; stub_git_clone
     pipe_run
     if [ "$status" -eq 0 ] && grep -q "^git clone https://example.invalid/dotfiles $FAKEHOME/.dotfiles$" "$LOG" \
-        && echo "$out" | grep -q '^exec-ed first_run=1 args=$'; then
+        && echo "$out" | grep -q '^exec-ed first_run=1 args=$' && [ -f "$FAKEHOME/.dotfiles/.git/setup-first-run" ]; then
         ok "piped from outside a checkout, setup.sh clones and execs the clone as a first run"
     else
         bad "pipe clone: status=$status out=$out log=$(cat "$LOG")"
@@ -411,6 +500,51 @@ test_first_run_steps_skip_without_flag() {
     fi
 }
 
+test_first_run_survives_failed_step() {
+    sandbox; setup_repo; converged_mac
+    touch "$REPO/.git/setup-first-run"
+    export STUB_DEPLOY_AUDIT=1
+    STUB_EXIT=2 STUB_FAIL="make -C $REPO deploy" setup_run
+    local s1="$status"
+    unset SETUP_FIRST_RUN
+    : > "$LOG"
+    STUB_DEPLOY_AUDIT=0 setup_run
+    local s2="$status" ran2
+    ran2="$(grep -c 'restore-preferences\|macos-reset-dock' "$LOG" || true)"
+    : > "$LOG"
+    setup_run
+    if [ "$s1" -eq 2 ] && [ "$s2" -eq 0 ] && [ "$ran2" -eq 2 ] && [ "$status" -eq 0 ] \
+        && ! grep -q 'restore-preferences\|macos-reset-dock' "$LOG" \
+        && echo "$out" | grep -q '^skip: restore-preferences (first run only)$' \
+        && echo "$out" | grep -q '^skip: macos-reset-dock (first run only)$'; then
+        ok "a failed step on the first run does not lose the first-run steps"
+    else
+        bad "first-run survive: s1=$s1 s2=$s2 ran2=$ran2 s3=$status out=$out"
+    fi
+}
+
+test_pipe_old_clone_without_setup_sh() {
+    sandbox; stub uname Linux; stub_git_clone
+    mkdir -p "$FAKEHOME/.dotfiles/.git"
+    pipe_run
+    if [ "$status" -eq 2 ] && echo "$out" | grep -q "^error: $FAKEHOME/.dotfiles has no setup.sh; run git -C $FAKEHOME/.dotfiles pull, then re-run$"; then
+        ok "piped with a pre-setup.sh clone, setup.sh exits 2 and says to pull"
+    else
+        bad "pipe old clone: status=$status out=$out"
+    fi
+}
+
+test_pipe_clone_failure_exits_2() {
+    sandbox; stub uname Linux
+    stub git
+    STUB_EXIT=128 STUB_FAIL='git clone' pipe_run
+    if [ "$status" -eq 2 ] && echo "$out" | grep -q '^failed: clone$'; then
+        ok "a failed clone exits 2, not git's 128"
+    else
+        bad "pipe clone fail: status=$status out=$out"
+    fi
+}
+
 test_link_karabiner_is_idempotent
 test_link_karabiner_refuses_real_directory
 test_link_sublime_skips_existing_clone
@@ -425,6 +559,12 @@ test_mac_dry_run_runs_nothing
 test_missing_clt_is_checkpoint_1
 test_doctor_failure_is_checkpoint_2
 test_failed_step_stops_run
+test_failed_step_exits_2_with_name
+test_failed_apply_skips_bootstrap
+test_stale_gitmodules_entry_does_not_rerun_init
+test_git_failure_runs_init
+test_dry_run_summary_counts_pending
+test_reboot_failure_is_checkpoint_3
 test_linux_runs_only_submodules_and_deploy
 test_unknown_flag_is_usage_error
 test_unsupported_os_fails
@@ -434,6 +574,9 @@ test_pipe_clones_and_execs_as_first_run
 test_pipe_reuses_existing_clone
 test_pipe_dry_run_does_not_clone
 test_pipe_on_mac_without_clt_is_checkpoint_1
+test_first_run_survives_failed_step
+test_pipe_old_clone_without_setup_sh
+test_pipe_clone_failure_exits_2
 
 echo
 echo "$pass passed, $fail failed"

@@ -48,8 +48,16 @@ setup_self_bootstrap() {
         exit 1
     fi
     if [ ! -d "$SETUP_CLONE_DIR/.git" ]; then
-        git clone ${SETUP_BRANCH:+--branch "$SETUP_BRANCH"} "$SETUP_REPO_URL" "$SETUP_CLONE_DIR"
+        git clone ${SETUP_BRANCH:+--branch "$SETUP_BRANCH"} "$SETUP_REPO_URL" "$SETUP_CLONE_DIR" \
+            || { echo "failed: clone" >&2; exit 2; }
+        # A marker, not just the env flag: a step failing before the
+        # first-run steps must not lose them on the re-run.
+        touch "$SETUP_CLONE_DIR/.git/setup-first-run"
         export SETUP_FIRST_RUN=1
+    fi
+    if [ ! -x "$SETUP_CLONE_DIR/setup.sh" ]; then
+        echo "error: $SETUP_CLONE_DIR has no setup.sh; run git -C $SETUP_CLONE_DIR pull, then re-run" >&2
+        exit 2
     fi
     exec "$SETUP_CLONE_DIR/setup.sh" "$@"
 }
@@ -57,6 +65,8 @@ setup_self_bootstrap() {
 # --- harness: step runner, checkpoints, dispatch ----------------------------
 
 SETUP_DRY_RUN=0
+# Counts the would: lines so a dry run can say how much is pending.
+SETUP_PENDING=0
 
 # step <name> <guard> <run>: skip when the guard exits 0; otherwise run, or
 # under --dry-run say what would run. Guards and runs are function names.
@@ -68,10 +78,11 @@ step() {
     fi
     if [ "$SETUP_DRY_RUN" = 1 ]; then
         echo "would: $name"
+        SETUP_PENDING=$((SETUP_PENDING + 1))
         return 0
     fi
     echo "run: $name"
-    "$run"
+    "$run" || { echo "failed: $name" >&2; exit 2; }
 }
 
 # first_run_step <name> <run>: runs only when the self-clone marked this run
@@ -79,16 +90,17 @@ step() {
 # destructive ones, and the clone is the only evidence they are wanted.
 first_run_step() {
     local name="$1" run="$2"
-    if [ "$SETUP_FIRST_RUN" != 1 ]; then
+    if [ "$SETUP_FIRST_RUN" != 1 ] && [ ! -e "$SETUP_ROOT/.git/setup-first-run" ]; then
         echo "skip: $name (first run only)"
         return 0
     fi
     if [ "$SETUP_DRY_RUN" = 1 ]; then
         echo "would: $name"
+        SETUP_PENDING=$((SETUP_PENDING + 1))
         return 0
     fi
     echo "run: $name"
-    "$run"
+    "$run" || { echo "failed: $name" >&2; exit 2; }
 }
 
 # checkpoint <n> <message...>: halt for a human. Exit 1 so a wrapper can tell
@@ -129,7 +141,11 @@ run_setup() {
             ;;
     esac
     echo
-    echo "setup: converged ($(os_id))"
+    if [ "$SETUP_DRY_RUN" = 1 ]; then
+        echo "setup: dry run ($(os_id)), $SETUP_PENDING would run"
+    else
+        echo "setup: converged ($(os_id))"
+    fi
 }
 
 # --- steps ------------------------------------------------------------------
@@ -147,15 +163,16 @@ shell_is_brew() {
         && [ "$(dscl . -read ~ UserShell 2>/dev/null | awk '{print $2}')" = "$SETUP_BREW_BASH" ]
 }
 submodules_present() {
-    local path
-    while read -r path; do
-        [ -n "$(ls -A "$SETUP_ROOT/$path" 2>/dev/null)" ] || return 1
-    done < <(git config -f "$SETUP_ROOT/.gitmodules" --get-regexp '\.path$' | awk '{print $2}')
-    return 0
+    # `submodule status` lists only paths with a gitlink, so a stale
+    # .gitmodules entry drops out; a leading '-' marks an uninitialized one.
+    local out
+    out="$(git -C "$SETUP_ROOT" submodule status 2>/dev/null)" || return 1
+    ! grep -q '^-' <<<"$out"
 }
 deployed() { "$SETUP_ROOT/deploy.sh" audit >/dev/null 2>&1; }
 karabiner_linked() { [ "$(readlink "$HOME/.config/karabiner" 2>/dev/null)" = "$SETUP_ROOT/karabiner" ]; }
-bridge_loaded() { launchctl list 2>/dev/null | grep -q org.nonrational.clipboard-bridge; }
+# No pipe: under pipefail a SIGPIPE'd launchctl would read as not loaded.
+bridge_loaded() { launchctl list org.nonrational.clipboard-bridge >/dev/null 2>&1; }
 gh_authed() { gh auth status >/dev/null 2>&1; }
 sublime_linked() {
     [ -d "$HOME/.sublime3/.git" ] \
@@ -198,20 +215,21 @@ clipboard_bridge() { mk clipboard-bridge; }
 gh_login() { gh auth login; }
 link_sublime() { mk link-sublime; }
 restore_preferences() { mk restore-preferences; }
-reset_dock() { mk macos-reset-dock; }
+# The last first-run step; clearing the marker here ends the first run.
+reset_dock() { mk macos-reset-dock && rm -f "$SETUP_ROOT/.git/setup-first-run"; }
 disable_restore() { mk macos-disable-restore-apps-on-login; }
 doctor_or_halt() {
     mk macos-doctor \
         || checkpoint 2 "grant Full Disk Access to this terminal (System Settings > Privacy & Security), then restart the terminal."
 }
 apply_macos() {
-    mk macos-apply
-    "$SETUP_ROOT/scripts/macos-bootstrap.sh"
-    SETUP_MACOS_APPLIED=1
+    # && chain: the caller's || disables errexit inside this function.
+    mk macos-apply && "$SETUP_ROOT/scripts/macos-bootstrap.sh" && SETUP_MACOS_APPLIED=1
 }
 reboot_mac() {
-    echo "checkpoint 3: rebooting. Run $0 once more afterwards; it should report every step as skip."
-    osascript -e 'tell app "loginwindow" to «event aevtrrst»'
+    echo "rebooting. Run $0 once more afterwards; it should report every step as skip."
+    osascript -e 'tell app "loginwindow" to «event aevtrrst»' \
+        || checkpoint 3 "the reboot request failed (no GUI session?). Restart this Mac by hand, then re-run setup.sh once more."
 }
 
 setup_darwin() {

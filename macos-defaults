@@ -569,10 +569,8 @@ com.apple.ActivityMonitor	SortDirection	int	0
 # Address Book, TextEdit, and QuickTime Player                                #
 ###############################################################################
 # Dropped 2026-09-25: the Calendar debug menu (pre-10.8) and both Disk Utility
-# rows (the El Capitan rewrite reads neither).
-
-# Enable the debug menu in Address Book
-com.apple.addressbook	ABShowDebugMenu	bool	true	noaudit=unset
+# rows (the El Capitan rewrite reads neither). Dropped 2026-10-29: the
+# Address Book ABShowDebugMenu row (macOS 26 refuses the write).
 
 # Use plain text mode for new TextEdit documents
 com.apple.TextEdit	RichText	int	0	noaudit=unset
