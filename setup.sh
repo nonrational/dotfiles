@@ -7,7 +7,7 @@
 # clone.
 # Spec: docs/superpowers/specs/2026-09-25-setup-script-design.md
 #
-#   curl -fsSL https://raw.githubusercontent.com/nonrational/dotfiles/main/setup.sh | bash
+#   curl -sS https://nonration.al/setup.sh | bash
 #   ./setup.sh [--dry-run]
 set -euf -o pipefail
 
@@ -44,7 +44,7 @@ setup_self_bootstrap() {
         xcode-select --install >/dev/null 2>&1 || true
         echo
         echo "checkpoint 1: finish the Command Line Tools installer."
-        echo "re-run the curl command when done."
+        echo "re-run: curl -sS https://nonration.al/setup.sh | bash"
         exit 1
     fi
     if [ ! -d "$SETUP_CLONE_DIR/.git" ]; then
