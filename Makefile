@@ -33,6 +33,11 @@ macos: macos-doctor macos-apply
 	./scripts/macos-bootstrap.sh
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
 
+# One command for a new exe.dev VM as an @nonreagent host; see the script.
+exe-box:
+	@test -n "$(NAME)" || { echo "usage: make exe-box NAME=<name>"; exit 1; }
+	./scripts/new-exe-box.sh "$(NAME)"
+
 macos-reset-dock:
 	defaults write com.apple.dock persistent-apps -array
 	killall Dock
@@ -88,6 +93,7 @@ test:
 	./test/test_kitty.sh
 	./test/test_fish.sh
 	./test/test_macos_defaults.sh
+	./test/test_exe_box.sh
 
 deploy:
 	./deploy.sh apply
