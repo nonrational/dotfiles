@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nonration.al</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
+  pre { padding: 0.75rem 1rem; background: #f4f4f4; overflow-x: auto; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #111; color: #ddd; }
+    pre { background: #222; }
+    a { color: #8ab4f8; }
+  }
+</style>
+</head>
+<body>
+<h1>hi!</h1>
+<p>New Mac? Open Terminal and run:</p>
+<pre><code>curl -sS https://nonration.al/setup.sh | bash</code></pre>
+<p>It stops at three checkpoints and tells you what to do at each one. Re-run the same command after each:</p>
+<ol>
+  <li>Finish the Command Line Tools installer.</li>
+  <li>Grant your terminal Full Disk Access, then restart it.</li>
+  <li>Let the Mac reboot, then run it once more.</li>
+</ol>
+<p>The script and everything it installs live at <a href="https://github.com/nonrational/dotfiles">nonrational/dotfiles</a>.</p>
+</body>
+</html>

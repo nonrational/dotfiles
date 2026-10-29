@@ -54,6 +54,20 @@ macos-accept:
 check-macos-defaults:
 	@./scripts/macos-defaults.sh check
 
+# nonration.al is GitHub Pages built from site/ plus the root setup.sh, so the
+# served script is always main's. The pages workflow and check-site share this.
+SITE_DIR ?= _site
+site:
+	@rm -rf "$(SITE_DIR)" && mkdir -p "$(SITE_DIR)"
+	@cp site/index.html setup.sh "$(SITE_DIR)/"
+
+check-site:
+	@d="$$(mktemp -d)" && $(MAKE) -s site SITE_DIR="$$d" \
+		&& cmp -s "$$d/setup.sh" setup.sh \
+		&& grep -qF 'curl -sS https://nonration.al/setup.sh | bash' "$$d/index.html" \
+		|| { echo "check-site: built site is missing setup.sh or the curl line" >&2; rm -rf "$$d"; exit 1; }; \
+		rm -rf "$$d"
+
 macos: macos-doctor macos-apply
 	./scripts/macos-bootstrap.sh
 	osascript -e 'tell app "loginwindow" to «event aevtrrst»'
@@ -176,7 +190,7 @@ check-copilot-instructions:
 
 # The one definition of "safe to commit" -- CI runs this same target, so a
 # new check-* target is covered by both the moment it's added here.
-preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults eval-validate eval-test
+preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults check-site eval-validate eval-test
 
 # Skill eval suite (evals/). eval-validate and eval-test are offline and free,
 # and run in preflight. eval and eval-compare spend subscription usage: a
