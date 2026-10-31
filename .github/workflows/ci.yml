@@ -33,7 +33,19 @@ jobs:
           node-version: "24"
       - run: make preflight
 
-      - run: |
+      - run: ./setup.sh --dry-run
+
+      # The real Linux path, twice: the second run must find nothing to do.
+      - if: runner.os == 'Linux'
+        run: |
+          export HOME="$(mktemp -d)"
+          ./setup.sh
+          ./setup.sh | tee second-run.log
+          grep -q '^skip: deploy$' second-run.log
+
+      # The macOS path needs brew and sudo; keep exercising the deploy engine alone.
+      - if: runner.os == 'macOS'
+        run: |
           export HOME="$(mktemp -d)"
           ./deploy.sh apply
           ./deploy.sh audit

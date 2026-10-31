@@ -7,8 +7,33 @@ MAKEFLAGS += -B
 default:
 	@echo "Cowardly refusing to run on $(shell uname). Use platform specific targets."
 
+BREW ?= /opt/homebrew/bin/brew
+BREW_BASH ?= /opt/homebrew/bin/bash
+SHELLS_FILE ?= /etc/shells
+
 brew-install:
-	/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	@if [ -x "$(BREW)" ]; then \
+		echo "brew already installed at $(BREW)"; \
+	else \
+		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+	fi
+
+# Make the brew bash the login shell. Replaces the README's inline block;
+# safe to re-run, and the only step of setup.sh that needs sudo without a
+# defaults write behind it.
+set-shell:
+	@[ -x "$(BREW_BASH)" ] || { echo "error: $(BREW_BASH) missing; run make brew-bundle first" >&2; exit 1; }
+	@grep -qx "$(BREW_BASH)" "$(SHELLS_FILE)" || echo "$(BREW_BASH)" | sudo tee -a "$(SHELLS_FILE)" >/dev/null
+	@if [ "$$(dscl . -read ~ UserShell | awk '{print $$2}')" = "$(BREW_BASH)" ]; then \
+		echo "login shell already $(BREW_BASH)"; \
+	else \
+		chsh -s "$(BREW_BASH)"; \
+	fi
+
+# setup.sh is the one entry point for a new or existing machine; `make setup`
+# is the alias, ARGS passes flags through (make setup ARGS=--dry-run).
+setup:
+	./setup.sh $(ARGS)
 
 brew-bundle:
 	/opt/homebrew/bin/brew shellenv > /tmp/brew-shell.env
@@ -28,6 +53,20 @@ macos-accept:
 
 check-macos-defaults:
 	@./scripts/macos-defaults.sh check
+
+# nonration.al is GitHub Pages built from site/ plus the root setup.sh, so the
+# served script is always main's. The pages workflow and check-site share this.
+SITE_DIR ?= _site
+site:
+	@rm -rf "$(SITE_DIR)" && mkdir -p "$(SITE_DIR)"
+	@cp site/index.html setup.sh "$(SITE_DIR)/"
+
+check-site:
+	@d="$$(mktemp -d)" && $(MAKE) -s site SITE_DIR="$$d" \
+		&& cmp -s "$$d/setup.sh" setup.sh \
+		&& grep -qF 'curl -sS https://nonration.al/setup.sh | bash' "$$d/index.html" \
+		|| { echo "check-site: built site is missing setup.sh or the curl line" >&2; rm -rf "$$d"; exit 1; }; \
+		rm -rf "$$d"
 
 macos: macos-doctor macos-apply
 	./scripts/macos-bootstrap.sh
@@ -88,6 +127,7 @@ test:
 	./test/test_kitty.sh
 	./test/test_fish.sh
 	./test/test_macos_defaults.sh
+	./test/test_setup.sh
 
 deploy:
 	./deploy.sh apply
@@ -150,7 +190,7 @@ check-copilot-instructions:
 
 # The one definition of "safe to commit" -- CI runs this same target, so a
 # new check-* target is covered by both the moment it's added here.
-preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults eval-validate eval-test
+preflight: test check-symlinks check-skills check-skill-frontmatter check-editorconfig check-copilot-instructions check-macos-defaults check-site eval-validate eval-test
 
 # Skill eval suite (evals/). eval-validate and eval-test are offline and free,
 # and run in preflight. eval and eval-compare spend subscription usage: a
@@ -188,13 +228,24 @@ eval-compare: evals/node_modules
 
 link-karabiner:
 	# don't link entire .config directory because it may contain secrets
-	mkdir -p $$HOME/.config
-	ln -s $$PWD/karabiner $$HOME/.config/karabiner
+	@mkdir -p $$HOME/.config
+	@if [ "$$(readlink $$HOME/.config/karabiner 2>/dev/null)" = "$$PWD/karabiner" ]; then \
+		echo "karabiner already linked"; \
+	elif [ -e $$HOME/.config/karabiner ] && [ ! -L $$HOME/.config/karabiner ]; then \
+		echo "error: $$HOME/.config/karabiner exists and is not a symlink; move it aside" >&2; exit 1; \
+	else \
+		ln -sfn $$PWD/karabiner $$HOME/.config/karabiner; \
+	fi
 
 link-sublime:
-	git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
-	rm -rf $$HOME/Library/Application\ Support/Sublime\ Text
-	ln -s $$HOME/.sublime3 $$HOME/Library/Application\ Support/Sublime\ Text
+	@[ -d $$HOME/.sublime3/.git ] || git clone https://github.com/nonrational/sublime3 $$HOME/.sublime3
+	@if [ "$$(readlink "$$HOME/Library/Application Support/Sublime Text" 2>/dev/null)" = "$$HOME/.sublime3" ]; then \
+		echo "Sublime Text already linked"; \
+	elif [ -e "$$HOME/Library/Application Support/Sublime Text" ] && [ ! -L "$$HOME/Library/Application Support/Sublime Text" ]; then \
+		echo "error: $$HOME/Library/Application Support/Sublime Text exists and is not a symlink; move it aside" >&2; exit 1; \
+	else \
+		ln -sfn $$HOME/.sublime3 "$$HOME/Library/Application Support/Sublime Text"; \
+	fi
 
 # (Re)load the clipboard bridge launch agent: a socket-activated responder on
 # 127.0.0.1:2224 that hands the pasteboard image to exe.dev VMs (see
@@ -219,7 +270,8 @@ restore-preferences:
 
 macos-disable-restore-apps-on-login:
 	# See https://apple.stackexchange.com/a/322787
-	# clear the file if it isn't empty
+	# clear the file if it isn't empty (lifting the flag a previous run set)
+	find ~/Library/Preferences/ByHost/ -name 'com.apple.loginwindow*' -exec chflags nouimmutable {} \;
 	find ~/Library/Preferences/ByHost/ -name 'com.apple.loginwindow*' ! -size 0 -exec tee {} \; < /dev/null
 	# set the user immutable flag
 	find ~/Library/Preferences/ByHost/ -name 'com.apple.loginwindow*' -exec chflags uimmutable {} \;
