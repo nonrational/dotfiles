@@ -43,7 +43,7 @@ BRANCH_FORMAT="$BRANCH_PREFIX^$BRANCH_REF^$BRANCH_HASH^$BRANCH_DATE^$BRANCH_AUTH
 
 # Print the name of the "primary" branch, be it main or master.
 remote_origin_primary_branch() {
-  git branch -a | grep 'remotes.origin.\(main\|master\)' | sed 's|.*remotes/||g'
+  git branch -a | grep -E 'remotes/origin/(main|master)$' | sed 's|.*remotes/||g'
 }
 
 # Get the host of the remote origin
@@ -148,9 +148,10 @@ switch_wildcard() {
   if [ -z "$1" ]; then
     echo "No pattern provided"
   elif [ "$all_branches" = true ]; then
-    git branch --all --sort=-committerdate | sed 's|remotes/origin/||' | egrep "$1" | head -1 | xargs git switch
+    # for-each-ref emits bare names; `git branch` prefixes the current (`*`) and other-worktree (`+`) branches, which breaks xargs. A bare `origin` is the remote's HEAD ref.
+    git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ refs/remotes/origin/ | sed 's|^origin/||' | grep -vx origin | egrep "$1" | head -1 | xargs git switch
   else
-    git branch --sort=-committerdate | egrep "$1" | head -1 | xargs git switch
+    git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | egrep "$1" | head -1 | xargs git switch
   fi
 }
 
@@ -191,12 +192,17 @@ delete_remoteless_branches_interactive() {
   git fetch origin --prune --tags -f
   git worktree prune
 
+  local main_branch current
   main_branch=$(remote_origin_primary_branch)
-  remote_branches=$(git branch --remote | grep "origin" | grep -v "HEAD" | cut -c10- | egrep -v "^${main_branch}$")
-  local_branches=$(git branch | grep -v "HEAD" | cut -c3- | egrep -v "^${main_branch}$")
+  main_branch=${main_branch#origin/}
+  current=$(git branch --show-current)
+  # A bare `origin` is the remote's HEAD ref.
+  remote_branches=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ | sed 's|^origin/||' | grep -vx origin)
+  local_branches=$(git for-each-ref --format='%(refname:short)' refs/heads/ | grep -vxF "$main_branch")
 
   for local_branch in $local_branches; do
-    if ! echo "$remote_branches" | grep -q "$local_branch"; then
+    [ "$local_branch" = "$current" ] && continue
+    if ! echo "$remote_branches" | grep -qxF "$local_branch"; then
       printf "Delete %s? (y/n): " "$local_branch"
       read -r response
       case "$response" in
@@ -222,7 +228,6 @@ delete_remoteless_branches_interactive() {
 
 # Delete all personally-prefixed non-primary branches with confirmation.
 delete_all_my_branches_interactive() {
-  # for-each-ref emits bare names; `git branch` prefixes the current branch with `* `, which the shell glob-expands into filenames.
   local current
   current=$(git branch --show-current)
   for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/ | egrep '^(aln|anorton)/'); do
