@@ -222,8 +222,12 @@ delete_remoteless_branches_interactive() {
 
 # Delete all personally-prefixed non-primary branches with confirmation.
 delete_all_my_branches_interactive() {
-  for branch in $(git branch | egrep '^\W*(aln|anorton)/'); do
-    printf "Delete $branch, both local and origin? (y/[n])";
+  # for-each-ref emits bare names; `git branch` prefixes the current branch with `* `, which the shell glob-expands into filenames.
+  local current
+  current=$(git branch --show-current)
+  for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/ | egrep '^(aln|anorton)/'); do
+    [ "$branch" = "$current" ] && continue
+    printf "Delete $branch, both local and origin? (y/[n]) ";
     read ans;
     [ "$ans" = "y" ] && git branch -D $branch && git push origin :$branch
   done
@@ -231,8 +235,11 @@ delete_all_my_branches_interactive() {
 
 # Delete all non-personally-prefixed, non-primary branches.
 delete_all_others_local_branches() {
-  for branch in $(git branch | grep '/' | egrep -v '^\W*(aln|anorton)/'); do
-    printf "Delete $branch? ";
+  local current
+  current=$(git branch --show-current)
+  for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/ | grep '/' | egrep -v '^(aln|anorton)/'); do
+    [ "$branch" = "$current" ] && continue
+    printf "Delete $branch? (y/[n]) ";
     read ans;
     [ "$ans" = "y" ] && git branch -D $branch
   done
