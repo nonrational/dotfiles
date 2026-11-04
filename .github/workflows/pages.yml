@@ -24,8 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: make check-site site SITE_DIR=_site
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
