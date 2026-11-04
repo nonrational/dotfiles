@@ -23,7 +23,7 @@ test('code-comment-register evals validate with zero unsupported cases', () => {
 test('prose-register evals validate with zero unsupported cases', () => {
   const data = loadSuite(path.join(REPO_ROOT, 'home/.agents/skills/prose-register/evals/README.md'));
   const { caseCount, unsupported } = validateData(data);
-  assert.equal(caseCount, 24);
+  assert.equal(caseCount, 41);
   assert.equal(unsupported.length, 0);
 });
 

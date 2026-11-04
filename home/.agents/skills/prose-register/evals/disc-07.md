@@ -4,7 +4,7 @@ type: discrimination
 status: approved
 source_commit: c26cd1a
 correct: after
-expected_rule: '"Just" is banned as a modifier.'
+expected_rule: '"Just" is banned when it stacks the deck.'
 accepted_rules:
   - Hedges of precision stay. Hedges of cowardice go.
 ---
@@ -13,7 +13,7 @@ Which variant is on-register, and which SKILL.md rule decides it?
 
 ## rule
 
-"Just" is banned as a modifier. It stacks the deck. / Hedges of precision stay. Hedges of cowardice go.
+"Just" is banned when it stacks the deck. / Hedges of precision stay. Hedges of cowardice go.
 
 ## before
 
