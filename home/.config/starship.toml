@@ -2,7 +2,7 @@
 add_newline = false
 format = """
 $hostname$directory$git_branch$git_status$cmd_duration
-$character"""
+$sudo${env_var.AWS_SESSION_TOKEN}$character"""
 
 [directory]
 truncation_length = 3
@@ -40,6 +40,12 @@ disabled = false
 symbol = "# "
 style = "bold red"
 format = "[$symbol]($style)"
+
+# Session credentials outlive the command that loaded them, so flag any prompt
+# where AWS calls would run as a real account. Never print the value.
+[env_var.AWS_SESSION_TOKEN]
+style = "bold yellow"
+format = "[aws ]($style)"
 
 [character]
 success_symbol = "[❯](green)"
