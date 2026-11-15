@@ -5,19 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>nonration.al</title>
 <style>
-  body { font: 16px/1.5 system-ui, sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
-  pre { padding: 0.75rem 1rem; background: #f4f4f4; overflow-x: auto; }
-  @media (prefers-color-scheme: dark) {
-    body { background: #111; color: #ddd; }
-    pre { background: #222; }
-    a { color: #8ab4f8; }
+  :root { color-scheme: dark; --bg: #0c0a06; --fg: #ffb000; --dim: #a87400; }
+  body {
+    min-height: 100vh; box-sizing: border-box; margin: 0; padding: 2rem 1rem;
+    background: var(--bg); color: var(--fg);
+    font: 16px/1.5 ui-monospace, Menlo, Consolas, monospace;
+    text-shadow: 0 0 4px rgb(255 176 0 / 0.35);
   }
+  /* Scanlines sit above the text, so the overlay must not swallow clicks. */
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(transparent 0 2px, rgb(0 0 0 / 0.18) 2px 4px);
+  }
+  main { max-width: 80ch; margin: 0 auto; }
+  h1, p, ol, pre { font: inherit; margin: 0 0 1.5em; }
+  h1 { font-weight: bold; }
+  ol { padding-left: 4ch; }
+  a { color: inherit; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .prompt::before { content: "$ "; color: var(--dim); }
+  .copy { cursor: pointer; }
+  .copy:hover code { background: var(--fg); color: var(--bg); text-shadow: none; }
+  button {
+    padding: 0; border: 0; background: none; font: inherit; text-shadow: inherit;
+    color: var(--dim); cursor: pointer; white-space: nowrap;
+  }
+  button:hover { color: var(--fg); }
+  button:focus-visible { outline: 1px solid var(--fg); outline-offset: 2px; }
+  .cursor { display: inline-block; width: 1ch; height: 1.2em; vertical-align: text-bottom; background: var(--fg); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { visibility: hidden; } }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
 </style>
 </head>
 <body>
+<main>
+<p class="prompt" aria-hidden="true">cat hi.txt</p>
 <h1>hi!</h1>
 <p>New Mac? Open Terminal and run:</p>
-<pre><code>curl -sS https://nonration.al/setup.sh | bash</code></pre>
+<pre id="command" class="prompt"><code>curl -sS https://nonration.al/setup.sh | bash</code> <button type="button" aria-live="polite" hidden>[copy]</button></pre>
 <p>It stops at three checkpoints and tells you what to do at each one. Re-run the same command after each:</p>
 <ol>
   <li>Finish the Command Line Tools installer.</li>
@@ -25,5 +50,28 @@
   <li>Let the Mac reboot, then run it once more.</li>
 </ol>
 <p>The script and everything it installs live at <a href="https://github.com/nonrational/dotfiles">nonrational/dotfiles</a>.</p>
+<p class="prompt" aria-hidden="true"><span class="cursor"></span></p>
+</main>
+<script>
+  const command = document.getElementById("command");
+  const button = command.querySelector("button");
+  // navigator.clipboard is absent outside secure contexts; the text stays selectable there.
+  if (navigator.clipboard) {
+    let reset;
+    const show = (label) => {
+      button.textContent = label;
+      clearTimeout(reset);
+      reset = setTimeout(() => { button.textContent = "[copy]"; }, 2000);
+    };
+    button.hidden = false;
+    command.classList.add("copy");
+    command.addEventListener("click", () => {
+      // Dragging across the line is a manual selection, not a request to copy.
+      if (!getSelection().isCollapsed) return;
+      navigator.clipboard.writeText(command.querySelector("code").textContent)
+        .then(() => show("[copied]"), () => show("[copy failed]"));
+    });
+  }
+</script>
 </body>
 </html>
