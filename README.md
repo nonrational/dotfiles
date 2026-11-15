@@ -6,21 +6,41 @@ _Architectural Digest_ for `$HOME`.
 
 # Installation
 
-## Any machine
-
 ```shell
 curl -sS https://nonration.al/setup.sh | bash
 ```
 
-That is the whole sequence, for a new Mac, a Linux host, or a machine catching up after months. `setup.sh` clones this repo into `~/.dotfiles` if it has to, then runs every step whose end state does not already hold; re-run it any time with `./setup.sh` or `make setup` (`make setup ARGS=--dry-run` shows what a run would do). On a Mac it halts at three checkpoints, each printed with a number and the instruction to re-run when done:
+## What `setup.sh` does
 
-1. The Command Line Tools installer, on a machine without them.
-2. Full Disk Access for the terminal, which the `defaults` audit needs.
-3. The reboot at the end.
+On a Mac, `setup.sh` will...
 
-The Dock reset and the iTerm, Amphetamine and Moom preference restore run only when `setup.sh` had to clone, so a re-run on an existing machine never wipes either. Linux runs only the submodule init and the deploy.
+1. Install the Xcode Command Line Tools if they are missing.
+2. Install Homebrew if missing, then run `brew bundle`.
+3. Make Homebrew's bash your login shell (needs `sudo`).
+4. Initialize git submodules.
+5. Symlink `home/` into `$HOME` (`deploy.sh`).
+6. Link the Karabiner and Sublime Text configs, load the clipboard bridge launch agent, and run `gh auth login`.
+7. Turn off "reopen windows on login", then apply the macOS defaults table and `scripts/macos-bootstrap.sh`.
+8. Reboot, only if this run applied the defaults for applications like iTerm, Amphetamine, and Moom.
 
-A failed step prints `failed: <name>` and exits 2; re-run after fixing it.
+On Linux, `setup.sh` initializes git submodules and deploys the `home/` symlinks.
+
+### Checkpoints
+
+A few steps along the way require human input. The script prints a numbered instruction, exits 1, and resumes when re-run.
+
+1. Finish the Command Line Tools installer.
+2. Grant Full Disk Access to your terminal (System Settings > Privacy & Security), then restart it. The defaults audit cannot read Safari or Mail settings without it.
+3. Reboot, if the automatic restart fails.
+
+A failed step prints `failed: <name>` and exits 2. Fix the cause and re-run.
+
+### What it does not do
+
+- Pull updates. It runs the checkout you have; `git pull` first to pick up new changes.
+- Upgrade software beyond what `brew bundle` does.
+- Support Intel Macs (the Homebrew path is `/opt/homebrew`) or Windows.
+- Undo anything. `deploy.sh audit` and `make macos-audit` report drift without changing it.
 
 # Clipboard bridge (exe.dev VMs)
 
